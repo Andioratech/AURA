@@ -4,7 +4,7 @@ This is the planned mapping for [D03](../D03-requirements.md). Replace planned r
 
 | Requirement | Implementation and tasks | Planned verification evidence | Completion boundary |
 |---|---|---|---|
-| FR-001 versioned scenarios | Implemented `schema/models.py`, `schema/io.py`; FND-02 | [FND-05 B-02 structural report](../benchmarks/B01-B02-foundation-verification.md); `tests/test_schema.py`, `tests/test_foundation_verification.py` JSON/YAML cases | Verified for schema 1.0 supported geometries; no solver capability implied; canonical identity remains FND-07 |
+| FR-001 versioned scenarios | Implemented `schema/models.py`, `schema/io.py`; FND-02; `cli.py` validation interface, FND-06 | [FND-05 B-02 structural report](../benchmarks/B01-B02-foundation-verification.md); schema/integration tests; [FND-06](../work-items/FND-06.md) installed JSON/YAML CLI checks | Verified for schema 1.0 supported geometries; no solver capability implied; canonical identity remains FND-07 |
 | FR-002 pre-allocation validation | Implemented `schema/quantities.py`, `mclf/rules.py`, evaluator and explicit gate; FND-03…FND-05 | [FND-05](../work-items/FND-05.md): 22 fault classes in both formats, exact diagnostics, no downstream hook calls | PARTIAL: test-only composition verified; actual runner integration required in RUN-01 and resource preflight in NUM-02 |
 | FR-003 fast field independent of FEM | `fields/analytic.py`, `fields/numerical.py`; ANA and NUM cards | B-03…B-07, convergence report | A verified fast backend exists, beyond just symbolic formulas |
 | FR-004 in-domain force/torque | `forces/*`, `mclf/regimes.py`; FOR-01…FOR-08 | B-08/B-09, regime rejection, torque reference when supported | Torque marked unsupported until justified; no automatic general completion from radial sphere force |
@@ -19,6 +19,8 @@ This is the planned mapping for [D03](../D03-requirements.md). Replace planned r
 | FR-013 compare runs (SHOULD) | `analysis/compare.py`; FOR-05, IND-02 | Same observable/input mapping; mismatches rejected | Numeric comparison and limitation report available |
 | FR-014 sweeps/Monte Carlo (SHOULD) | `analysis/sweeps.py`; ADV-02/ADV-03 | Fixed design/seeds, all-failure index, convergence of statistics where claimed | Monte Carlo distributions require evidence |
 | FR-015 evidence bundle | `reporting/evidence.py`; RUN-02, IND-05 | Bundle hash check, fresh replay and review | Missing/raw evidence accessible with durable identity |
+
+[FND-06](../work-items/FND-06.md) adds a user-facing interface for FR-001/002/009 foundation checks. `tests/test_cli.py` verifies the same 22 rejection classes, stable nonzero failures, missing-file handling, structured reports and unresolved model status. It preserves the partial FR-002/009 completion boundary above: no actual execution lifecycle or scientific coverage is supplied by a CLI wrapper.
 
 ## D03 metric implementation register
 

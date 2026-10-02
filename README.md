@@ -36,6 +36,8 @@ Implemented foundations include a [versioned JSON/YAML input and evidence schema
 
 [FND-05](docs/work-items/FND-05.md) verifies reference answers, JSON/YAML rejection diagnostics and acceptance-gate behavior through instrumented test hooks. The [B-01/B-02 report](docs/benchmarks/B01-B02-foundation-verification.md) records coverage and limits: actual runner integration and authenticated content hashes remain pending.
 
+[FND-06](docs/work-items/FND-06.md) exposes these checks through `aura validate-config <path> [--json]`. The [CLI guide](docs/cli-usage.md) covers installation, diagnostics and exit codes. The manufactured example has valid structure and an INDETERMINATE scientific audit (exit 3); configuration checks do not run a simulation.
+
 ## Repository structure
 
 | Path | Purpose |
@@ -52,6 +54,7 @@ Implemented foundations include a [versioned JSON/YAML input and evidence schema
 
 ## Start here
 
+- [Install and validate a configuration](docs/cli-usage.md)
 - [D00: Document control and scientific baseline](docs/D00-document-control.md)
 - [D01: System architecture](docs/D01-system-architecture.md)
 - [D02: Mathematical Bounds and Limits Framework](docs/D02-mclf.md)

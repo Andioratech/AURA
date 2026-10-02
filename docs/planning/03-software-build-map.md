@@ -2,7 +2,7 @@
 
 ## Implementation rule
 
-Paths below describe the construction target; consult the work board and task records for actual availability. FND-02 implements the schema boundary; FND-03 supplies safe arithmetic/conversions; FND-04 implements L0 audits, reports and typed gate failures. Scientific solvers remain unimplemented. Preserve the working CLI and SI helpers. Build modules in the task order; optional branches are implemented only when the regime/evidence requires them. No notebook is the sole implementation of a scientific result.
+Paths below describe the construction target; consult the work board and task records for actual availability. FND-02 implements the schema boundary; FND-03 supplies safe arithmetic/conversions; FND-04 implements L0 audits, reports and typed gate failures; FND-05 verifies foundation composition; FND-06 exposes configuration checks through the CLI. Scientific solvers remain unimplemented. Preserve the working CLI and SI helpers. Build modules in the task order; optional branches are implemented only when the regime/evidence requires them. No notebook is the sole implementation of a scientific result.
 
 Core remains CPU-first. FND-02 records the [initial schema dependency review](../research/schema-contract.md); FND-08 completes environment locking and compatibility review. NumPy/SciPy and array-storage libraries remain candidates. A new backend needs a documented need and decision. Keep optional expensive solvers behind extras and narrow adapters.
 
@@ -49,7 +49,7 @@ Core remains CPU-first. FND-02 records the [initial schema dependency review](..
 | `analysis/limits.py` | Necessary-condition calculations and scoped certificate records | ADV-01, ADV-05 | Independent derivation; uncertainty direction of bounds |
 | `reporting/evidence.py` | Markdown/JSON reports and bundle manifest with claim restrictions | RUN-02, IND-05 | INVALIDATED promotion refusal; incomplete evidence labels |
 | `reporting/plots.py` | Field, trajectory, residual and limits plots with units/domain/error bars | ANA-07, MOT-08, ADV-06 | Data/plot consistency and source labels |
-| `cli.py` (existing) | Commands below; stable exit codes and structured output option | RUN-01, RUN-02 | CLI integration, failed checks return nonzero |
+| `cli.py` (existing) | Implemented `status` and `validate-config` with stable exit codes and JSON output; remaining commands below are planned | FND-06, RUN-01, RUN-02 | CLI integration, failed checks return nonzero |
 
 `RUN-01` and `RUN-02` are cross-cutting cards in [08](08-reproducibility-and-ci.md); finish the minimal run recorder before P3 evidence runs and expand replay/reporting before P4 closes.
 
@@ -67,12 +67,12 @@ Core remains CPU-first. FND-02 records the [initial schema dependency review](..
 
 Names are proposed interface targets. Any renamed path must update this map and its task/test mapping in the same change.
 
-## CLI construction order (planned, not available today)
+## CLI construction order and availability
 
 | Command contract | Input → output | First gate |
 |---|---|---|
-| `aura status` | Existing scaffold status → capability inventory | Existing; update as capabilities ship |
-| `aura validate-config <path>` | Versioned scenario → validation/MCLF report | P2 |
+| `aura status` | Existing scaffold status → capability inventory | Implemented; updated with FND-06 |
+| `aura validate-config <path> [--json]` | Versioned scenario → validation/MCLF report | Implemented FND-06; [CLI-1.0](../cli-usage.md); current valid fixture exits 3 for missing model coverage |
 | `aura preflight <path>` | Valid scenario + explicit resource caps → allocation estimate | P4, basic form in RUN-01 |
 | `aura run <experiment>` | Frozen experiment → immutable run directory | P3 minimal; P4 production lifecycle |
 | `aura check <run>` | Saved artifacts → fresh independent audit | P3/P4 |
