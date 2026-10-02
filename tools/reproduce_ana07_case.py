@@ -136,8 +136,8 @@ def reproduce(original_folder, campaign_index_path, output_folder) -> dict:
         "reproduction": "PASS" if inputs_identical and fields_identical and metrics_identical else "FAIL",
         "physical_validation": "NOT_ESTABLISHED",
         "limitations": [
-            "Reproduction checks the deterministic analytic plane-field software and frozen inputs only.",
-            "No measured water, physical source, body coupling, force, motion or microgravity result.",
+            "Reproduction checks deterministic analytic plane or outgoing spherical-field software and frozen inputs only.",
+            "No measured water, physical radiator, body coupling, force, motion or microgravity result.",
         ],
     }
     raw = (json.dumps(report, indent=2, sort_keys=True, allow_nan=False) + "\n").encode()
