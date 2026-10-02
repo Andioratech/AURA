@@ -20,7 +20,7 @@ def test_status_command(capsys, monkeypatch):
     monkeypatch.setattr("sys.argv", ["aura", "status"])
     assert main() == 0
     output = capsys.readouterr().out
-    assert "plane-wave and counterpropagating kernels are available through Python" in output
+    assert "single-wave and coherent two-wave kernels are available through Python" in output
     assert "recorded runs remain software diagnostics" in output
     assert "Physical validation is pending" in output
 

@@ -1,4 +1,4 @@
-"""PLANE-WAVE-1.0: bounded ideal incident wave, not a body/force model."""
+"""Bounded coherent plane-wave fields; no body or force model."""
 
 from __future__ import annotations
 
@@ -19,6 +19,7 @@ from .types import MAX_SAMPLES, FieldSamples
 
 MODEL_VERSION = "PLANE-WAVE-1.0"
 PAIR_MODEL_VERSION = "COUNTERPROPAGATING-1.0"
+TWO_WAVE_MODEL_VERSION = "TWO-PLANE-WAVES-1.0"
 
 
 def _vector(value, name):
@@ -180,6 +181,22 @@ def evaluate_counterpropagating_pair(
     workspace_bytes: int,
 ) -> FieldSamples:
     """Sum two compatible opposing waves after validating both complete plans."""
+    _validate_pair_specs(forward, backward)
+    if backward.direction != tuple(-n for n in forward.direction):
+        raise InvalidInputError(
+            "FIELD_DIRECTION", "/backward/direction", "Expected exactly opposite directions."
+        )
+    return evaluate_plane_wave_pair(
+        forward,
+        backward,
+        coordinates_m,
+        box_min_m=box_min_m,
+        box_max_m=box_max_m,
+        workspace_bytes=workspace_bytes,
+    )
+
+
+def _validate_pair_specs(forward, backward):
     if type(forward) is not PlaneWave or type(backward) is not PlaneWave:
         raise InvalidInputError("FIELD_SPEC", "/waves", "Expected two explicit PlaneWave objects.")
     for name in ("density_kg_m3", "sound_speed_m_s", "frequency_hz"):
@@ -187,10 +204,19 @@ def evaluate_counterpropagating_pair(
             raise InvalidInputError(
                 "FIELD_MODEL", "/" + name, "Both sources must share the medium and frequency."
             )
-    if backward.direction != tuple(-n for n in forward.direction):
-        raise InvalidInputError(
-            "FIELD_DIRECTION", "/backward/direction", "Expected exactly opposite directions."
-        )
+
+
+def evaluate_plane_wave_pair(
+    first_wave: PlaneWave,
+    second_wave: PlaneWave,
+    coordinates_m,
+    *,
+    box_min_m,
+    box_max_m,
+    workspace_bytes: int,
+) -> FieldSamples:
+    """Sum two coherent waves in one medium after complete input preflight."""
+    _validate_pair_specs(first_wave, second_wave)
     if type(coordinates_m) not in (list, tuple) or not 1 <= len(coordinates_m) <= MAX_SAMPLES:
         raise InvalidInputError("FIELD_SHAPE", "/coordinates_m", "Expected 1 to 256 sample rows.")
     if type(workspace_bytes) is not int or workspace_bytes < 4096 * len(coordinates_m) + 8192:
@@ -198,10 +224,10 @@ def evaluate_counterpropagating_pair(
             "FIELD_RESOURCE", "/workspace_bytes", "Insufficient pair workspace budget."
         )
     options = {"box_min_m": box_min_m, "box_max_m": box_max_m, "workspace_bytes": workspace_bytes}
-    first_plan = _prepare_plane_wave(forward, coordinates_m, **options)
-    second_plan = _prepare_plane_wave(backward, first_plan[0], **options)
-    first = _evaluate_prepared(forward, *first_plan)
-    second = _evaluate_prepared(backward, *second_plan)
+    first_plan = _prepare_plane_wave(first_wave, coordinates_m, **options)
+    second_plan = _prepare_plane_wave(second_wave, first_plan[0], **options)
+    first = _evaluate_prepared(first_wave, *first_plan)
+    second = _evaluate_prepared(second_wave, *second_plan)
 
     def add(a, b):
         return complex(
@@ -216,7 +242,7 @@ def evaluate_counterpropagating_pair(
         )
 
     return FieldSamples(
-        frequency_hz=forward.frequency_hz,
+        frequency_hz=first_wave.frequency_hz,
         coordinates_m=first.coordinates_m,
         pressure_pa=tuple(
             add(a, b) for a, b in zip(first.pressure_pa, second.pressure_pa, strict=True)

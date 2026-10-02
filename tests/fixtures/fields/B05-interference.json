@@ -1,0 +1,599 @@
+{
+  "protocol": "ANA-REF-1.0",
+  "model": "TWO-PLANE-WAVES-1.0",
+  "normalized_tolerance": 4.547473508864641e-13,
+  "cases": [
+    {
+      "box_min_m": [
+        -0.0015,
+        -0.0015,
+        -0.0015
+      ],
+      "box_max_m": [
+        0.0015,
+        0.0015,
+        0.0015
+      ],
+      "workspace_bytes": 2097152,
+      "id": "B05-AXIAL",
+      "first": {
+        "density_kg_m3": 1000,
+        "sound_speed_m_s": 1500,
+        "frequency_hz": 1000000,
+        "peak_pressure_pa": 2,
+        "direction": [
+          1,
+          0,
+          0
+        ],
+        "reference_m": [
+          0,
+          0,
+          0
+        ],
+        "phase_rad": 0,
+        "dynamic_viscosity_pa_s": 0,
+        "amplitude_attenuation_per_m": 0
+      },
+      "second": {
+        "density_kg_m3": 1000,
+        "sound_speed_m_s": 1500,
+        "frequency_hz": 1000000,
+        "peak_pressure_pa": 2,
+        "direction": [
+          0,
+          1,
+          0
+        ],
+        "reference_m": [
+          0,
+          0,
+          0
+        ],
+        "phase_rad": 0,
+        "dynamic_viscosity_pa_s": 0,
+        "amplitude_attenuation_per_m": 0
+      },
+      "coordinates_m": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0.00075,
+          0
+        ],
+        [
+          0.000375,
+          0,
+          0
+        ],
+        [
+          0.000375,
+          0.000375,
+          0
+        ]
+      ]
+    },
+    {
+      "box_min_m": [
+        -0.0015,
+        -0.0015,
+        -0.0015
+      ],
+      "box_max_m": [
+        0.0015,
+        0.0015,
+        0.0015
+      ],
+      "workspace_bytes": 2097152,
+      "id": "B05-ROTATED",
+      "first": {
+        "density_kg_m3": 1000,
+        "sound_speed_m_s": 1500,
+        "frequency_hz": 1000000,
+        "peak_pressure_pa": 2,
+        "direction": [
+          0,
+          0,
+          1
+        ],
+        "reference_m": [
+          0,
+          0,
+          0
+        ],
+        "phase_rad": 0,
+        "dynamic_viscosity_pa_s": 0,
+        "amplitude_attenuation_per_m": 0
+      },
+      "second": {
+        "density_kg_m3": 1000,
+        "sound_speed_m_s": 1500,
+        "frequency_hz": 1000000,
+        "peak_pressure_pa": 2,
+        "direction": [
+          1,
+          0,
+          0
+        ],
+        "reference_m": [
+          0,
+          0,
+          0
+        ],
+        "phase_rad": 0,
+        "dynamic_viscosity_pa_s": 0,
+        "amplitude_attenuation_per_m": 0
+      },
+      "coordinates_m": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0.00075,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0.000375
+        ],
+        [
+          0.000375,
+          0,
+          0.000375
+        ]
+      ]
+    },
+    {
+      "box_min_m": [
+        -0.0015,
+        -0.0015,
+        -0.0015
+      ],
+      "box_max_m": [
+        0.0015,
+        0.0015,
+        0.0015
+      ],
+      "workspace_bytes": 2097152,
+      "id": "B05-COMMON-PHASE",
+      "first": {
+        "density_kg_m3": 1000,
+        "sound_speed_m_s": 1500,
+        "frequency_hz": 1000000,
+        "peak_pressure_pa": 2,
+        "direction": [
+          1,
+          0,
+          0
+        ],
+        "reference_m": [
+          0,
+          0,
+          0
+        ],
+        "phase_rad": 1.5707963267948966,
+        "dynamic_viscosity_pa_s": 0,
+        "amplitude_attenuation_per_m": 0
+      },
+      "second": {
+        "density_kg_m3": 1000,
+        "sound_speed_m_s": 1500,
+        "frequency_hz": 1000000,
+        "peak_pressure_pa": 2,
+        "direction": [
+          0,
+          1,
+          0
+        ],
+        "reference_m": [
+          0,
+          0,
+          0
+        ],
+        "phase_rad": 1.5707963267948966,
+        "dynamic_viscosity_pa_s": 0,
+        "amplitude_attenuation_per_m": 0
+      },
+      "coordinates_m": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0.00075,
+          0
+        ],
+        [
+          0.000375,
+          0,
+          0
+        ],
+        [
+          0.000375,
+          0.000375,
+          0
+        ]
+      ]
+    },
+    {
+      "box_min_m": [
+        -0.0015,
+        -0.0015,
+        -0.0015
+      ],
+      "box_max_m": [
+        0.0015,
+        0.0015,
+        0.0015
+      ],
+      "workspace_bytes": 2097152,
+      "id": "B05-TRANSLATED",
+      "first": {
+        "density_kg_m3": 1000,
+        "sound_speed_m_s": 1500,
+        "frequency_hz": 1000000,
+        "peak_pressure_pa": 2,
+        "direction": [
+          1,
+          0,
+          0
+        ],
+        "reference_m": [
+          0.0001875,
+          0.0001875,
+          0
+        ],
+        "phase_rad": 0,
+        "dynamic_viscosity_pa_s": 0,
+        "amplitude_attenuation_per_m": 0
+      },
+      "second": {
+        "density_kg_m3": 1000,
+        "sound_speed_m_s": 1500,
+        "frequency_hz": 1000000,
+        "peak_pressure_pa": 2,
+        "direction": [
+          0,
+          1,
+          0
+        ],
+        "reference_m": [
+          0.0001875,
+          0.0001875,
+          0
+        ],
+        "phase_rad": 0,
+        "dynamic_viscosity_pa_s": 0,
+        "amplitude_attenuation_per_m": 0
+      },
+      "coordinates_m": [
+        [
+          0.0001875,
+          0.0001875,
+          0
+        ],
+        [
+          0.0001875,
+          0.0009375,
+          0
+        ],
+        [
+          0.0005625000000000001,
+          0.0001875,
+          0
+        ],
+        [
+          0.0005625000000000001,
+          0.0005625000000000001,
+          0
+        ]
+      ]
+    },
+    {
+      "box_min_m": [
+        -0.0015,
+        -0.0015,
+        -0.0015
+      ],
+      "box_max_m": [
+        0.0015,
+        0.0015,
+        0.0015
+      ],
+      "workspace_bytes": 2097152,
+      "id": "B05-OBLIQUE",
+      "first": {
+        "density_kg_m3": 1000,
+        "sound_speed_m_s": 1500,
+        "frequency_hz": 1000000,
+        "peak_pressure_pa": 2,
+        "direction": [
+          0.6,
+          0.8,
+          0
+        ],
+        "reference_m": [
+          0,
+          0,
+          0
+        ],
+        "phase_rad": 0,
+        "dynamic_viscosity_pa_s": 0,
+        "amplitude_attenuation_per_m": 0
+      },
+      "second": {
+        "density_kg_m3": 1000,
+        "sound_speed_m_s": 1500,
+        "frequency_hz": 1000000,
+        "peak_pressure_pa": 2,
+        "direction": [
+          0,
+          0.6,
+          0.8
+        ],
+        "reference_m": [
+          0,
+          0,
+          0
+        ],
+        "phase_rad": 0,
+        "dynamic_viscosity_pa_s": 0,
+        "amplitude_attenuation_per_m": 0
+      },
+      "coordinates_m": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0.00075,
+          0
+        ],
+        [
+          0.000375,
+          0,
+          0
+        ],
+        [
+          0.000375,
+          0.000375,
+          0
+        ]
+      ]
+    },
+    {
+      "box_min_m": [
+        -0.0015,
+        -0.0015,
+        -0.0015
+      ],
+      "box_max_m": [
+        0.0015,
+        0.0015,
+        0.0015
+      ],
+      "workspace_bytes": 2097152,
+      "id": "B05-UNEQUAL-PHASE",
+      "first": {
+        "density_kg_m3": 1000,
+        "sound_speed_m_s": 1500,
+        "frequency_hz": 1000000,
+        "peak_pressure_pa": 4,
+        "direction": [
+          1,
+          0,
+          0
+        ],
+        "reference_m": [
+          0,
+          0,
+          0
+        ],
+        "phase_rad": 1.5707963267948966,
+        "dynamic_viscosity_pa_s": 0,
+        "amplitude_attenuation_per_m": 0
+      },
+      "second": {
+        "density_kg_m3": 1000,
+        "sound_speed_m_s": 1500,
+        "frequency_hz": 1000000,
+        "peak_pressure_pa": 2,
+        "direction": [
+          0,
+          1,
+          0
+        ],
+        "reference_m": [
+          0,
+          0,
+          0
+        ],
+        "phase_rad": -0.7853981633974483,
+        "dynamic_viscosity_pa_s": 0,
+        "amplitude_attenuation_per_m": 0
+      },
+      "coordinates_m": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0.00075,
+          0
+        ],
+        [
+          0.000375,
+          0,
+          0
+        ],
+        [
+          0.000375,
+          0.000375,
+          0
+        ]
+      ]
+    },
+    {
+      "box_min_m": [
+        -0.0015,
+        -0.0015,
+        -0.0015
+      ],
+      "box_max_m": [
+        0.0015,
+        0.0015,
+        0.0015
+      ],
+      "workspace_bytes": 2097152,
+      "id": "B05-ZERO",
+      "first": {
+        "density_kg_m3": 1000,
+        "sound_speed_m_s": 1500,
+        "frequency_hz": 1000000,
+        "peak_pressure_pa": 0,
+        "direction": [
+          1,
+          0,
+          0
+        ],
+        "reference_m": [
+          0,
+          0,
+          0
+        ],
+        "phase_rad": 0,
+        "dynamic_viscosity_pa_s": 0,
+        "amplitude_attenuation_per_m": 0
+      },
+      "second": {
+        "density_kg_m3": 1000,
+        "sound_speed_m_s": 1500,
+        "frequency_hz": 1000000,
+        "peak_pressure_pa": 0,
+        "direction": [
+          0,
+          1,
+          0
+        ],
+        "reference_m": [
+          0,
+          0,
+          0
+        ],
+        "phase_rad": 0,
+        "dynamic_viscosity_pa_s": 0,
+        "amplitude_attenuation_per_m": 0
+      },
+      "coordinates_m": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0.00075,
+          0
+        ],
+        [
+          0.000375,
+          0,
+          0
+        ],
+        [
+          0.000375,
+          0.000375,
+          0
+        ]
+      ]
+    },
+    {
+      "box_min_m": [
+        -0.0015,
+        -0.0015,
+        -0.0015
+      ],
+      "box_max_m": [
+        0.0015,
+        0.0015,
+        0.0015
+      ],
+      "workspace_bytes": 2097152,
+      "id": "B05-SINGLE",
+      "first": {
+        "density_kg_m3": 1000,
+        "sound_speed_m_s": 1500,
+        "frequency_hz": 1000000,
+        "peak_pressure_pa": 2,
+        "direction": [
+          1,
+          0,
+          0
+        ],
+        "reference_m": [
+          0,
+          0,
+          0
+        ],
+        "phase_rad": 0,
+        "dynamic_viscosity_pa_s": 0,
+        "amplitude_attenuation_per_m": 0
+      },
+      "second": {
+        "density_kg_m3": 1000,
+        "sound_speed_m_s": 1500,
+        "frequency_hz": 1000000,
+        "peak_pressure_pa": 0,
+        "direction": [
+          0,
+          1,
+          0
+        ],
+        "reference_m": [
+          0,
+          0,
+          0
+        ],
+        "phase_rad": 0,
+        "dynamic_viscosity_pa_s": 0,
+        "amplitude_attenuation_per_m": 0
+      },
+      "coordinates_m": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0.00075,
+          0
+        ],
+        [
+          0.000375,
+          0,
+          0
+        ],
+        [
+          0.000375,
+          0.000375,
+          0
+        ]
+      ]
+    }
+  ]
+}

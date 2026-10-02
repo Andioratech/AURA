@@ -4,7 +4,7 @@
 
 ## Entry condition
 
-P2 PASS and [RUN-01 complete](../../reviews/RUN-01-lifecycle.md); [ANA-01](../../reviews/ANA-01-field-contract.md) and [ANA-02](../../reviews/ANA-02-plane-wave.md) are complete in their reviewed scopes. [ANA-03](../../reviews/ANA-03-counterpropagating.md) is complete in its bounded counterpropagating scope; ANA-04 is READY. Analytical cases may proceed without conclusive P1 measurement uncertainty. The current recorder supports software diagnostics; analytical driver admission must implement the specified output/resource contracts before model execution through the recorder.
+P2 PASS and [RUN-01 complete](../../reviews/RUN-01-lifecycle.md); [ANA-01](../../reviews/ANA-01-field-contract.md) and [ANA-02](../../reviews/ANA-02-plane-wave.md) are complete in their reviewed scopes. [ANA-03](../../reviews/ANA-03-counterpropagating.md) is complete in its bounded counterpropagating scope; ANA-04 is ACTIVE. Analytical cases may proceed without conclusive P1 measurement uncertainty. The current recorder supports software diagnostics; analytical driver admission must implement the specified output/resource contracts before model execution through the recorder.
 
 ## Working contract
 
@@ -67,7 +67,7 @@ Use [00](../00-execution-protocol.md), the [task template](../templates/task-rec
 
 ## ANA-04 — Verify two-source interference and allowed symmetries
 
-**Current state:** READY; ANA-03 kernel/reference/plot review complete. **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
+**Current state:** ACTIVE — [task record](../../work-items/ANA-04.md); ANA-03 review complete. **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
 
 **Inputs / predecessors:** ANA-03
 
