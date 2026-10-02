@@ -1,6 +1,6 @@
 # PLAN-01: AURA Phase-Gated Master Work Plan
 
-**Version:** 1.1 · **Status:** BASELINE · **Owner:** AURA project owner · **Last updated:** 2026-10-02
+**Version:** 1.0 · **Status:** BASELINE · **Owner:** AURA project owner · **Last updated:** 2026-10-01
 
 ## 1. Purpose
 
@@ -58,7 +58,7 @@ Do not combine phases to save time. A phase may split into subphases only by a r
 | Phase | Status | Blocking condition / next action |
 |---|---|---|
 | P0 | PASS | Owner acceptance recorded in DEC-001; repository, source provenance, links, local quality checks, and remote CI passed |
-| P1 | REVIEW | Owner approved the 50 mm sphere force curve as the measurable starting case; complete source-figure uncertainty and the comparison rule before the P1 exit review |
+| P1 | REVIEW | The water/microparticle proposal has been withdrawn as the primary benchmark; define the first body and whether the case is Earth-gravity levitation or prescribed acceleration in microgravity, then rescreen sources |
 | P2-P10 | BLOCKED | Advance only after the preceding phase receives a recorded PASS decision |
 
 ## 5. Phase details
@@ -92,7 +92,7 @@ Do not combine phases to save time. A phase may split into subphases only by a r
 
 - P1.1 Extract candidate benchmarks from primary literature. Record exact citation, DOI, equation/table/figure, source parameters, and known errata.
 - P1.2 Score each candidate for parameter completeness, analytical/reference availability, regime match, implementability, and independence from planned code.
-- P1.3 Select exactly one primary benchmark for the bounded capability. Identify a backup only if it measures the same capability; a later-stage benchmark is not a substitute backup.
+- P1.3 Select exactly one primary benchmark and one backup. The backup is not implemented unless the primary is unusable for a documented reason.
 - P1.4 Freeze one body shape and material, medium state, source/array geometry, frequency, boundary assumptions, state variables, initial conditions, and the modeled gravity environment.
 - P1.5 Define one primary observable and its units, sampling, averaging interval, and comparison formula. Secondary metrics are diagnostic only.
 - P1.6 Define the falsification/stop condition, tolerance derivation, uncertainty sources, and allowable parameter range before computing.
@@ -351,20 +351,7 @@ Changes to phase order, gates, primary observables, acceptance thresholds, model
 
 ## 11. Immediate next actions
 
-1. DEC-002 records the owner's approval of the Andrade et al. 50 mm sphere force measurement as AURA's first measurable force-model check.
-2. Complete P1.4–P1.7 by extracting the published force curve, defining digitization and source uncertainty, and freezing comparison and stop rules before a model run.
-3. Do not infer microgravity performance, multi-element control or behavior of heavier bodies from this first benchmark. At each later gate, search for and validate a benchmark suited to that next capability.
+1. The existing P1.1 dossier and P1.2 screen are recorded in `docs/benchmarks/P1.1-benchmark-candidates.md`; their water/microparticle cases are not eligible as the AURA primary benchmark.
+2. Owner review has withdrawn the water/microparticle proposal. The dossier records closer air/macroscopic literature leads but does not select one.
+3. Get the representative first body class and operating purpose from the owner, rescreen primary literature for air and that body scale, then complete and approve P1.3–P1.7 before implementation.
 4. Do not start implementation before P1 PASS or implement acoustic propagation, radiation force, control, AI optimization, or high-fidelity solvers before the applicable gate.
-
-## 12. Benchmark progression toward the microgravity objective
-
-The first benchmark is an empirical anchor for one force calculation, not a reduced claim that AURA already works. Reassess published and measurable alternatives whenever the body class, field configuration or capability changes. Never carry a validation result beyond its tested domain without a justified model and new evidence.
-
-| Step | Capability to examine | Candidate evidence | What must be revalidated |
-|---|---|---|---|
-| M1 — initial force check | Predict axial force on one 50 mm, 1.46 g expanded-polystyrene sphere in air from one 25.23 kHz transducer as the gap varies | Andrade et al. (2016), direct scale measurements and a published force-versus-gap curve; recorded in DEC-002 | Force model for this body, air, source amplitude, frequency and gap range only |
-| M2 — array and stability | Predict force/torque gradients, equilibrium and restoring behavior for a free rigid body acted on by a phased array | Inoue et al. (2019), macroscopic sphere/octahedron levitation and force-displacement measurements; candidate for a later gate | Array field, body scattering, rotation, force/torque and stability; recheck assumptions such as neglected air viscosity |
-| M3 — AURA acceleration case | For an owner-defined body and array, test whether the model can produce a declared acceleration vector with gravity set to the chosen microgravity value | New benchmark search required for the target body's material, mass, shape and source arrangement | Translational/rotational dynamics, force uniformity over the body, actuator limits, and robustness in the declared environment |
-| M4 — broader target domain | Consider denser/heavier bodies, other shapes, multiple bodies or longer operating times only as separately bounded cases | New source search and owner decision for each scope expansion | Every changed material, scale, geometry, medium or operating claim |
-
-These steps are a research path, not performance promises. Advancement requires the applicable phase gate, independent evidence and an owner-reviewed decision. The 50 mm sphere result cannot be used to predict performance for a denser body or the eventual microgravity case by itself.

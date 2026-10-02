@@ -1,6 +1,6 @@
 # AURA-D00: Document Control and Scientific Baseline
 
-**Version:** 1.0 · **Status:** BASELINE · **Date:** 2026-10-01 · **Owner:** Andiora Research
+**Version:** 1.1 · **Status:** BASELINE · **Date:** 2026-10-02 · **Owner:** Andiora Research
 
 ## Purpose
 
@@ -58,7 +58,7 @@ Use MAJOR.MINOR versions. Increase MAJOR when requirements, accepted equations, 
 
 ## Baseline approval
 
-On 2026-10-01, the project owner approved D00-D09 and PLAN-01 as the controlled development baseline. The decision is recorded in [DEC-001](decisions/DEC-001-p0-baseline-approval.md) against commit `8cbd2e2e50a17e96299fd00dbba667b5c3b24ed4`. G01-G05 remain DRAFT pending procedure review. This approval authorizes the gated research workflow; it does not validate AURA's hypothesis, establish feasibility, or mean the software is ready for scientific runs. The Definition of Ready items below remain separate implementation gates.
+On 2026-10-01, the project owner approved D00-D09 and PLAN-01 as the controlled development baseline. The decision is recorded in [DEC-001](decisions/DEC-001-p0-baseline-approval.md) against commit `8cbd2e2e50a17e96299fd00dbba667b5c3b24ed4`. On 2026-10-02, the owner approved the first measurable force-model benchmark and a staged search for later benchmarks; [DEC-002](decisions/DEC-002-initial-measurable-force-benchmark.md) records the scope. PLAN-01 v1.1 is the current phase plan and supersedes v1.0 while retaining its phase gates and the D00-D09 baseline. G01-G05 remain DRAFT pending procedure review. These approvals authorize the gated research workflow; they do not validate AURA's hypothesis, establish feasibility, or mean the software is ready for scientific runs. The Definition of Ready items below remain separate implementation gates.
 
 ## Definition of ready
 
