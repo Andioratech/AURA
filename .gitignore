@@ -14,3 +14,7 @@ data/processed/
 *.hdf5
 *.zarr/
 .DS_Store
+.codegraph/
+/.ai/
+/AGENTS.md
+/.codex/config.toml
