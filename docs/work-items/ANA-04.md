@@ -1,6 +1,6 @@
 # ANA-04 — Two-Source Interference and Symmetries
 
-**State:** ACTIVE · **Protocol frozen:** 2026-10-02 · **Owner role:** research implementer
+**State:** DONE · **Protocol frozen:** 2026-10-02 · **Owner role:** research implementer
 
 ## Authority, question and scope
 
@@ -26,3 +26,9 @@ Implement only the ANA-04 kernel, B-05 examples, independent calculations and re
 ## Development verification
 
 The first focused B-03/B-04/B-05 regression execution passed 255 tests in 1.31 s. Its actual log and JUnit are retained at `/tmp/aura-ana04-development-01.log` and `/tmp/aura-ana04-development-01.xml`. This is a dirty-tree software check, not the published-source verification report. All first-pass lint and functional checks passed; no equation, fixture or acceptance tolerance was adjusted to obtain a pass. The final full Quality workflow and clean published-source report follow before closure.
+
+## Published-source outcome
+
+Implementation `6bd45bdec28f37f6e00512664ff9510f68e6f818` passed full local Quality (1,288 tests in 16.30 s) and [exact remote Quality](https://github.com/Andioratech/AURA/actions/runs/37046825752) (1,288 tests in 13.99 s). Clean-source verification passed 65 B-05 checks in 0.32 s. The immutable retained report is `VERIFY-ANA04-0a7258c2aa2047dc9d3f78cea8176144`; source/environment observations agreed before and after.
+
+[The numerical report](../benchmarks/B05-interference-verification.md) records per-observable maximum/RMS error, cancellation and flux outcomes, resource measurements and artifact hashes. [The artifact review](../reviews/ANA-04-interference.md) closes ANA-04 and makes ANA-05 READY. P3 remains open; no experimental or physical-model verdict was promoted. Closure receives its own full local workflow and exact remote CI confirmation.
