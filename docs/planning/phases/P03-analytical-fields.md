@@ -4,7 +4,7 @@
 
 ## Entry condition
 
-P2 PASS and [RUN-01 complete](../../reviews/RUN-01-lifecycle.md); [ANA-01](../../reviews/ANA-01-field-contract.md) and [ANA-02](../../reviews/ANA-02-plane-wave.md) are complete in their reviewed scopes. [ANA-03](../../reviews/ANA-03-counterpropagating.md) is complete in its bounded counterpropagating scope; [ANA-04](../../reviews/ANA-04-interference.md) is complete for bounded two-wave interference; [ANA-05](../../reviews/ANA-05-spherical.md) is complete for ideal spherical spreading; [ANA-06](../../reviews/ANA-06-energy-balance.md) is complete for its frozen model-specific energy ledgers. ANA-07 is ACTIVE. Its recorded plane matrix and one fresh reproduction pass the frozen software criteria; spherical-source input admission, applicable post-audits and P3 review remain open. Analytical cases may proceed without conclusive P1 measurement uncertainty.
+P2 PASS and [RUN-01 complete](../../reviews/RUN-01-lifecycle.md); [ANA-01](../../reviews/ANA-01-field-contract.md) and [ANA-02](../../reviews/ANA-02-plane-wave.md) are complete in their reviewed scopes. [ANA-03](../../reviews/ANA-03-counterpropagating.md) is complete in its bounded counterpropagating scope; [ANA-04](../../reviews/ANA-04-interference.md) is complete for bounded two-wave interference; [ANA-05](../../reviews/ANA-05-spherical.md) is complete for ideal spherical spreading; [ANA-06](../../reviews/ANA-06-energy-balance.md) is complete for its frozen model-specific energy ledgers. ANA-07 is ACTIVE. Its 32-case B-03…B-06 recorded matrix and fresh B03-AXIAL/B06-AXIAL reproductions pass the frozen software criteria; remaining model-specific post-audits, precision/cancellation review, plotted-data review and P3 gate review remain open. Analytical cases may proceed without conclusive P1 measurement uncertainty.
 
 ## Working contract
 
@@ -121,7 +121,7 @@ Use [00](../00-execution-protocol.md), the [task template](../templates/task-rec
 
 ## ANA-07 — Publish P3 verification evidence and close the gate
 
-**Current state:** ACTIVE — the recorded B-03/B-04/B-05 matrix passes across 27 configurations and 248 samples. A fresh B03-AXIAL replay also matches the original input hashes, four field files and frozen metrics. ANA-06's four energy ledgers are completed for their exact source cases, with limits recorded in ANA-07. B-06 recorder admission, remaining post-audits and full P3 gate review remain pending. See [ANA-07 task record](../../work-items/ANA-07.md). **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
+**Current state:** ACTIVE — the recorded B-03…B-06 matrix passes across 32 configurations and 264 samples. Fresh B03-AXIAL and B06-AXIAL replays match their original inputs, four field files and frozen metrics. ANA-06's four energy ledgers are completed for their exact source cases, with limits recorded in ANA-07. Remaining model-specific post-audits, precision/cancellation review, plotted-data review and formal P3 gate review remain pending. See the [matrix report](../../benchmarks/ANA-07-recorded-field-matrix.md), [artifact review](../../reviews/ANA-07-matrix-artifact-review.md) and [ANA-07 task record](../../work-items/ANA-07.md). **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
 
 **Inputs / predecessors:** ANA-06
 
@@ -129,8 +129,9 @@ Use [00](../00-execution-protocol.md), the [task template](../templates/task-rec
 
 1. Implement and cross-check the versioned analytical field recorder and companion gradient index.
 2. Admit an explicit spherical-source input bound to Scenario; do not represent it as a piston or plane wave.
-3. Compare the admitted B-03/B-04/B-05 recorder matrix with its frozen references; map ANA-06's completed balances to their exact source cases without calling them bundle-derived audits. Review any remaining post-audits and precision/cancellation sensitivity; matrix resource observations are recorded.
+3. **Done for the numerical matrix:** compare all admitted B-03/B-04/B-05/B-06 recorder cases with their frozen references; map ANA-06's completed balances to their exact source cases without calling them bundle-derived audits. Review the remaining model-specific post-audits and precision/cancellation sensitivity; full-matrix resource observations are recorded.
 4. Reproduce a selected case. **Done for B03-AXIAL:** report `results/verification/ANA-07/REPRO-B03-AXIAL-4e24c75/reproduction.json`, checksum `b457a09e11174d08971829d95ca7c94e6d02c37ff754964e4dcbea7b127c8018`.
+   **Also done for B06-AXIAL:** report `results/verification/ANA-07/REPRO-B06-AXIAL-1d6efb0/reproduction.json`, checksum `7cb53754a80cc6804af60085f9ed960250338ffdbaa1e80a701907bd1a2e6618`.
 5. Complete the applicable post-audits and assemble the separate P3 gate review, including limitations and failures.
 
 **Required artifacts:** `analysis/metrics.py` initial functions; plots/reports; P3 gate review; replay inputs for RUN-02.
