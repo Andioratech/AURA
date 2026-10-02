@@ -1,4 +1,4 @@
-"""Bounded coherent plane-wave fields; no body or force model."""
+"""Bounded ideal plane and spherical incident fields; no body or force model."""
 
 from __future__ import annotations
 
@@ -20,6 +20,7 @@ from .types import MAX_SAMPLES, FieldSamples
 MODEL_VERSION = "PLANE-WAVE-1.0"
 PAIR_MODEL_VERSION = "COUNTERPROPAGATING-1.0"
 TWO_WAVE_MODEL_VERSION = "TWO-PLANE-WAVES-1.0"
+SPHERICAL_MODEL_VERSION = "SPHERICAL-WAVE-1.0"
 
 
 def _vector(value, name):
@@ -269,3 +270,160 @@ def mean_intensity_w_m2(field: FieldSamples) -> tuple[tuple[float, float, float]
             )
         )
     return tuple(result)
+
+
+@dataclass(frozen=True, kw_only=True)
+class SphericalWave:
+    """Ideal outgoing radial field, normalized on an explicit reference sphere."""
+
+    density_kg_m3: float
+    sound_speed_m_s: float
+    frequency_hz: float
+    peak_pressure_pa: float
+    center_m: tuple[float, float, float]
+    reference_radius_m: float
+    minimum_radius_m: float
+    phase_rad: float
+    dynamic_viscosity_pa_s: float
+    amplitude_attenuation_per_m: float
+
+    def __post_init__(self):
+        for name in (
+            "density_kg_m3",
+            "sound_speed_m_s",
+            "frequency_hz",
+            "reference_radius_m",
+            "minimum_radius_m",
+        ):
+            object.__setattr__(self, name, _positive_finite(name, getattr(self, name)))
+        for name in ("peak_pressure_pa", "dynamic_viscosity_pa_s", "amplitude_attenuation_per_m"):
+            object.__setattr__(self, name, _nonnegative_finite(name, getattr(self, name)))
+        for name in ("dynamic_viscosity_pa_s", "amplitude_attenuation_per_m"):
+            if getattr(self, name) != 0:
+                raise InvalidInputError(
+                    "FIELD_MODEL", "/" + name, "Only explicit zero loss is supported."
+                )
+        if self.reference_radius_m < self.minimum_radius_m:
+            raise InvalidInputError(
+                "FIELD_DOMAIN", "/reference_radius_m", "Reference sphere is inside exclusion."
+            )
+        object.__setattr__(self, "center_m", _vector(self.center_m, "center_m"))
+        object.__setattr__(self, "phase_rad", _finite_scalar("phase_rad", self.phase_rad))
+        wave_number_rad_m(self.sound_speed_m_s, self.frequency_hz)
+        _scaled_ratio("impedance", (self.density_kg_m3, self.sound_speed_m_s))
+
+
+def evaluate_spherical_wave(
+    wave: SphericalWave, coordinates_m, *, box_min_m, box_max_m, workspace_bytes: int
+) -> FieldSamples:
+    """Evaluate EQ-010 with full reactive velocity after complete domain preflight."""
+    if type(wave) is not SphericalWave:
+        raise InvalidInputError("FIELD_SPEC", "/wave", "Expected an explicit SphericalWave.")
+    if type(coordinates_m) not in (list, tuple) or not 1 <= len(coordinates_m) <= MAX_SAMPLES:
+        raise InvalidInputError("FIELD_SHAPE", "/coordinates_m", "Expected 1 to 256 sample rows.")
+    if type(workspace_bytes) is not int or workspace_bytes < 4096 * len(coordinates_m) + 4096:
+        raise InvalidInputError(
+            "FIELD_RESOURCE", "/workspace_bytes", "Insufficient incremental workspace budget."
+        )
+    lower, upper = _vector(box_min_m, "box_min_m"), _vector(box_max_m, "box_max_m")
+    if any(lo >= hi for lo, hi in zip(lower, upper)):
+        raise InvalidInputError(
+            "FIELD_DOMAIN", "/box_max_m", "Each upper bound must exceed its lower bound."
+        )
+    positions = tuple(_vector(row, f"coordinates_m/{i}") for i, row in enumerate(coordinates_m))
+    k = wave_number_rad_m(wave.sound_speed_m_s, wave.frequency_hz)
+    plans = []
+    for index, point in enumerate(positions):
+        path = f"coordinates_m/{index}"
+        if any(x < lo or x > hi for x, lo, hi in zip(point, lower, upper)):
+            raise InvalidInputError(
+                "FIELD_DOMAIN", "/" + path, "Sample lies outside the observation box."
+            )
+        delta = tuple(_finite_result(x - c, path) for x, c in zip(point, wave.center_m))
+        radius = _finite_result(math.hypot(*delta), path)
+        if radius < wave.minimum_radius_m:
+            raise InvalidInputError(
+                "FIELD_EXCLUSION", "/" + path, "Sample lies inside the excluded source region."
+            )
+        coordinate_scale = _finite_result(math.hypot(*point) + math.hypot(*wave.center_m), path)
+        conditioning = _scaled_ratio(path, (coordinate_scale,), (radius,))
+        if conditioning > 8:
+            raise NumericalDomainError(
+                "FIELD_GEOMETRY_RANGE", "/" + path, "Radial coordinate cancellation exceeds limit."
+            )
+        phase = _finite_result(
+            _scaled_ratio(path, (k, radius - wave.reference_radius_m)) + wave.phase_rad, path
+        )
+        condition = abs(wave.phase_rad) + abs(_scaled_ratio(path, (k, wave.reference_radius_m)))
+        for x, center in zip(point, wave.center_m):
+            condition += abs(_scaled_ratio(path, (k, x)))
+            condition += abs(_scaled_ratio(path, (k, center)))
+        if not math.isfinite(condition) or condition > 8 * math.pi or abs(phase) > 4 * math.pi:
+            raise NumericalDomainError(
+                "FIELD_PHASE_RANGE", "/" + path, "Phase conditioning exceeds the admitted range."
+            )
+        direction = tuple(_scaled_ratio(path, (d,), (radius,)) for d in delta)
+        plans.append((radius, direction, phase))
+    return _evaluate_spherical_prepared(wave, positions, k, plans)
+
+
+def _evaluate_spherical_prepared(wave, positions, k, plans):
+    pressures, velocities, gradients = [], [], []
+    impedance_factors = (wave.density_kg_m3, wave.sound_speed_m_s)
+    for radius, direction, phase in plans:
+        pressure = complex(
+            _scaled_ratio(
+                "pressure/real",
+                (wave.peak_pressure_pa, wave.reference_radius_m, math.cos(phase)),
+                (radius,),
+            ),
+            _scaled_ratio(
+                "pressure/imag",
+                (wave.peak_pressure_pa, wave.reference_radius_m, math.sin(phase)),
+                (radius,),
+            ),
+        )
+        vs, gs = [], []
+        for n in direction:
+            vs.append(
+                complex(
+                    _finite_result(
+                        _scaled_ratio("velocity/real", (n, pressure.real), impedance_factors)
+                        - _scaled_ratio(
+                            "velocity/reactive", (n, pressure.imag), (*impedance_factors, k, radius)
+                        ),
+                        "velocity/real",
+                    ),
+                    _finite_result(
+                        _scaled_ratio("velocity/imag", (n, pressure.imag), impedance_factors)
+                        + _scaled_ratio(
+                            "velocity/reactive", (n, pressure.real), (*impedance_factors, k, radius)
+                        ),
+                        "velocity/imag",
+                    ),
+                )
+            )
+            gs.append(
+                complex(
+                    _finite_result(
+                        -_scaled_ratio("pressure_gradient/radial", (n, pressure.real), (radius,))
+                        - _scaled_ratio("pressure_gradient/real", (k, n, pressure.imag)),
+                        "pressure_gradient/real",
+                    ),
+                    _finite_result(
+                        _scaled_ratio("pressure_gradient/imag", (k, n, pressure.real))
+                        - _scaled_ratio("pressure_gradient/radial", (n, pressure.imag), (radius,)),
+                        "pressure_gradient/imag",
+                    ),
+                )
+            )
+        pressures.append(pressure)
+        velocities.append(tuple(vs))
+        gradients.append(tuple(gs))
+    return FieldSamples(
+        frequency_hz=wave.frequency_hz,
+        coordinates_m=positions,
+        pressure_pa=pressures,
+        velocity_m_s=velocities,
+        pressure_gradient_pa_m=gradients,
+    )
