@@ -10,7 +10,7 @@
 4. The requested system/core explanation was delivered at P2 exit. RUN-01 is complete for software diagnostics; continue ANA-01…ANA-07 with their reviewed physical-output and execution contracts. Complete RUN-02 before NUM-07 closes P4. This is an explanation checkpoint, not an additional approval gate.
 5. Follow the remaining phase gates and decision tree. Do not start controller implementation before the required force/dynamics gates.
 
-ANA-03 is ACTIVE under its [frozen task record](../work-items/ANA-03.md). [ANA-02 is DONE](../reviews/ANA-02-plane-wave.md) for the bounded single-wave kernel and independent B-03 numerical tests. [ANA-01 is DONE](../reviews/ANA-01-field-contract.md) for the field representation and reference protocols. [RUN-01 is DONE](../reviews/RUN-01-lifecycle.md) for diagnostics; physical driver admission and the recorded P3 campaign remain pending. The owner received the requested explanation at P2 exit. P2 is PASS within its reviewed foundation scope. LIT-01 and SC-01 remain READY for research. Only explicitly reviewed task records are DONE; scientific model validation remains pending. BLOCKED below means a normal dependency has not yet been delivered, not that the whole project must stop.
+ANA-04 is the next READY task. [ANA-03 is DONE](../reviews/ANA-03-counterpropagating.md) for the bounded opposing-wave kernel, independent B-04 comparisons and diagnostic plot. [ANA-02 is DONE](../reviews/ANA-02-plane-wave.md) for the bounded single-wave kernel and independent B-03 numerical tests. [ANA-01 is DONE](../reviews/ANA-01-field-contract.md) for the field representation and reference protocols. [RUN-01 is DONE](../reviews/RUN-01-lifecycle.md) for diagnostics; physical driver admission and the recorded P3 campaign remain pending. The owner received the requested explanation at P2 exit. P2 is PASS within its reviewed foundation scope. LIT-01 and SC-01 remain READY for research. Only explicitly reviewed task records are DONE; scientific model validation remains pending. BLOCKED below means a normal dependency has not yet been delivered, not that the whole project must stop.
 
 ## Dependency and status table
 
@@ -31,8 +31,8 @@ ANA-03 is ACTIVE under its [frozen task record](../work-items/ANA-03.md). [ANA-0
 | FND-08 | Lock the development environment and close P2 | FND-07 | DONE — [record](../work-items/FND-08.md) | [FND](phases/P02-foundations.md) |
 | ANA-01 | Specify field outputs and the analytic case matrix | FND-08, RUN-01 | DONE — [record](../work-items/ANA-01.md) | [ANA](phases/P03-analytical-fields.md) |
 | ANA-02 | Implement a progressive plane wave and its velocity | ANA-01 | DONE — [record](../work-items/ANA-02.md) | [ANA](phases/P03-analytical-fields.md) |
-| ANA-03 | Construct a standing wave with correct flux accounting | ANA-02 | ACTIVE — [record](../work-items/ANA-03.md) | [ANA](phases/P03-analytical-fields.md) |
-| ANA-04 | Verify two-source interference and allowed symmetries | ANA-03 | BLOCKED | [ANA](phases/P03-analytical-fields.md) |
+| ANA-03 | Construct a standing wave with correct flux accounting | ANA-02 | DONE — [record](../work-items/ANA-03.md) | [ANA](phases/P03-analytical-fields.md) |
+| ANA-04 | Verify two-source interference and allowed symmetries | ANA-03 | READY | [ANA](phases/P03-analytical-fields.md) |
 | ANA-05 | Add only the needed spreading or attenuation reference | ANA-04 | BLOCKED | [ANA](phases/P03-analytical-fields.md) |
 | ANA-06 | Add independent model-specific balance checks | ANA-05 | BLOCKED | [ANA](phases/P03-analytical-fields.md) |
 | ANA-07 | Publish P3 verification evidence and close the gate | ANA-06 | BLOCKED | [ANA](phases/P03-analytical-fields.md) |

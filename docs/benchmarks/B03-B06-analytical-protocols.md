@@ -1,6 +1,6 @@
 # B-03…B-06 — Frozen Analytical Reference Protocols
 
-**Version:** ANA-REF-1.0 · **Date:** 2026-10-02 · **Status:** reference protocol frozen; B-03 kernel verification in [ANA-02](../work-items/ANA-02.md); recorded P3 campaign not executed
+**Version:** ANA-REF-1.0 · **Date:** 2026-10-02 · **Status:** reference protocol frozen; B-03 kernel verification in [ANA-02](../work-items/ANA-02.md) and B-04 in [ANA-03](../work-items/ANA-03.md); recorded P3 campaign not executed
 
 Authority: D04/D06, [FIELD-1.0](../research/analytical-field-contract.md), [source review](../research/analytical-source-review.md). These are manufactured mathematical verification cases. They contain no experimental observations, physical-object result or AURA feasibility conclusion.
 

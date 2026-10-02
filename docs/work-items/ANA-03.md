@@ -1,6 +1,6 @@
 # ANA-03 — Counterpropagating Waves
 
-**State:** ACTIVE · **Protocol frozen:** 2026-10-02 · **Owner role:** research implementer
+**State:** DONE · **Protocol frozen:** 2026-10-02 · **Owner role:** research implementer
 
 ## Authority and boundary
 
@@ -29,3 +29,9 @@ The first lint pass reported one unnecessary dict constructor (C408); it was cha
 The diagnostic uses `scripts/export_standing_wave.py` in ENV-1.0 and `scripts/plot_standing_wave.py` in the isolated rendering environment. Both refuse to overwrite output. The export labels dirty-source development data explicitly. The plot displays the original frozen samples; unequal/shifted cases have four points and are not additional dense-grid numerical verifications.
 
 The first full local workflow stopped at lint: the later export test had unsorted imports and omitted explicit subprocess check flags (I001/PLW1510). Its log is retained at `/tmp/aura-ana03-local-ci-01-failed.log`; no tests ran in that workflow. Imports were sorted and subprocess calls now state `check=False` because their return codes are asserted, including the expected overwrite rejection. The earlier C408 was a different lint cause. No numerical failure or threshold change occurred.
+
+## Published-source outcome
+
+Implementation `8b2b01a4ed14b9ca861bfedac3ececb65a93b3c7` passed full local Quality (1,223 tests, 16.01 s) and [exact remote Quality](https://github.com/Andioratech/AURA/actions/runs/37044324608) (1,223 tests, 21.68 s). Clean-source verification passed 60 B-04 tests in 0.71 s. The retained report is `VERIFY-ANA03-85f7169fa9d84e9397e56d69d9e28e38`; source/environment observations before and after agreed.
+
+[The numerical report](../benchmarks/B04-counterpropagating-verification.md) records every observable's maximum/RMS error, signed flux outcomes, resource usage, retained failures and artifact hashes. The required diagnostic figure is published under the frozen size exception; raw arrays/logs/environment observations remain ignored. [The artifact review](../reviews/ANA-03-counterpropagating.md) closes ANA-03 and opens ANA-04. P3 and physical validation remain open. Closure receives its own full CI and exact remote confirmation.
