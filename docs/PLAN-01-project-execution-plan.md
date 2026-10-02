@@ -58,7 +58,7 @@ Do not combine phases to save time. A phase may split into subphases only by a r
 | Phase | Status | Blocking condition / next action |
 |---|---|---|
 | P0 | PASS | Owner acceptance recorded in DEC-001; repository, source provenance, links, local quality checks, and remote CI passed |
-| P1 | REVIEW | Candidate A is proposed as primary using the published Table 5 ratio and a separately digitized Figure 8 uncertainty bound; P1.3–P1.7 design is documented and awaits owner approval before it is frozen |
+| P1 | REVIEW | The water/microparticle proposal has been withdrawn as the primary benchmark; define the first body and whether the case is Earth-gravity levitation or prescribed acceleration in microgravity, then rescreen sources |
 | P2-P10 | BLOCKED | Advance only after the preceding phase receives a recorded PASS decision |
 
 ## 5. Phase details
@@ -351,7 +351,7 @@ Changes to phase order, gates, primary observables, acceptance thresholds, model
 
 ## 11. Immediate next actions
 
-1. P1.1 candidate dossier and P1.2 equal-weight screen are recorded in `docs/benchmarks/P1.1-benchmark-candidates.md`.
-2. P1.3–P1.7 proposed design is documented in the dossier: Candidate A primary, B backup, two particle-size endpoints, the Table 5 ratio, a predeclared Figure 8 reading bound, stop rule, and workstation-scale resource estimate.
-3. Obtain owner approval of the proposed small-particle comparison and uncertainty handling at the P1 exit gate; freeze the digitization record and decision rule before implementing the benchmark.
+1. The existing P1.1 dossier and P1.2 screen are recorded in `docs/benchmarks/P1.1-benchmark-candidates.md`; their water/microparticle cases are not eligible as the AURA primary benchmark.
+2. Owner review has withdrawn the water/microparticle proposal. The dossier records closer air/macroscopic literature leads but does not select one.
+3. Get the representative first body class and operating purpose from the owner, rescreen primary literature for air and that body scale, then complete and approve P1.3–P1.7 before implementation.
 4. Do not start implementation before P1 PASS or implement acoustic propagation, radiation force, control, AI optimization, or high-fidelity solvers before the applicable gate.
