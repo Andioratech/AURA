@@ -24,10 +24,12 @@ Primary source: M. A. B. Andrade, A. L. Bernassau, and J. C. Adamowski, “Acous
 ## Required work before P1 PASS
 
 1. Recover and independently review the measured Fig. 5 force points and gap convention.
-2. Record all source-reported measurement uncertainty and added figure-digitization uncertainty.
-3. Predeclare the curve-comparison, numerical-error and stop/indeterminate rules; do not invent a percentage tolerance.
-4. Complete the experiment definition and resource preflight under P1.4–P1.7.
+2. Record all source-reported measurement uncertainty and added figure-digitization uncertainty. The published figure has no uncertainty bars; the paper identifies experimental uncertainty as a cause of the peak difference but does not quantify it.
+3. Predeclare the curve-comparison, numerical-error and stop/indeterminate rules; do not invent a percentage tolerance. Until experimental uncertainty is independently available, the strongest permitted outcome is a descriptive comparison and the formal validation result must remain INDETERMINATE.
+4. Complete the resource preflight and freeze the experiment definition under P1.4–P1.7.
 5. Obtain the P1 exit decision; solver implementation remains gated by the later P2–P5 phases.
+
+The source-figure review and conservative comparison rule are recorded in [P1.3 benchmark specification](../benchmarks/P1.3-andrade-force-curve-specification.md). They resolve the figure and decision-rule questions without claiming that the benchmark has passed.
 
 ## Benchmark evolution
 
