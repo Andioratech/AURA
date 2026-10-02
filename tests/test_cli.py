@@ -19,7 +19,10 @@ CASES = json.loads((ROOT / "tests/fixtures/foundation/rejections.json").read_tex
 def test_status_command(capsys, monkeypatch):
     monkeypatch.setattr("sys.argv", ["aura", "status"])
     assert main() == 0
-    assert "solvers are not implemented yet" in capsys.readouterr().out
+    output = capsys.readouterr().out
+    assert "plane-wave kernel is available through Python" in output
+    assert "recorded runs remain software diagnostics" in output
+    assert "Physical validation is pending" in output
 
 
 @pytest.fixture

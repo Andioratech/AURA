@@ -44,9 +44,9 @@ Implemented foundations include a [versioned JSON/YAML input and evidence schema
 
 [RUN-01](docs/work-items/RUN-01.md) adds an [immutable diagnostic recorder](docs/research/run-lifecycle.md) and `aura run` / `aura check`. It preserves clean-source/environment identity, exact input/output hashes and failed/aborted executions. The [examples](examples/runs/README.md) exercise software behavior only; they do not calculate an acoustic field or become scientific evidence. The [RUN-01 review](docs/reviews/RUN-01-lifecycle.md) records 911 passing checks and actual completed/failed diagnostic bundles.
 
-[ANA-01](docs/work-items/ANA-01.md) specifies [analytical field outputs](docs/research/analytical-field-contract.md) and [four independent reference protocols](docs/benchmarks/B03-B06-analytical-protocols.md). The new immutable container carries pressure, full fluid velocity and pressure gradients with explicit units and conventions. Acoustic solvers, physical run admission and execution of those reference cases remain pending.
+[ANA-01](docs/work-items/ANA-01.md) specifies [analytical field outputs](docs/research/analytical-field-contract.md) and [four independent reference protocols](docs/benchmarks/B03-B06-analytical-protocols.md). The immutable container carries pressure, full fluid velocity and pressure gradients with explicit units and conventions.
 
-The [ANA-01 artifact review](docs/reviews/ANA-01-field-contract.md) records 1,033 passing software checks. ANA-02 is READY to implement the first progressive plane wave; P3 verification and physical validation remain open.
+The [ANA-01 artifact review](docs/reviews/ANA-01-field-contract.md) records its 1,033 passing software checks. [ANA-02](docs/work-items/ANA-02.md) adds the [single progressive plane-wave kernel](docs/research/plane-wave-kernel.md), with independent B-03 numerical comparisons. It is available through the Python API; `aura run` still admits software diagnostics only. Standing/interfering fields, physical recorder admission, P3 evidence and experimental validation remain open.
 
 ## Repository structure
 
@@ -54,7 +54,7 @@ The [ANA-01 artifact review](docs/reviews/ANA-01-field-contract.md) records 1,03
 |---|---|
 | docs/ | Controlled scientific, numerical, and software specifications (D00-D09) |
 | guides/ | Procedures for contribution, experiments, anomaly handling, reproduction, and review (G01-G05) |
-| src/aura/ | Python package scaffold; research solvers are not yet implemented |
+| src/aura/ | Foundations, diagnostic recorder and bounded analytical plane-wave kernel |
 | tests/ | Starting point for software and scientific verification cases |
 | examples/ | Versioned experiment configurations |
 | data/ | Data provenance and retention policy |

@@ -164,7 +164,10 @@ def main(argv: list[str] | None = None) -> int:
     if args.command in ("run", "check"):
         return _lifecycle(args)
     if args.command == "status":
-        print("AURA scaffold initialized; scientific solvers are not implemented yet.")
+        print(
+            "AURA: a plane-wave kernel is available through Python; recorded runs remain "
+            "software diagnostics. Physical validation is pending."
+        )
         print("Available: strict scenario schemas, SI helpers, L0 audits and validate-config.")
         print("Available: run/check for immutable software diagnostics; scientific verdicts remain unresolved.")
         return 0
