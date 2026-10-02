@@ -720,3 +720,57 @@ def test_recorded_frozen_cases_compare_for_each_plane_family(analytical_inputs, 
     assert report["integrity"] == "VERIFIED"
     assert report["numerical_comparison"] == "PASS", report["metrics"]
     assert report["physical_validation"] == "NOT_ESTABLISHED"
+
+
+def test_recorded_case_reproduction_matches_components_and_frozen_report(
+    analytical_inputs, observed, monkeypatch, tmp_path
+):
+    import importlib.util
+
+    from aura.analysis.ana07_metrics import analyze_b03_01
+
+    tool_path = Path(__file__).parents[1] / "tools" / "reproduce_ana07_case.py"
+    spec = importlib.util.spec_from_file_location("reproduce_ana07_case", tool_path)
+    assert spec is not None and spec.loader is not None
+    reproduce_ana07_case = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(reproduce_ana07_case)
+
+    scenario_path, experiment_path, output = analytical_inputs
+    request_path = scenario_path.parent / "field-request.json"
+    request = json.loads(request_path.read_bytes())
+    request["coordinates_m"] = [[0, 0, 0]]
+    request_bytes = encode(request)
+    request_path.write_bytes(request_bytes)
+    experiment = json.loads(experiment_path.read_bytes())
+    experiment["protocol"]["sha256"] = digest(request_bytes)
+    experiment_path.write_bytes(encode(experiment))
+    result = execute(scenario_path, experiment_path, output=output, seed=None)
+    report = analyze_b03_01(output, expected_manifest_sha256=result["manifest_sha256"])
+    report_raw = encode(report)
+    reports = tmp_path / "reports"
+    reports.mkdir()
+    report_path = reports / "B03-01.json"
+    report_path.write_bytes(report_raw)
+    (reports / "B03-01.json.sha256").write_text(digest(report_raw) + "\n")
+    run_record = {
+        "case_id": report["case_id"],
+        "run_id": report["run_id"],
+        "manifest_sha256": report["manifest_sha256"],
+        "report_sha256": digest(report_raw),
+    }
+    index_raw = encode({"case_outcomes": [run_record]})
+    index_path = tmp_path / "index.json"
+    index_path.write_bytes(index_raw)
+    (tmp_path / "index.json.sha256").write_text(digest(index_raw) + "\n")
+    monkeypatch.setattr(reproduce_ana07_case, "_require_clean_checkout", lambda: None)
+    monkeypatch.setattr(
+        reproduce_ana07_case, "_source_identity", lambda: json.loads((output / "source.json").read_bytes())
+    )
+
+    replay = reproduce_ana07_case.reproduce(output, index_path, tmp_path / "replay")
+
+    assert replay["reproduction"] == "PASS"
+    assert replay["application_source_identical"] is True
+    assert replay["numerical_metrics_identical"] is True
+    assert all(item["identical"] for item in replay["field_artifacts"].values())
+    assert replay["physical_validation"] == "NOT_ESTABLISHED"
