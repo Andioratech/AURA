@@ -18,6 +18,7 @@ from aura.units import (
 from .types import MAX_SAMPLES, FieldSamples
 
 MODEL_VERSION = "PLANE-WAVE-1.0"
+PAIR_MODEL_VERSION = "COUNTERPROPAGATING-1.0"
 
 
 def _vector(value, name):
@@ -72,6 +73,18 @@ def evaluate_plane_wave(
     wave: PlaneWave, coordinates_m, *, box_min_m, box_max_m, workspace_bytes: int
 ) -> FieldSamples:
     """Evaluate EQ-007 after all geometry/resource/phase checks, preserving order."""
+    prepared = _prepare_plane_wave(
+        wave,
+        coordinates_m,
+        box_min_m=box_min_m,
+        box_max_m=box_max_m,
+        workspace_bytes=workspace_bytes,
+    )
+    return _evaluate_prepared(wave, *prepared)
+
+
+def _prepare_plane_wave(wave, coordinates_m, *, box_min_m, box_max_m, workspace_bytes):
+    """Validate a complete source plan without trig or complex field allocation."""
     if type(wave) is not PlaneWave:
         raise InvalidInputError("FIELD_SPEC", "/wave", "Expected an explicit PlaneWave.")
     if type(coordinates_m) not in (list, tuple) or not 1 <= len(coordinates_m) <= MAX_SAMPLES:
@@ -111,6 +124,10 @@ def evaluate_plane_wave(
             )
         phases.append(phase)
 
+    return positions, k, phases
+
+
+def _evaluate_prepared(wave, positions, k, phases):
     pressures, velocities, gradients = [], [], []
     for phase in phases:
         pressure = complex(
@@ -150,6 +167,62 @@ def evaluate_plane_wave(
         pressure_pa=pressures,
         velocity_m_s=velocities,
         pressure_gradient_pa_m=gradients,
+    )
+
+
+def evaluate_counterpropagating_pair(
+    forward: PlaneWave,
+    backward: PlaneWave,
+    coordinates_m,
+    *,
+    box_min_m,
+    box_max_m,
+    workspace_bytes: int,
+) -> FieldSamples:
+    """Sum two compatible opposing waves after validating both complete plans."""
+    if type(forward) is not PlaneWave or type(backward) is not PlaneWave:
+        raise InvalidInputError("FIELD_SPEC", "/waves", "Expected two explicit PlaneWave objects.")
+    for name in ("density_kg_m3", "sound_speed_m_s", "frequency_hz"):
+        if getattr(forward, name) != getattr(backward, name):
+            raise InvalidInputError(
+                "FIELD_MODEL", "/" + name, "Both sources must share the medium and frequency."
+            )
+    if backward.direction != tuple(-n for n in forward.direction):
+        raise InvalidInputError(
+            "FIELD_DIRECTION", "/backward/direction", "Expected exactly opposite directions."
+        )
+    if type(coordinates_m) not in (list, tuple) or not 1 <= len(coordinates_m) <= MAX_SAMPLES:
+        raise InvalidInputError("FIELD_SHAPE", "/coordinates_m", "Expected 1 to 256 sample rows.")
+    if type(workspace_bytes) is not int or workspace_bytes < 4096 * len(coordinates_m) + 8192:
+        raise InvalidInputError(
+            "FIELD_RESOURCE", "/workspace_bytes", "Insufficient pair workspace budget."
+        )
+    options = {"box_min_m": box_min_m, "box_max_m": box_max_m, "workspace_bytes": workspace_bytes}
+    first_plan = _prepare_plane_wave(forward, coordinates_m, **options)
+    second_plan = _prepare_plane_wave(backward, first_plan[0], **options)
+    first = _evaluate_prepared(forward, *first_plan)
+    second = _evaluate_prepared(backward, *second_plan)
+
+    def add(a, b):
+        return complex(
+            _finite_result(a.real + b.real, "superposition/real"),
+            _finite_result(a.imag + b.imag, "superposition/imag"),
+        )
+
+    def vectors(a, b):
+        return tuple(
+            tuple(add(x, y) for x, y in zip(row_a, row_b, strict=True))
+            for row_a, row_b in zip(a, b, strict=True)
+        )
+
+    return FieldSamples(
+        frequency_hz=forward.frequency_hz,
+        coordinates_m=first.coordinates_m,
+        pressure_pa=tuple(
+            add(a, b) for a, b in zip(first.pressure_pa, second.pressure_pa, strict=True)
+        ),
+        velocity_m_s=vectors(first.velocity_m_s, second.velocity_m_s),
+        pressure_gradient_pa_m=vectors(first.pressure_gradient_pa_m, second.pressure_gradient_pa_m),
     )
 
 

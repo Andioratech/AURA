@@ -70,3 +70,18 @@ Numerical tools remain **optional candidates, not installed dependencies**. Offi
 CI pins official [checkout](https://github.com/actions/checkout) v7.0.1 and [setup-python](https://github.com/actions/setup-python) v7.0.0 by commit, both using Node 24, and requests Python 3.12.14 explicitly. Ubuntu 24.04 is an OS label, **not an immutable hosted image**. Kernel, glibc, interpreter build and runner images can differ and are recorded. Bootstrap pip and the supplied interpreter remain external installation prerequisites; these locks do not promise a bit-identical machine or indefinite upstream download availability.
 
 A reviewed change must update exact pins, selected artifacts, provenance/license review and affected profile identifier, then repeat fresh development/core installs, dependency consistency, environment verification, negative hash rejection and full local/remote CI. Preserve failures. Do not regenerate locks automatically during normal CI. Store an external wheel archive with the same digests when durable/offline availability is needed; `--no-index --find-links <archive>` can replace the index while retaining mandatory hashes.
+
+## Optional B-04 figure renderer
+
+`render-b04-linux-py312.lock` pins the separately reviewed Matplotlib 3.10.8 renderer and its resolved wheels for Linux x86_64 / CPython 3.12. It is not part of ENV-1.0 or required by the solver, CLI, tests or Quality workflow. Install only into a separate environment. The renderer reads exported values; it does not produce the independent mathematical reference. The [ANA-03 record](../docs/work-items/ANA-03.md) defines its scope and output publication policy.
+
+```sh
+python3.12 -m venv /tmp/aura-b04-render
+/tmp/aura-b04-render/bin/python -m pip --isolated install --index-url https://pypi.org/simple --require-hashes --only-binary=:all: -r requirements/render-b04-linux-py312.lock
+/tmp/aura-b04-render/bin/python -m pip check
+# Export using the locked AURA development environment first:
+python scripts/export_standing_wave.py /tmp/b04-data.json
+/tmp/aura-b04-render/bin/python scripts/plot_standing_wave.py /tmp/b04-data.json /tmp/b04.png
+```
+
+Use unused output paths; both scripts refuse overwrite. Source/fixture identity is embedded in the export and figure. Retain the input hash, renderer lock, observed package/interpreter information and output hash with the verification report.

@@ -46,9 +46,9 @@ Implemented foundations include a [versioned JSON/YAML input and evidence schema
 
 [ANA-01](docs/work-items/ANA-01.md) specifies [analytical field outputs](docs/research/analytical-field-contract.md) and [four independent reference protocols](docs/benchmarks/B03-B06-analytical-protocols.md). The immutable container carries pressure, full fluid velocity and pressure gradients with explicit units and conventions.
 
-The [ANA-01 artifact review](docs/reviews/ANA-01-field-contract.md) records its 1,033 passing software checks. [ANA-02](docs/work-items/ANA-02.md) adds the [single progressive plane-wave kernel](docs/research/plane-wave-kernel.md), with independent B-03 numerical comparisons. It is available through the Python API; `aura run` still admits software diagnostics only. Standing/interfering fields, physical recorder admission, P3 evidence and experimental validation remain open.
+The [ANA-01 artifact review](docs/reviews/ANA-01-field-contract.md) records its 1,033 passing software checks. [ANA-02](docs/work-items/ANA-02.md) adds the [single progressive plane-wave kernel](docs/research/plane-wave-kernel.md), with independent B-03 numerical comparisons. It is available through the Python API; `aura run` still admits software diagnostics only. [ANA-03](docs/work-items/ANA-03.md) adds the bounded counterpropagating-pair kernel. Noncollinear interference, physical recorder admission, P3 evidence and experimental validation remain open.
 
-The [B-03 numerical report](docs/benchmarks/B03-plane-wave-verification.md) records 11 manufactured configurations, independent reference/error checks and 1,163 passing software tests. [ANA-02 is complete](docs/reviews/ANA-02-plane-wave.md); ANA-03 is READY to verify a counterpropagating pair. This numerical result does not establish physical feasibility.
+The [B-03 numerical report](docs/benchmarks/B03-plane-wave-verification.md) records 11 manufactured configurations, independent reference/error checks and 1,163 passing software tests. [ANA-02 is complete](docs/reviews/ANA-02-plane-wave.md); ANA-03 is ACTIVE to verify a counterpropagating pair. This numerical result does not establish physical feasibility.
 
 ## Repository structure
 

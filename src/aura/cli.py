@@ -165,7 +165,7 @@ def main(argv: list[str] | None = None) -> int:
         return _lifecycle(args)
     if args.command == "status":
         print(
-            "AURA: a plane-wave kernel is available through Python; recorded runs remain "
+            "AURA: plane-wave and counterpropagating kernels are available through Python; recorded runs remain "
             "software diagnostics. Physical validation is pending."
         )
         print("Available: strict scenario schemas, SI helpers, L0 audits and validate-config.")
