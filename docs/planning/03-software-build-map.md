@@ -2,7 +2,7 @@
 
 ## Implementation rule
 
-Paths below describe the construction target; consult the work board and task records for actual availability. FND-02 implements the schema boundary; FND-03 supplies safe arithmetic/conversions; FND-04 implements L0 audits, reports and typed gate failures; FND-05 verifies foundation composition; FND-06 exposes configuration checks through the CLI; FND-07 supplies canonical identity and bounded file-integrity helpers. Scientific solvers remain unimplemented. Preserve the working CLI and SI helpers. Build modules in the task order; optional branches are implemented only when the regime/evidence requires them. No notebook is the sole implementation of a scientific result.
+Paths below describe the construction target; consult the work board and task records for actual availability. FND-02 implements the schema boundary; FND-03 supplies safe arithmetic/conversions; FND-04 implements L0 audits, reports and typed gate failures; FND-05 verifies foundation composition; FND-06 exposes configuration checks through the CLI; FND-07 supplies canonical identity and bounded file-integrity helpers. [RUN-01](../work-items/RUN-01.md) supplies immutable diagnostic recording, source/environment observation and read-only bundle checks. Scientific solvers remain unimplemented. Preserve the working CLI and SI helpers. Build modules in the task order; optional branches are implemented only when the regime/evidence requires them. No notebook is the sole implementation of a scientific result.
 
 Core remains CPU-first. FND-02 records the [initial schema dependency review](../research/schema-contract.md); [FND-08](../work-items/FND-08.md) delivers [ENV-1.0](../../requirements/README.md), hashed core/development locks and `scripts/verify_environment.py`; [P2 review](../reviews/P2-foundation-exit.md) records the tested scope. NumPy/SciPy and array-storage libraries remain candidates. A new backend needs a documented need and decision. Keep optional expensive solvers behind extras and narrow adapters.
 
@@ -43,8 +43,9 @@ Core remains CPU-first. FND-02 records the [initial schema dependency review](..
 | `control/baseline.py` | One deterministic controller with actuator limits/anti-windup where applicable | CTL-04 | Open-loop baseline, saturation, delay and holdout |
 | `sensors/virtual.py` | Exact-state reference then sampled noisy/delayed observation | CTL-05 | Units, latency, stale/dropout timestamps |
 | `estimation/baseline.py` | Minimal estimator matched to observation; no oracle leakage | CTL-05 | Independent synthetic truth; held-out noise |
-| `runs/manifest.py` (planned) | Durable run metadata/storage using existing RunManifest schema and FND-07 identity primitives; source/environment/output evidence binding | RUN-01 | Hash mismatch, missing identity and immutable output checks |
-| `runs/execute.py` | Validate → preflight → run → checks → atomic finalize; keep failures | RUN-01, RUN-02 | Exception/interrupt/resume policy; never overwrite |
+| `runs/manifest.py` (implemented) | Durable run metadata/storage using existing RunManifest schema and FND-07 identity primitives; source/environment/output evidence binding | RUN-01 | Hash mismatch, missing identity and immutable output checks |
+| `runs/execute.py` (implemented for diagnostics) | Validate → bounded preflight → diagnostic → checks → exclusive final publication; keep failures | RUN-01, RUN-02 | Exception/interrupt/resume policy; never overwrite |
+| `runs/provenance.py`, `runs/check.py` (implemented) | Actual clean source/environment observation and recorded-bundle integrity inspection; no replay or physical acceptance | RUN-01 | Changed source/profile, missing/altered artifacts, conflicting records |
 | `runs/reproduce.py` | Verify inputs/environment and replay a stored experiment into a new run | RUN-02, IND-03 | Hash mismatch, unavailable inputs, backend variation |
 | `analysis/metrics.py` | D03 metrics with units, applicability, time weights and uncertainty | ANA-07, MOT-08, CTL-06 | Hand time series; zero denominator; missing window |
 | `analysis/compare.py` | Reference mapping, residuals and uncertainty-aware comparison status | FOR-05, IND-02 | Mismatched domains; missing uncertainty; held-out calibration |
@@ -52,7 +53,7 @@ Core remains CPU-first. FND-02 records the [initial schema dependency review](..
 | `analysis/limits.py` | Necessary-condition calculations and scoped certificate records | ADV-01, ADV-05 | Independent derivation; uncertainty direction of bounds |
 | `reporting/evidence.py` | Markdown/JSON reports and bundle manifest with claim restrictions | RUN-02, IND-05 | INVALIDATED promotion refusal; incomplete evidence labels |
 | `reporting/plots.py` | Field, trajectory, residual and limits plots with units/domain/error bars | ANA-07, MOT-08, ADV-06 | Data/plot consistency and source labels |
-| `cli.py` (existing) | Implemented `status` and `validate-config` with stable exit codes and JSON output; remaining commands below are planned | FND-06, RUN-01, RUN-02 | CLI integration, failed checks return nonzero |
+| `cli.py` (existing) | Implemented `status`, `validate-config` and diagnostic `run`/`check`; remaining commands below are planned | FND-06, RUN-01, RUN-02 | CLI integration, failed checks return nonzero |
 
 `RUN-01` and `RUN-02` are cross-cutting cards in [08](08-reproducibility-and-ci.md); finish the minimal run recorder before P3 evidence runs and expand replay/reporting before P4 closes.
 
@@ -65,7 +66,7 @@ Core remains CPU-first. FND-02 records the [initial schema dependency review](..
 5. `advance(state, loads, time_spec) -> TrajectoryResult`: time grid, state, per-term loads, acceleration definition and events; torque support may be explicitly unavailable until MOT-05.
 6. `control(observation, target, constraints) -> Actuation`: desired and realized command, limit activity, solver/feasibility status.
 7. `audit(evidence) -> MclfReport`: independent checks over recorded inputs/results; checker must not simply call the function being checked.
-8. `execute(experiment) -> RunManifest`: final status plus durable artifacts; failed runs retain a manifest as far as storage permits.
+8. Implemented diagnostic boundary: `runs.execute(scenario_path, experiment_path, *, output=None, seed) -> dict` stores initial/final RunManifest files and returns separate execution/scientific states, output location and final digest. `runs.check_run(folder, *, expected_sha256=None) -> dict` inspects retained bytes/links without replay. Physical driver integration follows P3; failed runs retain a manifest as far as storage permits.
 9. `compare(run, reference, protocol) -> ComparisonReport`: mapping, error/uncertainty and PASS/FAIL/INDETERMINATE for that comparison only.
 
 Names are proposed interface targets. Any renamed path must update this map and its task/test mapping in the same change.
@@ -77,8 +78,8 @@ Names are proposed interface targets. Any renamed path must update this map and 
 | `aura status` | Existing scaffold status → capability inventory | Implemented; updated with FND-06 |
 | `aura validate-config <path> [--json]` | Versioned scenario → validation/MCLF report | Implemented FND-06; [CLI-1.0](../cli-usage.md); current valid fixture exits 3 for missing model coverage |
 | `aura preflight <path>` | Valid scenario + explicit resource caps → allocation estimate | P4, basic form in RUN-01 |
-| `aura run <experiment>` | Frozen experiment → immutable run directory | P3 minimal; P4 production lifecycle |
-| `aura check <run>` | Saved artifacts → fresh independent audit | P3/P4 |
+| `aura run <scenario> --experiment <experiment> --no-randomness [--json]` | Frozen software diagnostic → immutable run directory | Implemented RUN-01; analytical driver contracts/models follow P3 |
+| `aura check <run> [--sha256 <digest>] [--json]` | Saved artifacts → read-only byte/link inspection with separate execution/scientific states | Implemented RUN-01 for its diagnostic bundles; no physical audit/replay |
 | `aura compare <run> <reference> --protocol <path>` | Two evidence records → qualified comparison | P5 |
 | `aura reproduce <run>` | Source/env/hash record → new run and comparison | P4 |
 | `aura sweep <design>` | Frozen bounded design → run index including failures | P8 |

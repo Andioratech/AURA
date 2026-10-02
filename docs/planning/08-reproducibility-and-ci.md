@@ -6,6 +6,8 @@ A task state is READY/ACTIVE/REVIEW/DONE/BLOCKED. A run execution state is plann
 
 ## RUN-01 — Minimal immutable execution lifecycle
 
+**Current state:** DONE — [implementation](../work-items/RUN-01.md), [artifact review](../reviews/RUN-01-lifecycle.md). The recorder supports the frozen software diagnostics; analytical adapter contracts/model admission follow ANA-01 and the owning P3 cards.
+
 **Depends on:** FND-08 and P2 gate. **Complete before:** ANA-01 evidence runs.
 
 1. Implement `runs/manifest.py` and `runs/execute.py` using the FND schemas and canonical input hashes.

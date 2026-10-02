@@ -4,7 +4,7 @@
 
 ## Entry condition
 
-P2 PASS and RUN-01 complete. Analytical cases may proceed without conclusive P1 measurement uncertainty.
+P2 PASS and [RUN-01 complete](../../reviews/RUN-01-lifecycle.md): ANA-01 is READY. Analytical cases may proceed without conclusive P1 measurement uncertainty. The current recorder supports software diagnostics; analytical driver admission and output/resource contracts must be fixed below before model execution.
 
 ## Working contract
 
@@ -12,7 +12,7 @@ Use [00](../00-execution-protocol.md), the [task template](../templates/task-rec
 
 ## ANA-01 — Specify field outputs and the analytic case matrix
 
-**Initial state:** BLOCKED by predecessors / applicable gates. **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
+**Current state:** READY; predecessor evidence reviewed. **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
 
 **Inputs / predecessors:** FND-08, RUN-01
 
@@ -21,6 +21,7 @@ Use [00](../00-execution-protocol.md), the [task template](../templates/task-rec
 1. Freeze homogeneous/linear medium assumptions, phasor sign, source normalization and required pressure/velocity/gradient outputs.
 2. Define sampling geometry, singular exclusions, units and shape conventions in FieldResult.
 3. Create B-03…B-06 protocols with independent expected values, tolerance derivation and small resource caps.
+4. Specify the analytical driver adapter, required artifact set, exploratory/model-coverage policy, physical post-audits and workload estimate needed to extend RUN-1.0 beyond software diagnostics. Implement each admitted driver with its owning analytical card before evidence runs.
 
 **Required artifacts:** `fields/types.py`; analytic case protocols; equation-to-case register.
 

@@ -1,6 +1,6 @@
 # RUN-01 — Immutable Execution Lifecycle
 
-**State:** ACTIVE · **Protocol frozen:** 2026-10-02 · **Depends on:** FND-08 and P2 PASS
+**State:** DONE · **Protocol frozen:** 2026-10-02 · **Depends on:** FND-08 and P2 PASS
 
 ## Question and scope
 
@@ -39,3 +39,12 @@ Coverage includes all 22 existing input-fault classes in both JSON and YAML befo
 Initial lint identified import ordering in the new modules/tests and the broad driver-exception handler. Import grouping was corrected. The handler intentionally records every ordinary executor exception; its narrowly located lint exception documents that failure-retention boundary, while final publication errors still propagate and leave the initial record/partial files intact. All executed functional test suites passed; negative diagnostic outcomes are deliberately asserted, not discarded failures.
 
 Artifact self-review also tightened tracked-source inventory, environment-observation timeouts, preallocation interruption reporting, final checksum absence, cross-record metrics/audit/profile consistency and process CPU metadata before publication. The protocol and scientific tolerances were not weakened. Full local CI and exact remote CI must pass for the implementation commit, followed by the actual clean-source CLI checks and separate closure review.
+
+
+## Published execution evidence and decision
+
+Implementation commit `5c62bb53ac6a1ef83b51f680d8ad4849fdee74b9` passed full local Quality with **911 tests in 15.59 s** and [exact GitHub Quality](https://github.com/Andioratech/AURA/actions/runs/37033919639) with **911 tests in 12.02 s**. No new dependency or lock version was needed. Maintained documentation file links resolve.
+
+Two actual installed-CLI executions from that clean source produced the frozen receipt and deliberate-failure outcomes. Both passed read-only integrity checking against separately retained manifest digests; both refused directory reuse without changing any file; an altered copy was rejected. Independent `sha256sum` matched both recorded manifest digests. [The artifact review](../reviews/RUN-01-lifecycle.md) records exact experiment/run IDs, checksums, local retention, resource observations and limits. The failure run remains failed and its lifecycle verdict INVALIDATED; retaining it correctly does not promote it into scientific evidence.
+
+**RUN-01 is DONE within the minimal diagnostic recorder scope; ANA-01 is READY.** Actual analytical driver admission, outputs and resource estimates must be frozen in ANA-01 and integrated as their P3 models are implemented. Dirty-source execution, environment reconstruction/replay and scientific model acceptance remain unavailable. This closure documentation is delivered in a separate commit after another full local workflow and exact remote CI confirmation; no additional owner decision is required to continue the approved analytical foundation.
