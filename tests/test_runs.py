@@ -608,3 +608,43 @@ def test_wrong_manifest_anchor_rejected(inputs, observed):
 
 def test_empty_directory_cannot_be_claimed_as_run(tmp_path):
     with pytest.raises(FileNotFoundError): check_run(tmp_path)
+
+
+def test_b03_01_metrics_pass_for_integrity_checked_record(analytical_inputs, observed):
+    from aura.analysis.ana07_metrics import TOLERANCE, analyze_b03_01
+
+    scenario_path, experiment_path, output = analytical_inputs
+    request_path = scenario_path.parent / "field-request.json"
+    request = json.loads(request_path.read_bytes())
+    request["coordinates_m"] = [[0, 0, 0]]
+    request_bytes = encode(request)
+    request_path.write_bytes(request_bytes)
+    experiment = json.loads(experiment_path.read_bytes())
+    experiment["protocol"]["sha256"] = digest(request_bytes)
+    experiment_path.write_bytes(encode(experiment))
+
+    execution = execute(scenario_path, experiment_path, output=output, seed=None)
+    report = analyze_b03_01(output, expected_manifest_sha256=execution["manifest_sha256"])
+
+    assert report["integrity"] == "VERIFIED"
+    assert report["numerical_comparison"] == "PASS"
+    assert report["physical_validation"] == "NOT_ESTABLISHED"
+    assert report["tolerance_normalized"] == TOLERANCE
+    assert report["metrics"]["pressure"]["E_max"] == pytest.approx(0, abs=1e-15)
+    assert report["metrics"]["velocity"]["criterion"] == "PASS"
+    assert report["mean_intensity_w_m2"] == pytest.approx([1 / 750_000, 0, 0])
+
+
+def test_b03_01_reference_rejects_a_different_sample(analytical_inputs):
+    from aura.analysis.ana07_metrics import _require_b03_01
+
+    scenario = json.loads(analytical_inputs[0].read_bytes())
+    request = {
+        "contract": "FIELD-REQUEST-1.0",
+        "case_id": "B03-01",
+        "box_min_m": [-0.0015, -0.0015, -0.0015],
+        "box_max_m": [0.0015, 0.0015, 0.0015],
+        "coordinates_m": [[0.000375, 0, 0]],
+    }
+    with pytest.raises(ValueError, match="frozen only"):
+        _require_b03_01(scenario, request)

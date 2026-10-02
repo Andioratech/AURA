@@ -1,14 +1,14 @@
 # Current Research Checkpoint
 
-**As of:** 2026-10-02 · **Last development delivery:** `260464a9e7975b4380cc223546a5b26304e6d303` · **Main next task:** ANA-07
+**As of:** 2026-10-02 · **Last development delivery:** `0fa1114100a218b5dd36afb159285c02b318d838` · **Main next task:** ANA-07
 
-This checkpoint now includes the ANA-06 delivery. Later documentation commits may contain this handoff itself. Reconcile it with actual history and the [live work board](../planning/10-work-board.md); do not treat this snapshot as an instruction to revert newer work.
+This checkpoint includes the ANA-07 plane recorder and its scope correction. Later documentation commits may contain this handoff itself. Reconcile it with actual history and the [live work board](../planning/10-work-board.md); do not treat this snapshot as an instruction to revert newer work.
 
 ## Objective and present boundary
 
 Investigate whether controlled acoustic forcing can produce prescribed acceleration in a declared object/domain, toward microgravity applications. Small particles in water are the starting implementation campaign. Greater masses, larger objects and other geometries are explicit subsequent research objectives with their own model/evidence gates. Acoustic forcing does not create gravity. The hypothesis and feasibility remain unvalidated.
 
-**P2 is PASS for foundations. P3 remains open.** The current code provides bounded ideal incident-field calculations, not a validated complete simulator. No force, object motion, controller, calibrated finite transducer, coupled wall/body field, physical attenuation model or demonstrated microgravity performance has been delivered.
+**P2 is PASS for foundations. P3 remains open.** The current code provides bounded ideal incident-field calculations and records plane-wave field components, not a validated complete simulator. The first clean-source recorded B03-01 origin sample passed its independent frozen comparison. No force, object motion, controller, calibrated finite transducer, coupled wall/body field, physical attenuation model or demonstrated microgravity performance has been delivered.
 
 ## Delivered work and where to inspect it
 
@@ -24,8 +24,9 @@ Investigate whether controlled acoustic forcing can produce prescribed accelerat
 | ANA-04 | Two coherent plane waves, noncollinear interference and vector symmetries | [B-05 report](../benchmarks/B05-interference-verification.md) |
 | ANA-05 | Outgoing spherical field with full reactive velocity and explicit source exclusion | [B-06 report](../benchmarks/B06-spherical-verification.md), [review](../reviews/ANA-05-spherical.md) |
 | ANA-06 | Fixed-domain closed-sphere and spherical-shell energy ledgers | [ANA-06 report](../benchmarks/ANA-06-energy-balance-verification.md), [review](../reviews/ANA-06-energy-balance.md) |
+| ANA-07 | Versioned plane-field recorder and first B03-01 recorded comparison; remaining matrix open | [ANA-07 task](../work-items/ANA-07.md) |
 
-Fifteen board tasks are DONE. ANA-07, LIT-01 and SC-01 are READY; ANA-07 is the selected continuation of the main implementation sequence. LIT/SC are separate evidence/scale tracks, not permission to skip P3. Other BLOCKED cards mostly await ordinary predecessors; the project is not globally blocked.
+Fifteen board tasks are DONE. ANA-07 is ACTIVE; LIT-01 and SC-01 are READY. LIT/SC are separate evidence/scale tracks, not permission to skip P3. Other BLOCKED cards mostly await ordinary predecessors; the project is not globally blocked.
 
 ## Exact latest evidence
 
@@ -36,6 +37,9 @@ Fifteen board tasks are DONE. ANA-07, LIT-01 and SC-01 are READY; ANA-07 is the 
 - The report contains source/environment observations, locks, inputs, raw samples, per-component errors, logs and artifact hashes. It is **software verification**, not a D07 RunManifest or experimental data. Source/environment observations matched before and after. Local operations/transfer-pack records locate raw evidence unavailable from a plain clone.
 - ANA-06 implementation: [`260464a9e7975b4380cc223546a5b26304e6d303`](https://github.com/Andioratech/AURA/commit/260464a9e7975b4380cc223546a5b26304e6d303), [exact Quality PASS](https://github.com/Andioratech/AURA/actions/runs/37055310149): environment/lock checks, Ruff and 1,366 tests in 21.50 s; full local Quality passed Ruff and 1,366 in 17.70 s.
 - ANA-06 checks three six-point antipodal plane-wave spheres and one two-boundary B-06 spherical shell. Clean-source focused verification passed 143 tests in 1.74 s; all four example ledgers PASS, with shell normalized residual 1.7141911890312011e-16 against 1.8189894035458565e-12. Immutable verification: `VERIFY-ANA06-6e3c0547cb364aef9d67e6518cc32b93`, ignored path `results/verification/ANA-06/VERIFY-ANA06-6e3c0547cb364aef9d67e6518cc32b93/`, index SHA-256 `beda8b9aca3d19525d10d3275ae91838dbe07f8c5f9c2a219a87a1bb670668f9`.
+- ANA-07 published plane recorder: [`4d35bf4698db26adef2b80dd455d8b2d88c6194e`](https://github.com/Andioratech/AURA/commit/4d35bf4698db26adef2b80dd455d8b2d88c6194e), [exact Quality PASS](https://github.com/Andioratech/AURA/actions/runs/37059818785); scope correction: [`0fa1114100a218b5dd36afb159285c02b318d838`](https://github.com/Andioratech/AURA/commit/0fa1114100a218b5dd36afb159285c02b318d838), [exact Quality PASS](https://github.com/Andioratech/AURA/actions/runs/37060410743), 1,373 tests.
+- Clean-source smoke bundle: `RUN-20261002-b1e2f315f5b94c099f8fc56c5ed1596e`, manifest SHA-256 `edc3a71b1149cbf4cad5f18a4bd517921a9bec8518b3a79aafde9f2c61be637f`, integrity `VERIFIED`, execution `completed`, verdict `INDETERMINATE`.
+- First independent recorded numerical comparison: B03-01 only, one origin sample. All pressure, velocity, pressure-gradient and derived mean-intensity components pass the frozen `2048 × 2^-52` normalized error criterion; reported `E_max=0` and `E_rms=0` for these exact values. Mean intensity `(1.3333333333333334e-6, 0, 0) W/m²`. Report is in the ignored local `results/verification/ANA-07/ANA07-METRICS-B03-01-0fa1114.json`; its analyzer source and report checksums are embedded/sidecar. It is mathematical software verification for a manufactured homogeneous lossless ideal-plane sample, not water measurement, physical validation or P3 closure. Remaining B-03/B-04/B-05 comparisons, post-audits, B-06 source contract and full campaign remain open.
 
 These are historical observed results. Rerun the required checks for new work; never quote this count as a fresh test result.
 
