@@ -69,7 +69,7 @@ Use [00](../00-execution-protocol.md), the [task template](../templates/task-rec
 
 ## FND-04 — Implement stable MCLF L0 rules and typed errors
 
-**Current state:** READY; FND-03 is complete. **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
+**Current state:** DONE — [implementation and audit verification](../../work-items/FND-04.md). **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
 
 **Inputs / predecessors:** FND-03
 
@@ -88,7 +88,7 @@ Use [00](../00-execution-protocol.md), the [task template](../templates/task-rec
 
 ## FND-05 — Build independent known-answer and invalid-input verification
 
-**Initial state:** BLOCKED by predecessors / applicable gates. **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
+**Current state:** READY; FND-04 is complete. **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
 
 **Inputs / predecessors:** FND-04
 
@@ -165,5 +165,7 @@ Use [00](../00-execution-protocol.md), the [task template](../templates/task-rec
 ## Phase exit review
 
 Canonical input contracts, independent known-answer checks, R-001…R-010 definitions, deterministic serialization and a reproducible development environment are reviewed. All required invalid inputs fail before allocation.
+
+Before starting RUN-01/P3, give the owner the requested plain-language explanation of the simulation system/core: components, inputs, outputs, first verification cases and limits. This communication checkpoint was requested on 2026-10-02 and does not add a scientific approval gate.
 
 Use [the gate template](../templates/gate-review.md), attach the actual artifact/run/CI links, and update [the board](../10-work-board.md). Keep experimental validation and software verification distinct.

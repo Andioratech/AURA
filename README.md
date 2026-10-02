@@ -32,6 +32,8 @@ This repository contains an owner-approved English development baseline (D00-D09
 
 Implemented foundations include a [versioned JSON/YAML input and evidence schema](docs/research/schema-contract.md) and [safe SI arithmetic with explicit conversions](docs/research/numerical-domain-and-conversions.md). [FND-01](docs/work-items/FND-01.md), [FND-02](docs/work-items/FND-02.md) and [FND-03](docs/work-items/FND-03.md) record the delivered work, verification and limitations. P2 is still open; accepting an input or passing an arithmetic check does not validate its physical model.
 
+[FND-04](docs/work-items/FND-04.md) adds [ten L0 audit rules](docs/registers/mclf-l0-rules.md), structured diagnostics and human-readable reports. Missing model coverage and unverified external evidence remain explicit; a supplied success label cannot establish scientific acceptance. Higher audit levels and simulation solvers remain future work.
+
 ## Repository structure
 
 | Path | Purpose |

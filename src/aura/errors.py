@@ -18,3 +18,11 @@ class InvalidInputError(ValueError):
 
 class NumericalDomainError(InvalidInputError):
     """Valid finite operands have a result outside the supported numeric range."""
+
+
+class MclfInvalidationError(InvalidInputError):
+    """A required acceptance gate failed because an audit is INVALIDATED."""
+
+
+class IncompleteEvidenceError(InvalidInputError):
+    """A required acceptance gate lacks an explained or covered result."""
