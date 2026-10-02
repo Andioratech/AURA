@@ -1,8 +1,8 @@
+# AURA Scientific Research Project
+
 <p align="center">
   <img src="assets/andiora-logo-no-slogan.svg" alt="Andiora Research" width="420">
 </p>
-
-# AURA Scientific Research Project
 
 **Adaptive Ultrasonic Regulated Acceleration (AURA)** is a proposed computational research program to study whether controlled acoustic radiation forces can produce a prescribed acceleration for selected free bodies within a defined operating domain.
 
@@ -39,6 +39,7 @@ This repository currently contains the English scientific specifications and a s
 | examples/ | Versioned experiment configurations |
 | data/ | Data provenance and retention policy |
 | results/ | Run output policy; generated results are excluded from Git |
+| references/source_documents/ | Unmodified source PDFs and checksums |
 | assets/ | README and project identity assets |
 
 ## Start here
@@ -46,6 +47,7 @@ This repository currently contains the English scientific specifications and a s
 - [D00: Document control and scientific baseline](docs/D00-document-control.md)
 - [D01: System architecture](docs/D01-system-architecture.md)
 - [D02: Mathematical Bounds and Limits Framework](docs/D02-mclf.md)
+- [PLAN-01: Phase-gated master work plan](docs/PLAN-01-project-execution-plan.md)
 - [G01: Contributor workflow](guides/G01-contributor-workflow.md)
 
 The full document register and precedence rules are maintained in D00. Physical-law and SI definitions take precedence over project specifications; conflicts must be investigated and versioned rather than resolved silently.
@@ -58,6 +60,6 @@ Large datasets and generated outputs should not be committed to Git by default. 
 
 ## Language, references, and reuse
 
-Maintained project documentation is in English. The initial specifications consolidate and review the Spanish source PDFs supplied to establish this repository; those source PDFs are not included here. Scientific references and claims must be traceable to primary literature and used only within their documented assumptions.
+Maintained project documentation is in English. Original Spanish source PDFs are preserved, unchanged, under references/source_documents; the English specifications consolidate and review their technical content. Scientific references and claims must be traceable to primary literature and used only within their documented assumptions.
 
 No project license or publication citation has been approved. Until one is selected, do not assume permission for reuse outside this repository.

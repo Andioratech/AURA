@@ -20,6 +20,7 @@ This is the entry point and document precedence policy for AURA. It identifies t
 | D07 | Experiments, data and reproducibility | Experiment/run identity, manifests, retention and bundles |
 | D08 | Software architecture and contracts | Modules, APIs, CLI, dependencies and error handling |
 | D09 | Scientific register, claims and literature | Equation and claim traceability, sources, evidence and novelty |
+| PLAN-01 | Project execution plan | Phase order, work packages, gates, stop rules and scope control; it cannot override D00-D09 |
 
 Working procedures: G01 contributor workflow; G02 experiment lifecycle; G03 anomaly handling; G04 run reproduction; G05 release and review.
 
@@ -71,7 +72,7 @@ A result is reproducible from an immutable commit and configuration, is not MCLF
 
 ## Source document review
 
-Three supplied PDFs were inspected: the 74-page baseline, the 15-page architecture proposal and the 14-page MCLF proposal. The baseline contains D00-D09 and G01-G05 material, including duplicated full copies of D01 and D02. The two standalone proposals are earlier versions of those duplicated sections. Their content was consolidated into this English document set; the original Spanish files are not included in the repository.
+Three supplied PDFs were inspected: the 74-page baseline, the 15-page architecture proposal and the 14-page MCLF proposal. The baseline contains D00-D09 and G01-G05 material, including duplicated full copies of D01 and D02. The two standalone proposals are earlier versions of those duplicated sections. Their technical content was consolidated into this English document set. Unmodified Spanish originals are retained under references/source_documents as source material; maintained specifications and procedures remain in English.
 
 Review findings and resolutions:
 
