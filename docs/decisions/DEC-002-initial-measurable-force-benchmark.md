@@ -23,7 +23,7 @@ Primary source: M. A. B. Andrade, A. L. Bernassau, and J. C. Adamowski, “Acous
 
 ## Required work before P1 PASS
 
-1. A first extraction of the measured Fig. 5 trace and a visual review of the gap convention are archived. An independent second extraction remains required; the 180/360 dpi versions are a rendering-sensitivity check, not independent digitizations.
+1. Figure-derived curve traces from two rendering resolutions and an alternate pixel-sampling method are archived, alongside a visual review of the gap convention. These are extraction cross-checks, not independent experimental measurements.
 2. Record all source-reported measurement uncertainty and added figure-digitization uncertainty. The published figure has no uncertainty bars; the paper identifies experimental uncertainty as a cause of the peak difference but does not quantify it.
 3. Predeclare the curve-comparison, numerical-error and stop/indeterminate rules; do not invent a percentage tolerance. Until experimental uncertainty is independently available, the strongest permitted outcome is a descriptive comparison and the formal validation result must remain INDETERMINATE.
 4. Complete the resource preflight and freeze the experiment definition under P1.4–P1.7.

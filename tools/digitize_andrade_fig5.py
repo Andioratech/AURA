@@ -18,6 +18,11 @@ def main() -> None:
     parser.add_argument("image", type=Path, help="PNG render of PDF page 9")
     parser.add_argument("output", type=Path, help="CSV output path")
     parser.add_argument("--dpi", type=float, choices=(180.0, 360.0), required=True)
+    parser.add_argument(
+        "--method",
+        choices=("window-median", "center-column"),
+        default="window-median",
+    )
     args = parser.parse_args()
 
     scale = args.dpi / 180.0
@@ -39,7 +44,8 @@ def main() -> None:
         x = x_left + (gap_mm / 30.0) * (x_right - x_left)
         center = round(x)
         ys = []
-        for px in range(center - window, center + window + 1):
+        half_width = window if args.method == "window-median" else 0
+        for px in range(center - half_width, center + half_width + 1):
             if px < 0 or px >= image.width:
                 continue
             for py in range(y_min, round(y_bottom)):
