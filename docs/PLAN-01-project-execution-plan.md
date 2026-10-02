@@ -58,7 +58,7 @@ Do not combine phases to save time. A phase may split into subphases only by a r
 | Phase | Status | Blocking condition / next action |
 |---|---|---|
 | P0 | PASS | Owner acceptance recorded in DEC-001; repository, source provenance, links, local quality checks, and remote CI passed |
-| P1 | ACTIVE | P1.1 dossier is complete and awaits review; next score the three candidates under P1.2, without implementation |
+| P1 | REVIEW | P1.1 dossier and P1.2 scoring are complete; owner must settle access/handling of the primary candidate's uncertainty data before P1.3–P1.7 can be frozen |
 | P2-P10 | BLOCKED | Advance only after the preceding phase receives a recorded PASS decision |
 
 ## 5. Phase details
@@ -351,7 +351,7 @@ Changes to phase order, gates, primary observables, acceptance thresholds, model
 
 ## 11. Immediate next actions
 
-1. Review the P1.1 dossier in `docs/benchmarks/P1.1-benchmark-candidates.md`; it documents three sources and deliberately selects no winner.
-2. Complete P1.2 by scoring candidates against the criteria in this plan; keep scoring evidence traceable to each source.
-3. Select one primary and one backup only in P1.3 after comparing the dossiers; obtain owner approval of the frozen domain at the P1 exit gate.
+1. P1.1 candidate dossier and P1.2 equal-weight screen are recorded in `docs/benchmarks/P1.1-benchmark-candidates.md`.
+2. Confirm the permitted source-data path for the provisional primary (APS supplement or figure digitization with added uncertainty).
+3. Complete P1.3–P1.7, then obtain owner approval of the selected benchmark, frozen domain, and uncertainty-derived decision rule at the P1 exit gate.
 4. Do not start implementation before P1 PASS or implement acoustic propagation, radiation force, control, AI optimization, or high-fidelity solvers before the applicable gate.
