@@ -121,7 +121,7 @@ Use [00](../00-execution-protocol.md), the [task template](../templates/task-rec
 
 ## ANA-07 — Publish P3 verification evidence and close the gate
 
-**Current state:** ACTIVE — plane-field recorder is published and the first B03-01 recorded numeric comparison passes; remaining comparisons, audits and full campaign remain pending. See [ANA-07 task record](../../work-items/ANA-07.md). **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
+**Current state:** ACTIVE — the recorded B-03/B-04/B-05 matrix passes across 27 configurations and 248 samples. B-06 source admission, applicable post-audits, reproduction and full P3 gate review remain pending. See [ANA-07 task record](../../work-items/ANA-07.md). **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
 
 **Inputs / predecessors:** ANA-06
 
@@ -129,7 +129,7 @@ Use [00](../00-execution-protocol.md), the [task template](../templates/task-rec
 
 1. Implement and cross-check the versioned analytical field recorder and companion gradient index.
 2. Admit an explicit spherical-source input bound to Scenario; do not represent it as a piston or plane wave.
-3. Extend the initial B03-01 recorded comparison across admitted B-03/B-04/B-05 cases, then compare the complete admitted set with independent frozen references; report metrics, post-audits, precision/cancellation sensitivity and resource observations.
+3. Compare the admitted B-03/B-04/B-05 recorder matrix with its frozen references; then complete the applicable model post-audits, precision/cancellation sensitivity and resource observations.
 4. Reproduce a selected case and assemble the separate P3 gate review, including limitations and failures.
 
 **Required artifacts:** `analysis/metrics.py` initial functions; plots/reports; P3 gate review; replay inputs for RUN-02.
