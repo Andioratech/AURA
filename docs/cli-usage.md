@@ -84,4 +84,4 @@ Schema errors retain their stable library codes (for example `SCHEMA_VERSION`, `
 
 [CLI tests](../tests/test_cli.py) cover the 22 known input-fault classes in JSON/YAML, explicit zero/missing fields through the established fixtures, independent output assertions, separate streams, subprocess exit codes, file preservation, parser/file failures and forbidden simulation imports. FND-06 also records an installation into a fresh Python 3.12 environment without development extras, exercised outside the repository.
 
-FND-07 owns canonical serialization and authentic content identity. FND-08 owns the reproducible environment and P2 exit review. Before RUN-01/P3 begins, the owner will receive the requested plain-language explanation of the simulation system/core.
+[FND-07](work-items/FND-07.md) supplies separate canonical identity and bounded file-integrity library helpers. This configuration command does not call those file-verification APIs or authenticate run evidence. FND-08 owns the reproducible environment and P2 exit review. Before RUN-01/P3 begins, the owner will receive the requested plain-language explanation of the simulation system/core.

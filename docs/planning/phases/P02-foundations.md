@@ -126,7 +126,7 @@ Use [00](../00-execution-protocol.md), the [task template](../templates/task-rec
 
 ## FND-07 — Freeze canonical serialization and immutable hash identity
 
-**Current state:** READY; FND-06 is complete. **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
+**Current state:** DONE — [content identity and verification](../../work-items/FND-07.md). **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
 
 **Inputs / predecessors:** FND-06
 
@@ -145,7 +145,7 @@ Use [00](../00-execution-protocol.md), the [task template](../templates/task-rec
 
 ## FND-08 — Lock the development environment and close P2
 
-**Initial state:** BLOCKED by predecessors / applicable gates. **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
+**Current state:** READY; FND-07 is complete. **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
 
 **Inputs / predecessors:** FND-07
 

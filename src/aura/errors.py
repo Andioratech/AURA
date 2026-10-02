@@ -26,3 +26,7 @@ class MclfInvalidationError(InvalidInputError):
 
 class IncompleteEvidenceError(InvalidInputError):
     """A required acceptance gate lacks an explained or covered result."""
+
+
+class IntegrityError(InvalidInputError):
+    """Declared content identity, file stability or record linkage could not be verified."""

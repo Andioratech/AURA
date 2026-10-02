@@ -59,7 +59,9 @@ copy = loads_document(dumps_document(record, format="yaml"), format="yaml")
 assert copy.to_dict() == record.to_dict()
 ```
 
-`validate_document(dictionary)` chooses the typed record; direct constructors such as `Body(dictionary)` enforce their document type. Records store isolated serialized snapshots and return new dictionaries. Input dictionaries and returned copies cannot mutate validated state. Serialization preserves values; it is not yet the canonical hash format of FND-07. CLI configuration validation is FND-06; `aura status` remains the only current CLI command.
+`validate_document(dictionary)` chooses the typed record; direct constructors such as `Body(dictionary)` enforce their document type. Records store isolated serialized snapshots and return new dictionaries. Input dictionaries and returned copies cannot mutate validated state. Display serialization preserves values; [FND-07 canonical identity](content-identity.md) is a separate API. [FND-06 CLI validation](../cli-usage.md) implements `aura validate-config`; `aura status` remains available.
+
+FND-07 defines full canonical configuration and raw artifact digest meanings without changing schema 1.0 fields. The existing RunManifest model remains an immutable in-memory snapshot; persistence and run creation are RUN-01. Configuration/link verification and bounded local file checks must be called explicitly. Merely parsing a digest string still does not authenticate content.
 
 ## What acceptance does not establish
 

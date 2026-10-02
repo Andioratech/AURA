@@ -1,0 +1,20 @@
+{
+  "protocol": "AURA-C14N-1",
+  "provenance": "Hand-authored bytes; no calls to the production encoder. Numeric 0.1 expansion follows the exact binary64 value documented by Python Decimal.from_float.",
+  "cases": [
+    {"name": "empty", "input": {}, "canonical": "{}"},
+    {"name": "order-numbers-text", "input": {"z": 1.0, "u": "é", "b": true, "a": -0.0}, "canonical": "{\"a\":0,\"b\":true,\"u\":\"\\u00e9\",\"z\":1}"},
+    {"name": "decimal-float", "input": 0.1, "canonical": "0.1000000000000000055511151231257827021181583404541015625"},
+    {"name": "array-types", "input": [null, false, 2.5, -2, "1", 1], "canonical": "[null,false,2.5,-2,\"1\",1]"},
+    {"name": "large-integer", "input": 9007199254740993, "canonical": "9007199254740993"},
+    {"name": "unicode-keys", "input": {"😀": 1, "�": 2}, "canonical": "{\"\\ufffd\":2,\"\\ud83d\\ude00\":1}"},
+    {"name": "escapes", "input": "line\n\t\"\\", "canonical": "\"line\\n\\t\\\"\\\\\""}
+  ],
+  "solver_document_sha256": "ca3f7514c34fd66f9c140f92e0e307e5f1ca99cfd0e9122a3e530cb3fd908433",
+  "solver": {
+    "document_type": "solver_spec", "schema_version": "1.0", "id": "GOLDEN-SOLVER",
+    "model_id": "fixture-only", "model_version": "0.0", "equation_ids": ["EQ-001"],
+    "regime": ["Manufactured identity fixture"], "precision": "float64", "parameters": {"tolerance": 0.5, "max_iterations": 2}
+  },
+  "solver_canonical": "{\"document_type\":\"solver_spec\",\"equation_ids\":[\"EQ-001\"],\"id\":\"GOLDEN-SOLVER\",\"model_id\":\"fixture-only\",\"model_version\":\"0.0\",\"parameters\":{\"max_iterations\":2,\"tolerance\":0.5},\"precision\":\"float64\",\"regime\":[\"Manufactured identity fixture\"],\"schema_version\":\"1.0\"}"
+}

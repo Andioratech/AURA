@@ -47,6 +47,8 @@ The [integration tests](../../tests/test_foundation_verification.py) compose `lo
 
 **B-02 structural/gate composition: PASS for these cases. B-02 identity benchmark: PENDING FND-07.** Key-order canonical hash equality, actual configuration/artifact tampering, environment/source authentication and immutable run storage are not verified by this card. RUN-01 must repeat the ordering checks on the actual execution lifecycle, including explicit treatment of exploratory inputs under DEC-003. This test harness is not a future execution-policy decision to forbid every exploratory model run.
 
+Subsequent evidence: [FND-07's B-02 identity report](B02-content-identity.md) closes the canonical/configuration/file-integrity comparison. The statement above preserves FND-05's original scope; actual source/environment evidence binding and immutable run storage still require later integration.
+
 ## Limits exposed by verification
 
 1. An explicit unsupported `diameter` key and an explicit `rms` convention are rejected. A positive diameter mislabeled as radius, or RMS data mislabeled as peak, can pass structural checks because the caller supplied the wrong meaning. Provenance/reference mapping must address these errors. The tests retain both the accepted declarations and their INDETERMINATE scientific status.

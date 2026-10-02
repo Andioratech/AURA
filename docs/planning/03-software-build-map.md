@@ -2,7 +2,7 @@
 
 ## Implementation rule
 
-Paths below describe the construction target; consult the work board and task records for actual availability. FND-02 implements the schema boundary; FND-03 supplies safe arithmetic/conversions; FND-04 implements L0 audits, reports and typed gate failures; FND-05 verifies foundation composition; FND-06 exposes configuration checks through the CLI. Scientific solvers remain unimplemented. Preserve the working CLI and SI helpers. Build modules in the task order; optional branches are implemented only when the regime/evidence requires them. No notebook is the sole implementation of a scientific result.
+Paths below describe the construction target; consult the work board and task records for actual availability. FND-02 implements the schema boundary; FND-03 supplies safe arithmetic/conversions; FND-04 implements L0 audits, reports and typed gate failures; FND-05 verifies foundation composition; FND-06 exposes configuration checks through the CLI; FND-07 supplies canonical identity and bounded file-integrity helpers. Scientific solvers remain unimplemented. Preserve the working CLI and SI helpers. Build modules in the task order; optional branches are implemented only when the regime/evidence requires them. No notebook is the sole implementation of a scientific result.
 
 Core remains CPU-first. FND-02 records the [initial schema dependency review](../research/schema-contract.md); FND-08 completes environment locking and compatibility review. NumPy/SciPy and array-storage libraries remain candidates. A new backend needs a documented need and decision. Keep optional expensive solvers behind extras and narrow adapters.
 
@@ -13,8 +13,11 @@ Core remains CPU-first. FND-02 records the [initial schema dependency review](..
 | `units.py` (existing) | SI calculations; explicit RMS/peak conversion boundary; return scalar values with documented domain | FND-01, FND-03 | Known values; nonfinite/sign/range; conversion round trip |
 | `schema/quantities.py` | Parse external value/unit pairs; convert once to canonical SI; reject unsupported dimensions | FND-02, FND-03 | Unit mismatch, unknown unit, overflow, bool-as-number policy |
 | `schema/models.py` | Medium, Body, SourceArray, Scenario, SolverSpec, Experiment, RunManifest; version and cross-field validation | FND-02 | Required fields; vectors/shapes; radius/diameter; incomplete inputs |
-| `schema/io.py` | Strict JSON/YAML input and deterministic canonical JSON; prohibit executable YAML tags | FND-02, FND-07 | Duplicate keys, nonfinite values, unknown fields, canonical ordering |
-| `errors.py` | Input, numeric-domain, MCLF invalidation and incomplete-evidence errors implemented; resource/convergence errors remain planned | FND-02, FND-03, FND-04 | Stable field/code diagnostics; CLI propagation; no false success |
+| `schema/io.py` | Strict JSON/YAML input and display serialization; prohibit executable YAML tags | FND-02 | Duplicate keys, nonfinite values, unknown fields |
+| `schema/canonical.py` (implemented) | AURA-C14N-1 exact canonical bytes, separate from display serialization | FND-07 | Golden bytes, numeric/Unicode rules, caps and key-order equivalence |
+| `schema/identity.py` (implemented) | Complete/projection digests and typed manifest/config/optional experiment link checks | FND-07 | Changed inputs/metadata, full versus projected digest, mismatched records |
+| `artifacts.py` (implemented) | Bounded read-only SHA-256 over explicitly supplied local regular files | FND-07 | Known digests, tampering, caps, special files and ordinary read-time changes |
+| `errors.py` | Input, numeric-domain, MCLF invalidation, incomplete-evidence and content-integrity errors implemented; solver resource/convergence errors remain planned | FND-02, FND-03, FND-04, FND-07 | Stable field/code diagnostics; CLI propagation; no false success |
 | `mclf/rules.py` | Stable R-001…R-010 L0 registry, predicates, assumptions and tolerance references | FND-04 | Valid, invalid, boundary and uncovered regime cases |
 | `mclf/evaluate.py` | Independent pre/post audit and per-rule verdict report | FND-04, FOR-07, ADV-06 | Severity precedence; no solver success override |
 | `mclf/reports.py` (implemented) | Immutable detailed audit envelope, compatible core record, human text and explicit acceptance gate | FND-04 | Missing rules, inherited warnings, serialization, typed rejection |
@@ -40,7 +43,7 @@ Core remains CPU-first. FND-02 records the [initial schema dependency review](..
 | `control/baseline.py` | One deterministic controller with actuator limits/anti-windup where applicable | CTL-04 | Open-loop baseline, saturation, delay and holdout |
 | `sensors/virtual.py` | Exact-state reference then sampled noisy/delayed observation | CTL-05 | Units, latency, stale/dropout timestamps |
 | `estimation/baseline.py` | Minimal estimator matched to observation; no oracle leakage | CTL-05 | Independent synthetic truth; held-out noise |
-| `runs/manifest.py` | Immutable run metadata, input/environment/source identity and output hash index | FND-07, RUN-01 | Hash mismatch, missing identity and immutable output checks |
+| `runs/manifest.py` (planned) | Durable run metadata/storage using existing RunManifest schema and FND-07 identity primitives; source/environment/output evidence binding | RUN-01 | Hash mismatch, missing identity and immutable output checks |
 | `runs/execute.py` | Validate → preflight → run → checks → atomic finalize; keep failures | RUN-01, RUN-02 | Exception/interrupt/resume policy; never overwrite |
 | `runs/reproduce.py` | Verify inputs/environment and replay a stored experiment into a new run | RUN-02, IND-03 | Hash mismatch, unavailable inputs, backend variation |
 | `analysis/metrics.py` | D03 metrics with units, applicability, time weights and uncertainty | ANA-07, MOT-08, CTL-06 | Hand time series; zero denominator; missing window |
