@@ -1,28 +1,28 @@
 # 10 — Single Work Board and Execution Order
 
-**Initial board:** 2026-10-02. **Baseline implementation inspected:** `aaf4aba7bff3774e645b3640784ebdcdbd14a7db`.
+**Updated:** 2026-10-02. **Initial implementation inspected:** `aaf4aba7bff3774e645b3640784ebdcdbd14a7db`; completed work is linked below.
 
 ## First work cycle
 
-1. Set FND-01 ACTIVE and complete SI, coordinate and amplitude conventions.
+1. FND-01 is complete: [CONV-1.0 and review](../work-items/FND-01.md) freeze the representation contract and record existing helper gaps.
 2. Continue FND-02…FND-08 in dependency order; close P2 only with its actual evidence.
 3. LIT-01…LIT-05 may proceed as the separate evidence track; missing measurements do not stop P2/P3.
 4. Build RUN-01, then ANA-01…ANA-07. Complete RUN-02 before NUM-07 closes P4.
 5. Follow the remaining phase gates and decision tree. Do not start controller implementation before the required force/dynamics gates.
 
-The board includes planned tasks, not finished deliverables. FND-01 and LIT-01 are immediately READY; SC-01 is also READY for larger-body research under DEC-004. Existing helpers/tests are PARTIAL starting evidence for P2; none of the phase cards is automatically DONE. BLOCKED below means a normal dependency has not yet been delivered, not that the whole project must stop.
+FND-02 is the next READY implementation task. LIT-01 and SC-01 remain READY for research. Existing helpers/tests are PARTIAL evidence for P2; only explicitly reviewed task records are DONE. BLOCKED below means a normal dependency has not yet been delivered, not that the whole project must stop.
 
 ## Dependency and status table
 
-| Task | Work item | Predecessors | Initial state | Phase card |
+| Task | Work item | Predecessors | Current state | Phase card |
 |---|---|---|---|---|
 | LIT-01 | Inventory the current evidence and unresolved decisions | Baseline available | READY | [LIT](phases/P01-evidence.md) |
 | LIT-02 | Select a measurable water reference or document the bounded fallback | LIT-01 | BLOCKED | [LIT](phases/P01-evidence.md) |
 | LIT-03 | Review the actual force equations and their domain | LIT-02 | BLOCKED | [LIT](phases/P01-evidence.md) |
 | LIT-04 | Identify fluid, wall, thermal and stochastic competing effects | LIT-03 | BLOCKED | [LIT](phases/P01-evidence.md) |
 | LIT-05 | Prepare necessary-limit and prior-work investigations | LIT-04 | BLOCKED | [LIT](phases/P01-evidence.md) |
-| FND-01 | Freeze coordinate, SI and amplitude conventions | Baseline available | READY | [FND](phases/P02-foundations.md) |
-| FND-02 | Implement versioned scenario and evidence schemas | FND-01 | BLOCKED | [FND](phases/P02-foundations.md) |
+| FND-01 | Freeze coordinate, SI and amplitude conventions | Baseline available | DONE — [record](../work-items/FND-01.md) | [FND](phases/P02-foundations.md) |
+| FND-02 | Implement versioned scenario and evidence schemas | FND-01 | READY | [FND](phases/P02-foundations.md) |
 | FND-03 | Extend safe SI calculations and conversion boundaries | FND-02 | BLOCKED | [FND](phases/P02-foundations.md) |
 | FND-04 | Implement stable MCLF L0 rules and typed errors | FND-03 | BLOCKED | [FND](phases/P02-foundations.md) |
 | FND-05 | Build independent known-answer and invalid-input verification | FND-04 | BLOCKED | [FND](phases/P02-foundations.md) |

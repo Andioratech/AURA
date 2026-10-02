@@ -13,7 +13,7 @@ This pack decomposes [PLAN-01](../PLAN-01-project-execution-plan.md); [D00](../D
 ## Start and follow
 
 1. Read [execution rules](00-execution-protocol.md) and [scientific objective](01-objective-and-domain.md).
-2. Open [the work board](10-work-board.md). Start FND-01; LIT-01 may proceed as a separate evidence task.
+2. Open [the work board](10-work-board.md) and select the next READY task; completed tasks link their actual evidence. LIT-01 may proceed as a separate evidence task.
 3. Open the linked phase card. Carry out its numbered steps and produce every named artifact.
 4. Complete the [task record](templates/task-record.md), including input versions and acceptance criteria, before implementation.
 5. If a decision is needed, follow [the decision tree](05-decision-tree.md). If an attempt fails, use [the matching recovery playbook](06-failure-playbooks.md).

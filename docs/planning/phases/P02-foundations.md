@@ -12,7 +12,7 @@ Use [00](../00-execution-protocol.md), the [task template](../templates/task-rec
 
 ## FND-01 — Freeze coordinate, SI and amplitude conventions
 
-**Initial state:** READY. **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
+**Current state:** DONE — [review and artifacts](../../work-items/FND-01.md). **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
 
 **Inputs / predecessors:** Current baseline, code inventory and owner direction; no new physical run required.
 
