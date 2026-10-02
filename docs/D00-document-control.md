@@ -1,6 +1,6 @@
 # AURA-D00: Document Control and Scientific Baseline
 
-**Version:** 1.1 · **Status:** BASELINE · **Date:** 2026-10-02 · **Owner:** Andiora Research
+**Version:** 1.2 · **Status:** BASELINE · **Date:** 2026-10-02 · **Owner:** Andiora Research
 
 ## Purpose
 
@@ -58,7 +58,11 @@ Use MAJOR.MINOR versions. Increase MAJOR when requirements, accepted equations, 
 
 ## Baseline approval
 
-On 2026-10-01, the project owner approved D00-D09 and PLAN-01 as the controlled development baseline. The decision is recorded in [DEC-001](decisions/DEC-001-p0-baseline-approval.md) against commit `8cbd2e2e50a17e96299fd00dbba667b5c3b24ed4`. On 2026-10-02, the owner approved the first measurable force-model benchmark and a staged search for later benchmarks; [DEC-002](decisions/DEC-002-initial-measurable-force-benchmark.md) records the scope. PLAN-01 v1.1 is the current phase plan and supersedes v1.0 while retaining its phase gates and the D00-D09 baseline. G01-G05 remain DRAFT pending procedure review. These approvals authorize the gated research workflow; they do not validate AURA's hypothesis, establish feasibility, or mean the software is ready for scientific runs. The Definition of Ready items below remain separate implementation gates.
+On 2026-10-01, the project owner approved D00-D09 and PLAN-01 as the controlled development baseline. The decision is recorded in [DEC-001](decisions/DEC-001-p0-baseline-approval.md) against commit `8cbd2e2e50a17e96299fd00dbba667b5c3b24ed4`. On 2026-10-02, the owner approved the first measurable force-model benchmark and a staged search for later benchmarks; [DEC-002](decisions/DEC-002-initial-measurable-force-benchmark.md) records the scope. The owner later directed that missing evidence must not stop independent foundation work; [DEC-003](decisions/DEC-003-nonblocking-foundation-work.md) records the evidence limits and sequencing change. PLAN-01 v1.2 is current; v1.0 and v1.1 are preserved in the archive. G01-G05 remain DRAFT pending procedure review. These approvals authorize foundation and phase-gated research work; they do not validate AURA's hypothesis, establish feasibility, or permit claims beyond the available evidence.
+
+## Progress while evidence is incomplete
+
+An incomplete measurement source does not block work that does not depend on the missing information, such as units, schemas, dimensional checks and analytical field cases. The affected comparison remains EXPLORATORY or INDETERMINATE until its evidence gap is resolved. This permission does not bypass D02, D04-D09, resource preflight, convergence or claim review, and does not authorize a stronger scientific claim. See DEC-003 for the approved work sequence.
 
 ## Definition of ready
 

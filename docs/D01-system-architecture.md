@@ -1,6 +1,6 @@
 # AURA-D01: System Architecture
 
-**Version:** 1.0 · **Status:** BASELINE · **Date:** 2026-10-01
+**Version:** 1.1 · **Status:** BASELINE · **Date:** 2026-10-02
 
 ## Purpose and hypothesis
 
@@ -51,7 +51,7 @@ Scenario, field, force, dynamics, control, MCLF and evidence modules communicate
 
 ## Initial research campaign
 
-Start with a single transducer and planar array at a selected ultrasonic frequency, then reproduce analytical wavelength, interference, spreading and power-balance cases. Select a published force/scattering benchmark with sufficient parameters. Do not combine controller or AI development with the first force-model reproduction. Only after benchmark and MCLF gates pass should ideal microgravity closed-loop cases be explored.
+Start with SI/schema/MCLF foundations and analytical wavelength, interference, spreading and power-balance checks. These can proceed while a separate published benchmark has unresolved measurement details, provided the missing information is not silently replaced. The Andrade sphere curve remains a first exploratory force reference; any comparison limited by its missing measurement uncertainty remains INDETERMINATE. Do not combine controller or AI development with the first force-model work. Array control, prescribed acceleration and ideal microgravity cases remain behind their applicable force-model, dynamics and evidence gates. See [DEC-003](decisions/DEC-003-nonblocking-foundation-work.md) and [PLAN-01 v1.2](PLAN-01-project-execution-plan.md).
 
 ## Scale-up boundary
 

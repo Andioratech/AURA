@@ -1,6 +1,6 @@
 # PLAN-01: AURA Phase-Gated Master Work Plan
 
-**Version:** 1.2 · **Status:** BASELINE · **Owner:** AURA project owner · **Last updated:** 2026-10-02
+**Version:** 1.1 · **Status:** BASELINE · **Owner:** AURA project owner · **Last updated:** 2026-10-02
 
 ## 1. Purpose
 
@@ -10,7 +10,7 @@ This is a work-sequencing document. It does not approve a physical model, prove 
 
 ## 2. Operating rules
 
-1. **Separate foundation work from evidence promotion.** P1 literature gaps do not block P2 input contracts or P3 analytical checks when those tasks do not rely on the missing information. Continue one bounded question at a time within each active track. A result marked EXPLORATORY or INDETERMINATE cannot pass a claim-critical gate.
+1. **One active phase.** Work on the next phase starts only after the current phase's exit review is recorded as PASS. The owner may explicitly pause or reprioritize.
 2. **One scientific question per work item.** Each issue or task has one question, one primary observable, a fixed domain, named artifacts, and a pass/fail/indeterminate condition.
 3. **Freeze before compute.** Version the configuration, model, assumptions, primary metric, tolerance rationale, seed policy, and resource budget before the run.
 4. **No hidden scope changes.** A changed equation, object class, regime, geometry, target, metric, solver fidelity, or hardware assumption requires a decision record and may require a new experiment ID.
@@ -40,8 +40,8 @@ A project phase is complete only when every mandatory work package has an artifa
 | Phase | Name | Main exit evidence | Dependency |
 |---|---|---|---|
 | P0 | Repository, provenance, and governance | Clean structure, source inventory, controlled plan, owner-approved baseline | Current |
-| P1 | Bounded scientific question and benchmark selection | Frozen domain, one benchmark, observable, decision rule, or explicit INDETERMINATE evidence limit | P0 |
-| P2 | Units, schemas, and MCLF L0 | Validated SI contracts, dimensional checks, known-answer cases | P0; may proceed alongside P1 evidence follow-up |
+| P1 | Bounded scientific question and benchmark selection | Frozen domain, one benchmark, observable, decision rule | P0 |
+| P2 | Units, schemas, and MCLF L0 | Validated SI contracts, dimensional checks, known-answer cases | P1 |
 | P3 | Analytical acoustic foundation | Reproduced closed-form field cases with quantified errors | P2 |
 | P4 | First numerical field solver | Solver verified against Phase 3 and resource-bounded | P3 |
 | P5 | One regime-specific force/torque model | Published/analytical force benchmark reproduced in-domain | P4 |
@@ -51,17 +51,15 @@ A project phase is complete only when every mandatory work package has an artifa
 | P9 | Independent high-fidelity confirmation | Claim-critical result reproduced using independent formulation | P8 |
 | P10 | Experimental feasibility decision | Reviewed design study with safety, cost, and evidence case | P9 |
 
-Do not combine claim-critical gates to save time. Foundation work may proceed while a separate evidence track remains open when DEC-003 permits it. A phase may split into subphases only by a recorded decision that preserves the original scientific limits.
+Do not combine phases to save time. A phase may split into subphases only by a recorded decision that preserves the original gates.
 
 ## 4.1 Current phase tracker
 
 | Phase | Status | Blocking condition / next action |
 |---|---|---|
 | P0 | PASS | Owner acceptance recorded in DEC-001; repository, source provenance, links, local quality checks, and remote CI passed |
-| P1 | REVIEW — EVIDENCE TRACK | First benchmark and comparison rule are recorded; source measurement uncertainty remains unquantified. Keep the published-curve comparison descriptive/INDETERMINATE; continue source search when useful. This no longer blocks P2 or P3 foundation work |
-| P2 | ACTIVE — FOUNDATION TRACK | Define SI contracts, scenario/run schemas and MCLF L0 rules without filling missing physical inputs with defaults |
-| P3 | QUEUED | Begin after P2's own contract and known-answer review; it does not require a conclusive P1 force validation |
-| P4-P10 | GATED | Advance according to scientific dependencies below. Before P4 solver runs, freeze its domain and complete solver-specific resource preflight. P5 comparisons using the current figure remain INDETERMINATE unless source uncertainty is recovered or a suitable independent measurement is added |
+| P1 | REVIEW | Candidate screen, benchmark choice, comparison rule and figure-derived curve files are recorded with a second pixel-sampling cross-check. Source measurement uncertainty remains unquantified, so formal validation must be INDETERMINATE unless uncertainty is recovered. Review the curve traces, freeze the experiment and finish the resource preflight before exit review |
+| P2-P10 | BLOCKED | Advance only after the preceding phase receives a recorded PASS decision |
 
 ## 5. Phase details
 
@@ -84,7 +82,7 @@ Do not combine claim-critical gates to save time. Foundation work may proceed wh
 
 **Stop conditions:** missing provenance, conflicting claims with no decision, uncertain ownership/license, or unstable repository identity. Do not start solver implementation while these remain unresolved.
 
-**Decision and evidence:** P0 PASS was recorded on 2026-10-01 after owner approval, source checksum verification, repository review, local quality checks, and successful remote CI. See [DEC-001](decisions/DEC-001-p0-baseline-approval.md). On 2026-10-02, DEC-003 approved foundation work to continue while P1 source uncertainty remains unresolved. This does not validate a solver or benchmark or authorize stronger claims. G01-G05 remain DRAFT.
+**Decision and evidence:** P0 PASS was recorded on 2026-10-01 after owner approval, source checksum verification, repository review, local quality checks, and successful remote CI. See [DEC-001](decisions/DEC-001-p0-baseline-approval.md). The accepted baseline is D00-D09 and this plan at commit `8cbd2e2e50a17e96299fd00dbba667b5c3b24ed4`; G01-G05 remain DRAFT. Baseline approval authorizes phase-gated research only; it does not mean a solver or benchmark has been validated.
 
 ### P1 — Bounded question and benchmark selection
 
@@ -98,11 +96,11 @@ Do not combine claim-critical gates to save time. Foundation work may proceed wh
 - P1.4 Freeze one body shape and material, medium state, source/array geometry, frequency, boundary assumptions, state variables, initial conditions, and the modeled gravity environment.
 - P1.5 Define one primary observable and its units, sampling, averaging interval, and comparison formula. Secondary metrics are diagnostic only.
 - P1.6 Define the falsification/stop condition, tolerance derivation, uncertainty sources, and allowable parameter range before computing.
-- P1.7 Record benchmark data volume and preliminary compute class. Complete detailed CPU, RAM, storage, and wall-time preflight when the P4 solver/domain is selected and before a solver run.
+- P1.7 Estimate CPU, RAM, storage, and wall time; reject a case that cannot be independently verified within available resources.
 
-**Deliverables:** benchmark dossier; experiment definition; parameter/provenance table; observable and uncertainty specification; source/data volume record; immutable EXP ID. Detailed solver resource preflight is required before P4 execution.
+**Deliverables:** benchmark dossier; experiment definition; parameter/provenance table; observable and uncertainty specification; resource preflight; immutable EXP ID.
 
-**Exit gate:** every required input is sourced or explicitly measured/assumed; an independent reference exists; the primary observable and pass/fail/indeterminate rule are reviewable; owner approves the frozen domain. Missing source uncertainty may be recorded as an accepted INDETERMINATE limit and does not block P2/P3, but it prevents a formal PASS for the experimental comparison.
+**Exit gate:** every required input is sourced or explicitly measured/assumed; an independent reference exists; the primary observable and pass/fail/indeterminate rule are reviewable; owner approves the frozen domain.
 
 **Out of scope:** optimization, control, AI, multi-object claims, human-scale extrapolation, and physical prototype design.
 
@@ -353,12 +351,10 @@ Changes to phase order, gates, primary observables, acceptance thresholds, model
 
 ## 11. Immediate next actions
 
-1. DEC-002 records the owner's approval of the Andrade et al. 50 mm sphere force measurement as AURA's first measurable force-model check. DEC-003 records the owner's direction to keep progressing while source uncertainty remains open.
-2. P1 remains open for source uncertainty and benchmark review. Its current figure comparison is descriptive and INDETERMINATE; it no longer blocks foundation work.
-3. Start P2.1–P2.8: unit conventions, small versioned schemas, pure dimensional/acoustic calculations, and the first MCLF L0 rule table. Do not add acoustic PDE solvers, force calculations or target-control logic in P2.
-4. After P2 review, proceed to P3 analytical wave cases. Treat them as equation/code verification, not experimental validation of AURA.
-5. Do not infer microgravity performance, multi-element control or behavior of heavier bodies from this first benchmark. At each later gate, search for evidence suited to that capability.
-6. Do not implement acoustic propagation, radiation force, control, AI optimization, or high-fidelity solvers before their applicable gates and solver-specific resource preflight.
+1. DEC-002 records the owner's approval of the Andrade et al. 50 mm sphere force measurement as AURA's first measurable force-model check.
+2. P1.1–P1.3 have a selected benchmark, written comparison rule and figure-derived curve extractions with resolution and pixel-sampling cross-checks. Next, review the traces, complete the experiment definition, and finish the resource preflight. The source's experimental uncertainty remains unquantified; keep formal validation INDETERMINATE unless authoritative uncertainty data are found.
+3. Do not infer microgravity performance, multi-element control or behavior of heavier bodies from this first benchmark. At each later gate, search for and validate a benchmark suited to that next capability.
+4. Do not start implementation before P1 PASS or implement acoustic propagation, radiation force, control, AI optimization, or high-fidelity solvers before the applicable gate.
 
 ## 12. Benchmark progression toward the microgravity objective
 
