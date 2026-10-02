@@ -58,7 +58,7 @@ Do not combine phases to save time. A phase may split into subphases only by a r
 | Phase | Status | Blocking condition / next action |
 |---|---|---|
 | P0 | PASS | Owner acceptance recorded in DEC-001; repository, source provenance, links, local quality checks, and remote CI passed |
-| P1 | REVIEW | Candidate screen and benchmark choice are recorded. The Fig. 5 curve has no uncertainty bars and the source does not quantify measurement uncertainty, so formal validation must be INDETERMINATE unless uncertainty is recovered; freeze the experiment and complete the resource preflight before exit review |
+| P1 | REVIEW | Candidate screen, benchmark choice, comparison rule and first figure-derived curve files are recorded. The 180/360 dpi outputs are not independent; source measurement uncertainty remains unquantified, so formal validation must be INDETERMINATE unless uncertainty is recovered. Complete independent curve review, freeze the experiment and finish the resource preflight before exit review |
 | P2-P10 | BLOCKED | Advance only after the preceding phase receives a recorded PASS decision |
 
 ## 5. Phase details
@@ -352,7 +352,7 @@ Changes to phase order, gates, primary observables, acceptance thresholds, model
 ## 11. Immediate next actions
 
 1. DEC-002 records the owner's approval of the Andrade et al. 50 mm sphere force measurement as AURA's first measurable force-model check.
-2. P1.1–P1.3 now have a selected benchmark and a written comparison rule. Next, complete the experiment definition, archive two reproducible figure digitizations with their figure-reading uncertainty, then select the later numerical formulation and finish its resource preflight. The source's experimental uncertainty remains unquantified; keep formal validation INDETERMINATE unless authoritative uncertainty data are found.
+2. P1.1–P1.3 have a selected benchmark, written comparison rule and first curve extraction at two rendering resolutions. Next, obtain an independent second digitization, complete the experiment definition, and finish the resource preflight. The source's experimental uncertainty remains unquantified; keep formal validation INDETERMINATE unless authoritative uncertainty data are found.
 3. Do not infer microgravity performance, multi-element control or behavior of heavier bodies from this first benchmark. At each later gate, search for and validate a benchmark suited to that next capability.
 4. Do not start implementation before P1 PASS or implement acoustic propagation, radiation force, control, AI optimization, or high-fidelity solvers before the applicable gate.
 
