@@ -19,11 +19,15 @@ from aura.schema import (
     verify_manifest_configuration,
 )
 
-from . import provenance
-from .manifest import digest, encode, fail, publish, read_bytes, verified_bytes
+from . import analytic, provenance
+from .manifest import decode, digest, encode, fail, publish, read_bytes, verified_bytes
 
 VERSION = "RUN-1.0"
-DRIVERS = {"lifecycle-receipt": "1.0", "lifecycle-failure": "1.0"}
+DRIVERS = {
+    "lifecycle-receipt": "1.0",
+    "lifecycle-failure": "1.0",
+    analytic.DRIVER: analytic.DRIVER_VERSION,
+}
 LIMITATION = "Software diagnostic only; no physical simulation or scientific acceptance."
 
 
@@ -40,7 +44,7 @@ def _load(path, kind):
     return record
 
 
-def _preflight(config, payloads, output):
+def _preflight(config, payloads, output, field_estimate=None):
     parent = output.parent
     while not parent.exists():
         parent = parent.parent
@@ -55,6 +59,8 @@ def _preflight(config, payloads, output):
     }
     caps = config["resources"]
     available_ram = os.sysconf("SC_AVPHYS_PAGES") * os.sysconf("SC_PAGE_SIZE")
+    if field_estimate is not None:
+        estimate = field_estimate
     if estimate["ram_bytes"] > min(caps["ram_bytes"], available_ram) or (
         estimate["disk_bytes"] > min(caps["disk_bytes"], shutil.disk_usage(parent).free)
     ) or estimate["wall_time_s"] > caps["wall_time"]["value"]:
@@ -79,20 +85,29 @@ def execute(scenario_path, experiment_path, *, output=None, seed):
     if seed is not None and (type(seed) is not int or seed < 0):
         fail("RUN_SEED", "Specify a nonnegative integer or explicit no-randomness null.")
     solver = config["solver"]
-    if DRIVERS.get(solver["model_id"]) != solver["model_version"] or (
-        solver["precision"] != "float64" or solver["parameters"] or solver["equation_ids"] != ["SOFTWARE-RUN-01"]
+    model_id = solver["model_id"]
+    analytical = model_id == analytic.DRIVER
+    if DRIVERS.get(model_id) != solver["model_version"]:
+        fail("RUN_MODEL", "Only a registered versioned run driver is available.")
+    if not analytical and (
+        solver["precision"] != "float64" or solver["parameters"]
+        or solver["equation_ids"] != ["SOFTWARE-RUN-01"]
     ):
-        fail("RUN_MODEL", "Only the registered version-1.0 software diagnostics are available.")
+        fail("RUN_MODEL", "Only the registered version-1.0 software diagnostics use this policy.")
     if (exp["scenario_id"], exp["scenario_sha256"]) != (
         config["id"], document_sha256(scenario)
     ):
         fail("HASH_MISMATCH", "Experiment does not identify this exact scenario.")
     protocol_uri = exp["protocol"]["uri"]
-    if ":" in protocol_uri or Path(protocol_uri).is_absolute():
-        fail("RUN_PROTOCOL", "Use a local protocol path relative to the experiment file.")
+    if ":" in protocol_uri or Path(protocol_uri).is_absolute() or Path(protocol_uri).name != protocol_uri:
+        fail("RUN_PROTOCOL", "Use one local protocol filename relative to the experiment file.")
     protocol = read_bytes(Path(experiment_path).parent / protocol_uri)
     if digest(protocol) != exp["protocol"]["sha256"]:
         fail("HASH_MISMATCH", "Protocol bytes differ from the frozen experiment.")
+    request = analytic.parse_request(protocol) if analytical else None
+    field_estimate = None
+    if analytical:
+        field_estimate = analytic.preflight(scenario, request)
     run_id = "RUN-" + datetime.now(timezone.utc).strftime("%Y%m%d") + "-" + uuid.uuid4().hex
     pre = evaluate_scenario(config, report_id=run_id + "-PRE", run_id=run_id, stage="pre")
     if pre.verdict in ("INVALIDATED", "ALERT"):
@@ -111,10 +126,10 @@ def execute(scenario_path, experiment_path, *, output=None, seed):
     payloads = {
         "scenario.json": dumps_document(scenario).encode(),
         "experiment.json": dumps_document(experiment).encode(),
-        "protocol.md": protocol, "source.json": encode(source),
+        Path(protocol_uri).name: protocol, "source.json": encode(source),
         "environment.json": encode(environment), **locks,
     }
-    estimate = _preflight(config, payloads, destination)
+    estimate = _preflight(config, payloads, destination, field_estimate)
     payloads["preflight.json"] = encode(estimate)
     inputs = [{"uri": name, "sha256": digest(data)} for name, data in payloads.items()]
     manifest = {
@@ -132,7 +147,8 @@ def execute(scenario_path, experiment_path, *, output=None, seed):
         "mclf_pre": {"status": "completed", "verdict": pre.verdict,
                      "report": {"uri": "audit-pre.json", "sha256": digest(encode(pre.to_dict()))}},
         "mclf_post": {"status": "not_run"}, "failure_code": None,
-        "operator_notes": LIMITATION + " Exploratory permission: DEC-003; seed is recorded but unused.",
+        "operator_notes": (analytic.SCOPE if analytical else LIMITATION)
+        + " Exploratory permission: DEC-003; seed is recorded but unused.",
     }
     verify_manifest_configuration(RunManifest(manifest), scenario, experiment=experiment)
     destination.parent.mkdir(parents=True, exist_ok=True)
@@ -148,17 +164,28 @@ def execute(scenario_path, experiment_path, *, output=None, seed):
     state, code = "completed", 3
 
     def emit(name, value):
-        outputs.append(publish(destination, name, encode(value)))
+        ref = publish(destination, name, encode(value))
+        outputs.append(ref)
+        return ref
 
     try:
-        _driver(config, emit)
+        if analytical:
+            analytic.execute_field(scenario, request, run_id, emit)
+        else:
+            _driver(config, emit)
         source_after, environment_after, locks_after = provenance.capture()
         if (source_after, environment_after, locks_after) != (source, environment, locks):
             fail("RUN_SOURCE_CHANGED", "Source changed during execution.")
         for ref in [*inputs, *outputs, manifest["mclf_pre"]["report"]]:
             verified_bytes(destination, ref)
-        if not any(ref["uri"] == "receipt.json" for ref in outputs):
-            fail("RUN_OUTPUT_MISSING", "Required diagnostic receipt is absent.")
+        expected_outputs = analytic.OUTPUT_NAMES if analytical else {"receipt.json"}
+        if {ref["uri"] for ref in outputs} != expected_outputs:
+            fail("RUN_OUTPUT_MISSING", "Required driver outputs are absent or unexpected.")
+        if analytical:
+            stored = {name: decode(read_bytes(destination / name)) for name in analytic.OUTPUT_NAMES}
+            analytic.check_field_outputs(run_id, config, request, outputs, stored)
+            if sum(path.stat().st_size for path in destination.iterdir()) > 15 * 1024**2:
+                fail("RUN_RESOURCE", "Analytical bundle crossed the reserved 16 MiB storage cap.")
         if time.monotonic() - started > config["resources"]["wall_time"]["value"]:
             fail("RUN_TIME_LIMIT", "Recorded execution exceeded its wall-time cap.")
     except (Exception, KeyboardInterrupt) as exc:  # noqa: BLE001 -- retain every driver failure
@@ -173,10 +200,12 @@ def execute(scenario_path, experiment_path, *, output=None, seed):
              "execution_status": state, "elapsed_s": elapsed, "error": error,
              "peak_process_rss_bytes": resource.getrusage(resource.RUSAGE_SELF).ru_maxrss * 1024,
              "process_cpu_time_s": time.process_time() - cpu_started,
-             "logical_cpu_count": os.cpu_count(), "backend": "software-diagnostic", "gpu_used": False,
+             "logical_cpu_count": os.cpu_count(), "gpu_used": False,
              "driver_artifact_bytes": sum((destination / ref["uri"]).stat().st_size for ref in outputs),
-             "expected_driver_outputs": ["receipt.json"], "seed_used": False,
-             "scope": LIMITATION}
+             "expected_driver_outputs": sorted(analytic.OUTPUT_NAMES) if analytical else ["receipt.json"],
+             "seed_used": False, "scope": analytic.SCOPE if analytical else LIMITATION,
+             "backend": "analytic-closed-form" if analytical else "software-diagnostic",
+             "run_policy": analytic.RUN_POLICY if analytical else "SOFTWARE-DIAGNOSTIC-1.0"}
     emit("execution.json", usage)
     post = {"audit_version": "RUN-POST-1.0", "run_id": run_id,
             "verdict": "INDETERMINATE" if state == "completed" else "INVALIDATED",

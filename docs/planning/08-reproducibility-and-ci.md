@@ -6,7 +6,7 @@ A task state is READY/ACTIVE/REVIEW/DONE/BLOCKED. A run execution state is plann
 
 ## RUN-01 — Minimal immutable execution lifecycle
 
-**Current state:** DONE — [implementation](../work-items/RUN-01.md), [artifact review](../reviews/RUN-01-lifecycle.md). The recorder supports the frozen software diagnostics; analytical adapter contracts/model admission follow ANA-01 and the owning P3 cards.
+**Current state:** DONE within the original lifecycle scope — [implementation](../work-items/RUN-01.md), [artifact review](../reviews/RUN-01-lifecycle.md). ANA-07 adds an `ANALYTIC-RUN-1.0` policy for bounded ideal plane-wave field records with a read-only artifact/index checker. Independent reference comparison and spherical-source recording are not yet admitted; both remain ANA-07 work.
 
 **Depends on:** FND-08 and P2 gate. **Complete before:** ANA-01 evidence runs.
 

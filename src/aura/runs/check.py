@@ -12,6 +12,7 @@ from aura.schema import (
     verify_manifest_configuration,
 )
 
+from . import analytic
 from .execute import DRIVERS, LIMITATION, VERSION
 from .manifest import decode, digest, fail, read_bytes, safe_file, verified_bytes
 from .provenance import LOCK_NAMES
@@ -45,8 +46,6 @@ def check_run(folder, *, expected_sha256=None):
             fail("HASH_MISMATCH", "Manifest checksum differs.")
     elif data["execution_status"] != "running":
         fail("RUN_STATE", "Initial manifest must record running state.")
-    if {ref["uri"] for ref in data["inputs"]} != INPUT_NAMES:
-        fail("RUN_INPUTS", "The required RUN-1.0 input set is incomplete or changed.")
     refs = [*data["inputs"], *data["outputs"], data["mclf_pre"].get("report", {})]
     if terminal:
         refs.append(data["mclf_post"].get("report", {}))
@@ -59,7 +58,13 @@ def check_run(folder, *, expected_sha256=None):
         fail("DOCUMENT_TYPE", "Stored scenario/experiment has the wrong document type.")
     verify_manifest_configuration(manifest, scenario, experiment=experiment)
     exp = experiment.to_dict()
-    if digest(content["protocol.md"]) != exp["protocol"]["sha256"]:
+    protocol_uri = exp["protocol"]["uri"]
+    if type(protocol_uri) is not str or Path(protocol_uri).name != protocol_uri or protocol_uri in ("", ".", ".."):
+        fail("RUN_PROTOCOL", "Stored protocol reference must be one local filename.")
+    expected_inputs = (INPUT_NAMES - {"protocol.md"}) | {protocol_uri}
+    if {ref["uri"] for ref in data["inputs"]} != expected_inputs:
+        fail("RUN_INPUTS", "The required RUN-1.0 input set is incomplete or changed.")
+    if digest(content[protocol_uri]) != exp["protocol"]["sha256"]:
         fail("HASH_MISMATCH", "Stored protocol differs from the experiment.")
     if data["observables"] != [exp["primary_observable"]["name"]]:
         fail("IDENTITY_MISMATCH", "Recorded observable differs from the experiment.")
@@ -90,10 +95,18 @@ def check_run(folder, *, expected_sha256=None):
         fail("RUN_AUDIT", "Pre-audit identity or diagnostic verdict differs.")
     if DRIVERS.get(data["solver"]["model_id"]) != data["solver"]["model_version"]:
         fail("RUN_MODEL", "Unrecognized recorded diagnostic model.")
+    analytical = data["solver"]["model_id"] == analytic.DRIVER
+    request = None
+    if analytical:
+        request = analytic.parse_request(content[protocol_uri])
+        analytic.check_preflight(decode(content["preflight.json"]), scenario, request)
+        if sum(len(value) for value in content.values()) > 16 * 1024**2:
+            fail("RUN_RESOURCE", "Analytical bundle inputs/artifacts exceed the 16 MiB cap.")
+    scope = analytic.SCOPE if analytical else LIMITATION
     if not terminal:
         return {"lifecycle_version": VERSION, "run_id": data["id"], "integrity": "INCOMPLETE",
                 "execution_status": "running", "verdict": "INDETERMINATE", "exit_code": 3,
-                "scope": "Initial artifacts verified; completion/liveness is unknown. " + LIMITATION}
+                "scope": "Initial artifacts verified; completion/liveness is unknown. " + scope}
     state = data["execution_status"]
     if state not in ("completed", "failed", "aborted"):
         fail("RUN_STATE", "Final manifest must have a terminal execution state.")
@@ -122,7 +135,27 @@ def check_run(folder, *, expected_sha256=None):
         usage["error"] is not None and usage["error"]["code"] != data["failure_code"]
     ):
         fail("RUN_STATE", "Failure record and manifest disagree.")
-    if state == "completed":
+    analytical_outputs = {ref["uri"] for ref in data["outputs"]}
+    if analytical:
+        required = {"execution.json", "running.json"}
+        allowed = analytic.OUTPUT_NAMES | required
+        if not required <= analytical_outputs or not analytical_outputs <= allowed or (
+            state == "completed" and analytical_outputs != allowed
+        ):
+            fail("FIELD_OUTPUTS", "Analytical run output index is incomplete or changed.")
+        if usage["scope"] != analytic.SCOPE or usage["backend"] != "analytic-closed-form" or (
+            usage["run_policy"] != analytic.RUN_POLICY or (
+                usage["expected_driver_outputs"] != sorted(analytic.OUTPUT_NAMES)
+            )
+        ):
+            fail("RUN_SCOPE", "Analytical driver provenance or scope differs.")
+    if state == "completed" and analytical:
+        analytic.check_field_outputs(
+            data["id"], scenario.to_dict(), request,
+            [ref for ref in data["outputs"] if ref["uri"] in analytic.OUTPUT_NAMES],
+            {name: decode(content[name]) for name in analytic.OUTPUT_NAMES},
+        )
+    elif state == "completed":
         receipt = decode(content["receipt.json"])
         if receipt != {"diagnostic_version": VERSION, "scenario_id": data["scenario_id"],
                        "physical_simulation": False, "scope": LIMITATION}:
@@ -130,7 +163,9 @@ def check_run(folder, *, expected_sha256=None):
     allowed = {*names, "manifest.json", "manifest.sha256"}
     if {path.name for path in folder.iterdir()} != allowed:
         fail("RUN_EXTRA_FILES", "Bundle contains unindexed or missing files.")
+    if analytical and sum(path.stat().st_size for path in folder.iterdir()) > 16 * 1024**2:
+        fail("RUN_RESOURCE", "Analytical run bundle exceeds the 16 MiB cap.")
     return {"lifecycle_version": VERSION, "run_id": data["id"], "integrity": "VERIFIED",
             "execution_status": state, "verdict": verdict, "manifest_sha256": actual,
             "exit_code": 3 if state == "completed" else 1,
-            "scope": "Recorded bytes and links verified; not source replay or publisher authentication. " + LIMITATION}
+            "scope": "Recorded bytes and links verified; not source replay or publisher authentication. " + scope}

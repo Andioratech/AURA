@@ -41,6 +41,60 @@ def inputs(tmp_path):
 
 
 @pytest.fixture
+def analytical_inputs(tmp_path):
+    scenario = json.loads((ROOT / "examples/schema/manufactured-scenario.json").read_text())
+    scenario["medium"]["dynamic_viscosity"]["value"] = 0
+    scenario["bodies"][0]["initial_state"]["position"]["value"] = [0, 0, 0]
+    scenario["domain"] = {
+        "origin": {"value": [-0.0015, -0.0015, -0.0015], "unit": "m"},
+        "size": {"value": [0.003, 0.003, 0.003], "unit": "m"},
+        "boundary_model": "analytic-window",
+        "boundary_reference": "Finite observation window; no wall solution",
+    }
+    scenario["sources"]["elements"][0].update(
+        position={"value": [0, 0, 0], "unit": "m"},
+        normal={"value": [1, 0, 0], "unit": "1"},
+        model="ideal_plane_wave",
+    )
+    scenario["solver"].update(
+        model_id="analytic-plane-field", model_version="1.0",
+        equation_ids=["EQ-007"], regime=["Manufactured plane-wave field"],
+        precision="complex128", parameters={},
+    )
+    scenario["resources"] = {
+        "ram_bytes": 4 * 1024**3, "disk_bytes": 16 * 1024**2,
+        "wall_time": {"value": 30, "unit": "s"},
+    }
+    request = {
+        "contract": "FIELD-REQUEST-1.0", "case_id": "B03-01",
+        "box_min_m": [-0.0015, -0.0015, -0.0015],
+        "box_max_m": [0.0015, 0.0015, 0.0015],
+        "coordinates_m": [[0, 0, 0], [0.000375, 0, 0]],
+    }
+    request_bytes = encode(request)
+    (tmp_path / "field-request.json").write_bytes(request_bytes)
+    exp = {
+        "document_type": "experiment", "schema_version": "1.0", "id": "EXP-ANALYTIC-TEST",
+        "scenario_id": scenario["id"],
+        "scenario_sha256": document_sha256(Scenario(scenario)),
+        "hypothesis": "Test-only recorder serializes a manufactured analytical field",
+        "claim_id": "TEST-ONLY",
+        "primary_observable": {
+            "name": "incident_field", "unit": "Pa", "definition": "Recorded harmonic pressure field",
+            "window": scenario["target"]["window"],
+        },
+        "acceptance_rule": "Integrity only; numerical comparison is separate",
+        "uncertainty_plan": "No physical result",
+        "protocol": {"uri": "field-request.json", "sha256": digest(request_bytes)},
+        "provenance": scenario["provenance"],
+    }
+    scenario_path, exp_path = tmp_path / "scenario.json", tmp_path / "experiment.json"
+    scenario_path.write_bytes(encode(scenario))
+    exp_path.write_bytes(encode(exp))
+    return scenario_path, exp_path, tmp_path / "run"
+
+
+@pytest.fixture
 def observed(monkeypatch):
     # Published clean-source CLI checks are performed separately at delivery.
     # Fault injection uses this synthetic observation, never scientific evidence.
@@ -88,6 +142,131 @@ def test_completed_bundle_keeps_scientific_unknown(inputs, observed):
     assert manifest["mclf_pre"]["verdict"] == manifest["mclf_post"]["verdict"] == "INDETERMINATE"
     for ref in [*manifest["inputs"], *manifest["outputs"]]:
         assert digest((output / ref["uri"]).read_bytes()) == ref["sha256"]
+
+
+def test_analytical_field_run_is_immutable_and_checkable(analytical_inputs, observed):
+    scenario, experiment, output = analytical_inputs
+    result = execute(scenario, experiment, output=output, seed=None)
+    assert (result["execution_status"], result["verdict"], result["exit_code"]) == (
+        "completed", "INDETERMINATE", 3,
+    )
+    checked = check_run(output, expected_sha256=result["manifest_sha256"])
+    assert (checked["integrity"], checked["verdict"]) == ("VERIFIED", "INDETERMINATE")
+    records = {
+        "coordinates": json.loads((output / "field-coordinates.json").read_bytes()),
+        "pressure": json.loads((output / "field-pressure.json").read_bytes()),
+        "velocity": json.loads((output / "field-velocity.json").read_bytes()),
+        "pressure_gradient": json.loads((output / "field-pressure-gradient.json").read_bytes()),
+    }
+    assert records["pressure"]["values"][0] == [2, 0]
+    assert records["pressure"]["values"][1] == pytest.approx([0, 2], abs=1e-15)
+    assert records["coordinates"]["values"] == [[0, 0, 0], [0.000375, 0, 0]]
+    index = json.loads((output / "field-index.json").read_bytes())
+    assert index["contract"] == "FIELD-INDEX-1.0"
+    assert index["run_policy"] == "ANALYTIC-RUN-1.0"
+    assert index["pressure_gradient"]["unit"] == "Pa/m"
+    assert index["run_id"] == result["run_id"]
+
+
+def test_analytical_check_rejects_component_tampering(analytical_inputs, observed):
+    scenario, experiment, output = analytical_inputs
+    execute(scenario, experiment, output=output, seed=None)
+    component = output / "field-pressure-gradient.json"
+    component.write_bytes(component.read_bytes() + b" ")
+    with pytest.raises((InvalidInputError, OSError), match="HASH_MISMATCH"):
+        check_run(output)
+
+
+def test_two_source_analytical_run_preserves_interference(analytical_inputs, observed):
+    scenario_path, experiment_path, output = analytical_inputs
+    scenario = json.loads(scenario_path.read_bytes())
+    second = copy.deepcopy(scenario["sources"]["elements"][0])
+    second.update(id="EXAMPLE-SOURCE-02", normal={"value": [-1, 0, 0], "unit": "1"})
+    scenario["sources"]["elements"].append(second)
+    scenario["solver"]["equation_ids"] = ["EQ-008"]
+    scenario_path.write_bytes(encode(scenario))
+    experiment = json.loads(experiment_path.read_bytes())
+    experiment["scenario_sha256"] = document_sha256(Scenario(scenario))
+    experiment_path.write_bytes(encode(experiment))
+    request_path = scenario_path.parent / "field-request.json"
+    request = json.loads(request_path.read_bytes())
+    request["case_id"] = "B04-01"
+    request["coordinates_m"] = [[0, 0, 0], [0.000375, 0, 0]]
+    request_bytes = encode(request)
+    request_path.write_bytes(request_bytes)
+    experiment["protocol"]["sha256"] = digest(request_bytes)
+    experiment_path.write_bytes(encode(experiment))
+
+    result = execute(scenario_path, experiment_path, output=output, seed=None)
+    assert result["execution_status"] == "completed", result["error"]
+    assert check_run(output)["integrity"] == "VERIFIED"
+    pressure = json.loads((output / "field-pressure.json").read_bytes())["values"]
+    velocity = json.loads((output / "field-velocity.json").read_bytes())["values"]
+    assert pressure[0] == [4, 0]
+    assert pressure[1] == pytest.approx([0, 0], abs=1e-15)
+    assert velocity[1][0] == pytest.approx([0, 4 / 1_500_000], abs=1e-15)
+
+
+def test_noncollinear_pair_uses_superposition_equation(analytical_inputs, observed):
+    scenario_path, experiment_path, output = analytical_inputs
+    scenario = json.loads(scenario_path.read_bytes())
+    second = copy.deepcopy(scenario["sources"]["elements"][0])
+    second.update(id="EXAMPLE-SOURCE-02", normal={"value": [0, 1, 0], "unit": "1"})
+    scenario["sources"]["elements"].append(second)
+    scenario["solver"]["equation_ids"] = ["EQ-008"]
+    scenario_path.write_bytes(encode(scenario))
+    experiment = json.loads(experiment_path.read_bytes())
+    experiment["scenario_sha256"] = document_sha256(Scenario(scenario))
+    experiment_path.write_bytes(encode(experiment))
+    request_path = scenario_path.parent / "field-request.json"
+    request = json.loads(request_path.read_bytes())
+    request["case_id"] = "B05-01"
+    request_bytes = encode(request)
+    request_path.write_bytes(request_bytes)
+    experiment["protocol"]["sha256"] = digest(request_bytes)
+    experiment_path.write_bytes(encode(experiment))
+
+    result = execute(scenario_path, experiment_path, output=output, seed=None)
+    assert result["execution_status"] == "completed", result["error"]
+    assert check_run(output)["integrity"] == "VERIFIED"
+    pressure = json.loads((output / "field-pressure.json").read_bytes())["values"]
+    velocity = json.loads((output / "field-velocity.json").read_bytes())["values"]
+    assert pressure[0] == [4, 0]
+    assert pressure[1] == pytest.approx([2, 2], abs=1e-15)
+    assert velocity[1][0] == pytest.approx([0, 2 / 1_500_000], abs=1e-15)
+    assert velocity[1][1] == pytest.approx([2 / 1_500_000, 0], abs=1e-15)
+
+
+def test_analytical_driver_rejects_unadmitted_piston_before_provenance(analytical_inputs, monkeypatch):
+    scenario_path, experiment_path, output = analytical_inputs
+    scenario = json.loads(scenario_path.read_bytes())
+    source = scenario["sources"]["elements"][0]
+    source["model"] = "circular_piston"
+    source["aperture_radius"] = {"value": 0.001, "unit": "m"}
+    scenario_path.write_bytes(encode(scenario))
+    experiment = json.loads(experiment_path.read_bytes())
+    experiment["scenario_sha256"] = document_sha256(Scenario(scenario))
+    experiment_path.write_bytes(encode(experiment))
+    monkeypatch.setattr(provenance, "capture", lambda: pytest.fail("Reached source observation"))
+    with pytest.raises(InvalidInputError, match="FIELD_MODEL"):
+        execute(scenario_path, experiment_path, output=output, seed=None)
+    assert not output.exists()
+
+
+def test_analytical_request_rejects_outside_sample_before_provenance(analytical_inputs, monkeypatch):
+    scenario_path, experiment_path, output = analytical_inputs
+    request_path = scenario_path.parent / "field-request.json"
+    request = json.loads(request_path.read_bytes())
+    request["coordinates_m"][0] = [0.002, 0, 0]
+    request_bytes = encode(request)
+    request_path.write_bytes(request_bytes)
+    experiment = json.loads(experiment_path.read_bytes())
+    experiment["protocol"]["sha256"] = digest(request_bytes)
+    experiment_path.write_bytes(encode(experiment))
+    monkeypatch.setattr(provenance, "capture", lambda: pytest.fail("Reached source observation"))
+    with pytest.raises(InvalidInputError, match="FIELD_DOMAIN"):
+        execute(scenario_path, experiment_path, output=output, seed=None)
+    assert not output.exists()
 
 
 def test_deliberate_failure_retains_partial_output(inputs, observed):

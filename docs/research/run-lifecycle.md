@@ -1,14 +1,22 @@
-# Immutable Diagnostic Run Contract — RUN-1.0
+# Immutable Run Contract — RUN-1.0
 
 **Implemented by:** [RUN-01](../work-items/RUN-01.md) · **Schema:** existing 1.0 · **Profile:** [ENV-1.0](../../requirements/README.md)
 
 ## Scope and execution policy
 
-This lifecycle records **two bounded software diagnostics**, `lifecycle-receipt` and `lifecycle-failure`, both version 1.0, float64 metadata, empty solver parameters and `SOFTWARE-RUN-01` procedure ID. Their [frozen protocols and examples](../../examples/runs/README.md) test success/failure retention. They calculate no acoustic field, force or trajectory. The scenario's manufactured physical values are preserved but not evaluated. No plugin/callback/unsupported scientific model is exposed through the CLI.
+This lifecycle retains two bounded software diagnostics, `lifecycle-receipt` and `lifecycle-failure`, both version 1.0, float64 metadata, empty solver parameters and `SOFTWARE-RUN-01` procedure ID. Their [frozen protocols and examples](../../examples/runs/README.md) test success/failure retention. ANA-07 adds the separately versioned `ANALYTIC-RUN-1.0` policy and `analytic-plane-field` driver version 1.0. That bounded adapter evaluates existing ideal plane-wave functions only; it does not calculate body force or trajectory. Spherical-source recording is not admitted until a matching versioned source contract exists. No arbitrary plugin or callback is exposed.
 
 Execution state, byte integrity, MCLF verdict and a software benchmark comparison are separate. The normal diagnostic completes with **INDETERMINATE** scientific status. A deliberately failed execution has **INVALIDATED** lifecycle post-audit and remains inspectable. Verifying that failure retention works is a software comparison PASS, not successful physics.
 
-The strict scenario reader, experiment/configuration link and actual protocol digest are checked before allocation. Existing L0 pre-audit runs under the real new run ID; INVALIDATED and ALERT block execution. Only the registered diagnostics may proceed with INDETERMINATE, under DEC-003 and the fixed software-only limitation. There is no acceptance override. Registering analytical models in P3 requires an explicit applicability/execution-policy review.
+The strict scenario reader, experiment/configuration link and actual protocol digest are checked before allocation. Existing L0 pre-audit runs under the real new run ID; INVALIDATED and ALERT block execution. Registered software diagnostics and analytical plane-field runs may proceed with INDETERMINATE under DEC-003, each with its own fixed limitation. There is no acceptance override. The analytical driver is not a new numerical solver or physical-result acceptance path.
+
+### ANA-07 plane-field adapter — ANALYTIC-RUN-1.0
+
+`analytic-plane-field` version 1.0 is admitted in both executor and checker. It requires solver precision `complex128`, empty parameters, and equation IDs matched to the frozen family: `EQ-007` for one `B03-*` source and `EQ-008` for two `B04-*` or `B05-*` sources. Source entries must explicitly be schema-1.0 `ideal_plane_wave` records. The homogeneous medium's dynamic viscosity and amplitude attenuation must both be explicit zero; density, sound speed, frequency, direction, peak amplitude, phase and phase-reference position come from the validated Scenario source records. No source is normalized, approximated as hardware, or coupled to the recorded body.
+
+The hash-bound Experiment protocol is a bounded JSON `FIELD-REQUEST-1.0` record with exactly `contract`, `case_id`, `box_min_m`, `box_max_m`, and ordered `coordinates_m`. Its basename is retained exactly in the run bundle. The request box must equal the Scenario domain; `1 <= N <= 256`, `1 <= M <= 2`, and all source, phase and sample-domain checks precede field-array allocation. The runner calls only the existing closed-form one-wave or two-wave kernels. The seed is explicit no-randomness and is unused.
+
+The run stores the four `FIELD-ARRAY-1.0` component records, schema-1.0 FieldResult, and a strict `FIELD-INDEX-1.0`. FieldResult references coordinates, pressure and velocity. The index records the exact FieldResult hash and run/result IDs plus the Pa/m pressure-gradient reference, shape and dtype. The read-only checker verifies hashes, exact output inventory, structural metadata, sample order/coordinates, Scenario frequency, source admission, result/index links and the recorded preflight; it reconstructs the immutable FieldSamples representation but does not re-evaluate the wave equation. Integrity verification is not the frozen-reference numerical comparison, MCLF acceptance, model validation or experimental evidence. The P3 comparison and full B-03…B-06 campaign remain open.
 
 ## Source and environment
 
@@ -18,15 +26,15 @@ This initial recorder requires an editable development installation from the che
 
 ## Inputs, IDs and paths
 
-Supply one Scenario, one Experiment and an explicit integer seed or explicit null/no-randomness choice. The experiment ID, question, observable, acceptance rule and protocol digest must already exist; the recorder does not manufacture these after execution. Protocol paths are local and relative to the supplied experiment; URI schemes and absolute protocol paths are rejected. Input documents/protocol and stored individual files have a 1 MiB limit and must be stable regular files; symlinks/FIFOs are rejected. Existing FND structural limits also apply.
+Supply one Scenario, one Experiment and an explicit integer seed or explicit null/no-randomness choice. The experiment ID, question, observable, acceptance rule and protocol digest must already exist; the recorder does not manufacture these after execution. Protocol references must be a single local basename; URI schemes, absolute paths, directories and path traversal are rejected. Input documents/protocol and stored individual files have a 1 MiB limit and must be stable regular files; symlinks/FIFOs are rejected. Existing FND structural limits also apply.
 
 A fresh UTC-date/UUID run ID is generated before execution. Default directory: `results/<experiment-id>/<run-id>/` under the source checkout. `--output` may select another unused local directory; inside the source checkout it must remain under `results/`. Existing directories, files and symlinks are never reused. The UUID provides identity, not physical randomness; diagnostics do not consume the recorded seed.
 
-The stored `scenario.json` and `experiment.json` preserve the validated input content in the existing JSON representation. Their complete canonical identities bind the supplied content; raw whitespace/key ordering and original YAML spelling are not retained. `protocol.md` retains the exact supplied protocol bytes. Its copied name is local; the original experiment reference is preserved without attempting remote resolution on later inspection.
+The stored `scenario.json` and `experiment.json` preserve the validated input content in the existing JSON representation. Their complete canonical identities bind the supplied content; raw whitespace/key ordering and original YAML spelling are not retained. The protocol file retains the exact supplied bytes under its declared local basename (`protocol.md` for diagnostics; commonly `field-request.json` for ANA-07). The original Experiment reference remains inspectable without remote resolution.
 
 ## Preflight and observed resources
 
-Before directory reservation, the fixed diagnostic estimates:
+Before directory reservation, the software diagnostic estimates:
 
 - One sequential CPU worker, no GPU and zero field samples.
 - RAM: the greater of 64 MiB and the current process peak RSS plus 16 MiB of headroom.
@@ -35,6 +43,8 @@ Before directory reservation, the fixed diagnostic estimates:
 
 Compare RAM/disk estimates with both requested caps and available Linux memory/disk. Refuse insufficient budgets before the driver or output directory. The example requests 1 GiB RAM, 16 MiB disk and 30 s. These are diagnostic budgets, not measured solver requirements, calibration of a PDE cost model or operating-system hard limits. Small input validation/provenance observation happens before this allocation estimate.
 
+The analytical policy instead fixes one worker, no GPU, `N<=256`, `M<=2`, no randomness, a 16 MiB bundle ceiling and 30 s cap. Its RAM estimate is twice the observed process peak RSS plus the frozen `4096*N + 4096*M` byte workspace allowance. Its disk preflight reserves the whole 16 MiB bundle allowance. These are bounded analytic-driver caps, not a calibrated PDE cost model; actual bundle bytes and elapsed execution are checked, and any excess is recorded as failure.
+
 Record actual elapsed recorder time, process CPU time (excluding subprocess CPU), logical CPU count, fixed diagnostic backend/no-GPU use, Linux process peak RSS (including earlier imports/work), driver artifact bytes, expected output, explicit seed policy, terminal UTC timestamp and failure type/code/message. Check elapsed wall time after the bounded driver; no arbitrary or long-running solver is allowed by this implementation. Final publication time is excluded from `runtime_s`. Per-child/GPU accounting, numerical arrays, calibrated forecasts and hard workload timeouts remain later resource work.
 
 ## File layout and publication
@@ -42,12 +52,13 @@ Record actual elapsed recorder time, process CPU time (excluding subprocess CPU)
 | File | Content / role |
 |---|---|
 | `running.json` | Initial schema-1.0 manifest; published first and never rewritten |
-| `scenario.json`, `experiment.json`, `protocol.md` | Frozen input records and actual protocol bytes |
+| `scenario.json`, `experiment.json`, protocol basename | Frozen input records and exact protocol/request bytes |
 | `source.json` | Actual clean revision and source inventory |
 | `environment.json`, `*-linux-py312.lock`, `environment-linux-py312.json` | Observed environment and complete lock inputs |
 | `preflight.json` | Estimate and scope |
 | `audit-pre.json` | Unmodified L0 detailed pre-audit; evaluated before manifest construction |
 | `receipt.json` or `partial.json` | Diagnostic receipt or retained partial progress |
+| `field-*.json` | For an analytical run: four component files, schema-1.0 FieldResult and FIELD-INDEX-1.0 |
 | `execution.json` | Structured execution log: terminal state, timing/resources, seed usage and error |
 | `audit-post.json` | RUN-POST-1.0 lifecycle integrity/coverage audit |
 | `manifest.json`, `manifest.sha256` | Final manifest and exact raw-file checksum; separately retain the checksum if needed |
@@ -68,7 +79,7 @@ Once reserved, a failure during initialization/final storage can leave an incomp
 
 This envelope occupies the manifest's artifact-backed `mclf_post` check-state slot with explicit scope. It is **not** a schema-1.0 `MclfReport`, does not use R-001…R-010 as new predicates, and does not alter the existing L0 evaluator's required FieldResult/ForceResult rules. Physical postchecks, balances, convergence and experimental comparisons remain unavailable. A receipt is never disguised as a FieldResult to obtain acceptance.
 
-`check` is read-only. It verifies the final manifest checksum, every indexed local artifact, exact required input set, record identities, scenario/experiment/protocol links, preserved initial manifest, source/environment declarations, pre/post verdict links, terminal failure code and diagnostic receipt. It rejects path traversal, symlinked referenced files, duplicate references and unindexed final files. Missing/corrupt records fail visibly. An initial record with verified inputs but no final manifest reports INCOMPLETE and unknown completion/liveness. A final manifest missing its checksum reports RUN_INCOMPLETE. No inspection resumes execution, consults remote references or authenticates the current checkout against an older run.
+`check` is read-only. It verifies the final manifest checksum, every indexed local artifact, exact required input/output set, record identities, scenario/experiment/protocol links, preserved initial manifest, source/environment declarations, pre/post verdict links, terminal failure code and driver-specific artifacts. For analytical runs it also applies the checks described above, without recalculating the field or comparing it with ANA-REF. It rejects path traversal, symlinked referenced files, duplicate references and unindexed final files. Missing/corrupt records fail visibly. An initial record with verified inputs but no final manifest reports INCOMPLETE and unknown completion/liveness. A final manifest missing its checksum reports RUN_INCOMPLETE. No inspection resumes execution, consults remote references or authenticates the current checkout against an older run.
 
 A checksum stored beside a file can detect accidental change but can also be replaced with it. `check --sha256 <retained-digest>` binds the manifest to a separately retained expected value. Without such a trust anchor, internal consistency is not independent proof of origin. Archived source availability, environment reconstruction and actual replay remain RUN-02.
 
@@ -90,7 +101,7 @@ No physical acceptance/exit-0 run is available. Inspect `execution_status`, `int
 
 Existing RunManifest fields carry IDs, hypothesis/observable, start time, source/config identity, environment lock/platform, solver/precision, seed, requested caps, input/output references, runtime metric, pre/post states, failure code and notes. Referenced Experiment carries the complete observable definition/window, acceptance and uncertainty plan. Referenced source/environment/preflight/execution records carry detailed inventory, end time, estimates and observations. Physical declarations remain in the hashed Scenario. Convergence is an empty list because these software diagnostics calculate no physical approximation; it is not zero numerical error.
 
-FR-002 ordering and FR-010 identity now have real recorder integration for the bounded diagnostics. FR-009 has preserved pre-audit plus a scoped lifecycle postcheck; scientific post-audit integration remains pending. FR-011 has only this diagnostic estimate. RUN-02 adds replay/evidence comparison; ANA-01 defines real field outputs and reference cases. Physical forces, motion/control, independent scientific review, microgravity evidence and larger-object models remain at their own gates.
+FR-002 ordering and FR-010 identity have real recorder integration for the bounded diagnostics and ANA-07 plane-field adapter. FR-009 has a preserved pre-audit plus scoped lifecycle postcheck; the independent numerical field comparison/post-audit remains pending in ANA-07. FR-011 has a diagnostic estimate and the bounded analytical estimate above. RUN-02 adds replay/evidence comparison. The full B-03…B-06 campaign, P3 gate, physical forces, motion/control, independent scientific review, microgravity evidence and larger-object models remain at their own gates.
 
 ## Implementation references
 
