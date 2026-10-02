@@ -1,6 +1,6 @@
 # ANA-02 — Progressive Plane-Wave Kernel
 
-**State:** ACTIVE · **Protocol frozen:** 2026-10-02 · **Owner role:** research implementer
+**State:** DONE · **Protocol frozen:** 2026-10-02 · **Owner role:** research implementer
 
 ## Authority, question and boundary
 
@@ -31,3 +31,9 @@ Close ANA-02 only when its numerical comparisons and rejection checks actually p
 The first focused numerical/rejection suite passed 128 tests in 0.18 s. Adding the maximum-size allocation/encoding check brought it to 129 passes in 0.31 s. Its development JUnit report `/tmp/aura-ana02-development-01.xml` retains all per-case component errors and resource observations; this is a dirty-tree development check, not the clean-source publication record. A further independent complex-vector flux case and the updated CLI status contract are included in final verification. No executed functional check failed and no acceptance threshold was changed.
 
 The 11 frozen configurations include 59 observation points in total, plus separate maximum-size/resource and rejection checks. The initial comparisons were below the frozen 2048e budget; the maximum elementary-function error observed was below the separately required 4e bound. The final published-source numerical/resource values and retained report identity are recorded in the closure review.
+
+## Published-source outcome
+
+Implementation `540488c9de6d37984d36b82d7f2a195f07d82b74` passed full local Quality (1,163 tests, 15.27 s) and [exact GitHub Quality](https://github.com/Andioratech/AURA/actions/runs/37041107704) (1,163 tests, 24.66 s). The clean-source numerical rerun passed 130 tests in 0.26 s. Source/environment observations before and after agreed; the retained software report is `VERIFY-ANA02-ab2d94ba14b14be388bc807b55d341d4`, not a D07 run. [The B-03 report](../benchmarks/B03-plane-wave-verification.md) gives exact artifact hashes, per-observable maximum/RMS values and resource measurements.
+
+[The artifact review](../reviews/ANA-02-plane-wave.md) closes ANA-02. ANA-03 is READY. P3 is open, RUN-1.0 remains diagnostic-only, and physical model/experimental validation and mass/size expansion remain unresolved. The scientific uncertainty and acceptance boundaries were not promoted by the numerical comparison. Closure documentation receives its own full local and exact remote CI before delivery.
