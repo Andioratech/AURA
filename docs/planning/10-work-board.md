@@ -5,12 +5,12 @@
 ## First work cycle
 
 1. FND-01 is complete: [CONV-1.0 and review](../work-items/FND-01.md) freeze the representation contract and record existing helper gaps.
-2. FND-02…FND-07 are complete: [schemas](../work-items/FND-02.md), [safe arithmetic](../work-items/FND-03.md), [L0 audit rules and reports](../work-items/FND-04.md), [foundation integration verification](../work-items/FND-05.md), [configuration-validation CLI](../work-items/FND-06.md), [content identity](../work-items/FND-07.md). Continue FND-08; close P2 only with its actual evidence.
+2. FND-02…FND-07 are complete: [schemas](../work-items/FND-02.md), [safe arithmetic](../work-items/FND-03.md), [L0 audit rules and reports](../work-items/FND-04.md), [foundation integration verification](../work-items/FND-05.md), [configuration-validation CLI](../work-items/FND-06.md), [content identity](../work-items/FND-07.md). [FND-08](../work-items/FND-08.md) completes the locked environment; [P2 PASS review](../reviews/P2-foundation-exit.md) records the actual evidence and limits.
 3. LIT-01…LIT-05 may proceed as the separate evidence track; missing measurements do not stop P2/P3.
 4. At P2 exit, give the owner the requested plain-language explanation before starting the simulation system/core: components, inputs, outputs, first verification cases and limits. Then build RUN-01 and ANA-01…ANA-07. Complete RUN-02 before NUM-07 closes P4. This is an explanation checkpoint, not an additional approval gate.
 5. Follow the remaining phase gates and decision tree. Do not start controller implementation before the required force/dynamics gates.
 
-FND-08 is the ACTIVE implementation task. LIT-01 and SC-01 remain READY for research. Existing helpers/tests are PARTIAL evidence for P2; only explicitly reviewed task records are DONE. BLOCKED below means a normal dependency has not yet been delivered, not that the whole project must stop.
+RUN-01 is the next READY implementation task after the requested explanation checkpoint. P2 is PASS within its reviewed foundation scope. LIT-01 and SC-01 remain READY for research. Only explicitly reviewed task records are DONE; production integration and scientific model validation remain pending. BLOCKED below means a normal dependency has not yet been delivered, not that the whole project must stop.
 
 ## Dependency and status table
 
@@ -28,7 +28,7 @@ FND-08 is the ACTIVE implementation task. LIT-01 and SC-01 remain READY for rese
 | FND-05 | Build independent known-answer and invalid-input verification | FND-04 | DONE — [record](../work-items/FND-05.md) | [FND](phases/P02-foundations.md) |
 | FND-06 | Expose configuration validation through the CLI | FND-05 | DONE — [record](../work-items/FND-06.md) | [FND](phases/P02-foundations.md) |
 | FND-07 | Freeze canonical serialization and immutable hash identity | FND-06 | DONE — [record](../work-items/FND-07.md) | [FND](phases/P02-foundations.md) |
-| FND-08 | Lock the development environment and close P2 | FND-07 | ACTIVE — [record](../work-items/FND-08.md) | [FND](phases/P02-foundations.md) |
+| FND-08 | Lock the development environment and close P2 | FND-07 | DONE — [record](../work-items/FND-08.md) | [FND](phases/P02-foundations.md) |
 | ANA-01 | Specify field outputs and the analytic case matrix | FND-08, RUN-01 | BLOCKED | [ANA](phases/P03-analytical-fields.md) |
 | ANA-02 | Implement a progressive plane wave and its velocity | ANA-01 | BLOCKED | [ANA](phases/P03-analytical-fields.md) |
 | ANA-03 | Construct a standing wave with correct flux accounting | ANA-02 | BLOCKED | [ANA](phases/P03-analytical-fields.md) |
@@ -83,7 +83,7 @@ FND-08 is the ACTIVE implementation task. LIT-01 and SC-01 remain READY for rese
 | EXP-03 | Estimate resources and review the actual hardware risks | EXP-02 | BLOCKED | [EXP](phases/P10-experiment-decision.md) |
 | EXP-04 | Review the design and record GO, REVISE or NO-GO | EXP-03 | BLOCKED | [EXP](phases/P10-experiment-decision.md) |
 | EXP-05 | Close the planning-to-evidence chain and hand off | EXP-04 | BLOCKED | [EXP](phases/P10-experiment-decision.md) |
-| RUN-01 | Immutable minimal run lifecycle | FND-08 and P2 PASS | BLOCKED | [Cross-cutting card](08-reproducibility-and-ci.md) |
+| RUN-01 | Immutable minimal run lifecycle | FND-08 and P2 PASS | READY | [Cross-cutting card](08-reproducibility-and-ci.md) |
 | RUN-02 | Replay, comparison and evidence reporting | RUN-01, ANA-07 | BLOCKED | [Cross-cutting card](08-reproducibility-and-ci.md) |
 | SC-01 | Register candidate mass, size and shape campaigns | DEC-004; LIT-01 inventory when available | READY for research | [Scale progression](11-scale-progression.md) |
 | SC-02 | Establish whether a model change is needed | SC-01; relevant source/applicability review | BLOCKED | [Scale progression](11-scale-progression.md) |

@@ -15,12 +15,14 @@ This is the planned mapping for [D03](../D03-requirements.md). Replace planned r
 | FR-009 MCLF before/after | Implemented L0 `mclf/*`; planned `runs/execute.py` and later levels; FND-04, FOR-07, RUN-01, ADV-06 | [FND-04](../work-items/FND-04.md), [FND-05](../work-items/FND-05.md): pre/post verdicts, refusal to promote adverse/uncovered results, supplied success cannot establish acceptance | PARTIAL: L0 declarations and gate composition verified; production lifecycle, authenticated artifacts and physical audit levels remain open |
 | FR-010 run identity | Existing RunManifest schema; implemented `schema/canonical.py`, `schema/identity.py`, `artifacts.py`; planned `runs/*` | [FND-07](../work-items/FND-07.md), [B-02 identity report](../benchmarks/B02-content-identity.md); exception retention and replay remain RUN-01/RUN-02 | PARTIAL: exact config/file integrity and declared links verified; durable run storage, actual source/environment verification and replay still pending |
 | FR-011 compute estimate | `preflight.py`; NUM-02, NUM-06 | Deliberate budget rejection; pilot actual/predicted | Estimate occurs before allocation |
-| FR-012 compute/backend portability (SHOULD) | Backend context, environment record; FND-08, NUM-06, IND-03 | CPU baseline; optional backend equivalence | GPU/remote implementation only if scientifically justified |
+| FR-012 compute/backend portability (SHOULD) | Implemented ENV-1.0 locks and `scripts/verify_environment.py`; later backend context in NUM-06/IND-03 | [FND-08](../work-items/FND-08.md): fresh core/dev installs, exact packages, local/remote CI and bad-hash rejection | PARTIAL: tested Linux x86_64 CPU development environment; no numerical backend portability/equivalence claim |
 | FR-013 compare runs (SHOULD) | `analysis/compare.py`; FOR-05, IND-02 | Same observable/input mapping; mismatches rejected | Numeric comparison and limitation report available |
 | FR-014 sweeps/Monte Carlo (SHOULD) | `analysis/sweeps.py`; ADV-02/ADV-03 | Fixed design/seeds, all-failure index, convergence of statistics where claimed | Monte Carlo distributions require evidence |
 | FR-015 evidence bundle | `reporting/evidence.py`; RUN-02, IND-05 | Bundle hash check, fresh replay and review | Missing/raw evidence accessible with durable identity |
 
 [FND-06](../work-items/FND-06.md) adds a user-facing interface for FR-001/002/009 foundation checks. `tests/test_cli.py` verifies the same 22 rejection classes, stable nonzero failures, missing-file handling, structured reports and unresolved model status. It preserves the partial FR-002/009 completion boundary above: no actual execution lifecycle or scientific coverage is supplied by a CLI wrapper.
+
+[P2 gate review](../reviews/P2-foundation-exit.md) records foundation PASS. FND-08 adds actual installed-environment inspection and artifact locks as FR-010 prerequisites; binding that snapshot to a source revision and durable scientific run is still RUN-01. This decision preserves every partial/unsupported boundary above and does not complete all D03 MUST requirements.
 
 ## D03 metric implementation register
 

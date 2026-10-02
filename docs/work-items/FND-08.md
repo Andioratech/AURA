@@ -1,6 +1,6 @@
 # FND-08 — Locked Development Environment and P2 Review
 
-**State:** ACTIVE · **Protocol frozen:** 2026-10-02 · **Depends on:** FND-07
+**State:** DONE · **Protocol frozen:** 2026-10-02 · **Depends on:** FND-07
 
 ## Question and scope
 
@@ -21,7 +21,7 @@ Starting revision: `67f5c91dcc411cc8aab629afc918566b8db7370f`. Authority: D00, D
 
 Primary observables: exact pinned distribution set/versions, installation/hash-rejection outcomes, full test count, CLI exit/status and requirement/gate mapping. No numerical tolerance change. CPU-only software checks; cap each installation at ten minutes and investigate full tests above sixty seconds. No scientific run, measurement or physical hypothesis comparison.
 
-## Planned delivery and result
+## Planned delivery (frozen before execution)
 
 First deliver the locked environment/CI and its actual remote result. Then close the documented P2 gate only after reviewing that evidence and rerunning final CI. FND-08/P2 status and eligible next task remain pending until the checks are complete.
 
@@ -45,3 +45,10 @@ Observed on a fresh CPython 3.12.14 environment, Linux x86_64 / glibc 2.43, Clan
 4. Parsing the edited workflow locally caught an unquoted `:all:` argument in a YAML plain scalar, before publication. That command now uses a YAML block scalar. The complete parsed workflow is rerun after correction; no failing workflow is knowingly committed.
 
 These are software setup/verification observations. No physical model, experimental uncertainty, tolerance, scientific claim, baseline approval or G01–G05 procedure status was changed.
+
+
+## Final artifact review and result
+
+The complete corrected local workflow passed **784 tests** (about 12.4 s), Ruff, hashed dependency installation, local project build, `pip check`, installed-profile verification and required-document checks. Relative Markdown file destinations resolve. The original baseline remote CI was successful before the environment commit. Commit `ff09fb182f191ed35bc7b92f6d0076ed28585cb4` then passed [GitHub Quality run 37030255717](https://github.com/Andioratech/AURA/actions/runs/37030255717), including **784 tests in 16.44 s** and the same profile check on Ubuntu 24.04 / glibc 2.39 / GCC 13.3.0. No unresolved environment failure remains in the tested profile.
+
+[The P2 gate review](../reviews/P2-foundation-exit.md) maps every exit criterion to evidence and records the implementation self-review, separate scientific statuses, exact lock digests and integration limits. **FND-08 is DONE and P2 PASS within its software foundation scope. RUN-01 is READY; ANA-01 still depends on RUN-01.** Full local CI is repeated after these closure edits; exact closure-commit remote CI is confirmed and linked in the delivery message. The requested simulator/core explanation is delivered at this checkpoint before RUN-01/P3 implementation. No simulation lifecycle or physical solver was implemented in this task.

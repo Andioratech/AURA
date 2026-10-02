@@ -4,7 +4,7 @@
 
 ## Entry condition
 
-Current active implementation phase. Existing helpers and nine tests are starting artifacts, not P2 completion.
+At plan creation, helpers and nine tests were starting artifacts. **Current gate: PASS** — [P2 evidence review](../../reviews/P2-foundation-exit.md). FND-01…08 are complete within the foundation scope; production lifecycle and physical-model gates remain ahead.
 
 ## Working contract
 
@@ -145,7 +145,7 @@ Use [00](../00-execution-protocol.md), the [task template](../templates/task-rec
 
 ## FND-08 — Lock the development environment and close P2
 
-**Current state:** ACTIVE — [environment implementation and pending review](../../work-items/FND-08.md). **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
+**Current state:** DONE — [environment verification](../../work-items/FND-08.md) and [P2 review](../../reviews/P2-foundation-exit.md). **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
 
 **Inputs / predecessors:** FND-07
 

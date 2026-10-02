@@ -4,7 +4,7 @@
 
 Paths below describe the construction target; consult the work board and task records for actual availability. FND-02 implements the schema boundary; FND-03 supplies safe arithmetic/conversions; FND-04 implements L0 audits, reports and typed gate failures; FND-05 verifies foundation composition; FND-06 exposes configuration checks through the CLI; FND-07 supplies canonical identity and bounded file-integrity helpers. Scientific solvers remain unimplemented. Preserve the working CLI and SI helpers. Build modules in the task order; optional branches are implemented only when the regime/evidence requires them. No notebook is the sole implementation of a scientific result.
 
-Core remains CPU-first. FND-02 records the [initial schema dependency review](../research/schema-contract.md); FND-08 completes environment locking and compatibility review. NumPy/SciPy and array-storage libraries remain candidates. A new backend needs a documented need and decision. Keep optional expensive solvers behind extras and narrow adapters.
+Core remains CPU-first. FND-02 records the [initial schema dependency review](../research/schema-contract.md); [FND-08](../work-items/FND-08.md) delivers [ENV-1.0](../../requirements/README.md), hashed core/development locks and `scripts/verify_environment.py`; [P2 review](../reviews/P2-foundation-exit.md) records the tested scope. NumPy/SciPy and array-storage libraries remain candidates. A new backend needs a documented need and decision. Keep optional expensive solvers behind extras and narrow adapters.
 
 ## Planned package inventory
 
