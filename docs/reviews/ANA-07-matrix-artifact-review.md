@@ -12,6 +12,7 @@
 - Confirmed the fresh B06-AXIAL replay is anchored to the campaign index and reproduces all three input hashes, four field hashes and numerical metrics exactly.
 - Confirmed generated bundles, reports and campaign index remain in the ignored local `results/` tree rather than Git.
 - Confirmed the implementation commit and replay-tool correction both passed exact-head GitHub Quality. Local full Quality passed with 1,385 tests, Ruff, environment verification, dependency checks and required-document checks.
+- The separate [numerical sensitivity review](ANA-07-numerical-sensitivity-review.md) covers the existing Decimal precision and math-library checks and a reproducible one-ULP standing-wave-node probe. It also records why no plot was warranted for this tabular evidence set.
 
 ## Findings and limits
 
@@ -19,4 +20,4 @@ No missing bundle, checksum mismatch, numerical criterion failure or unexpected 
 
 This review verifies the integrity and consistency of the retained software evidence. The checker does not authenticate the publisher or recalculate the equations. The manufactured fields are not measurements, and this review provides no independent physical validation, source calibration, body-force result, object-motion result or microgravity evidence.
 
-ANA-07 remains **ACTIVE** until the remaining model-specific post-audits and precision/cancellation review are completed, any required plots are checked against the machine-readable metrics, and the formal P3 gate review is recorded.
+No additional field-only numerical post-audit was identified for the declared uncoupled incident-field scope; force and motion audits would require a different model. ANA-07 remains **ACTIVE** until the formal P3 gate review decides whether the existing per-case flux comparisons and exact-source ANA-06 ledgers meet the gate criteria. The independent reviewer is not yet assigned.

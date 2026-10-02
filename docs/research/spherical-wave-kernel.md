@@ -55,4 +55,4 @@ print([abs(p) for p in field.pressure_pa])  # approximately 2, 1, 2/3 Pa
 print(mean_intensity_w_m2(field))
 ```
 
-Pressure magnitudes halve at twice the radius and radial flux becomes one quarter. This in-memory example carries no run provenance; physical recorder input/index/checker admission, balance audits and the recorded P3 campaign remain separate tasks.
+Pressure magnitudes halve at twice the radius and radial flux becomes one quarter. This in-memory example carries no run provenance. Physical source characterization, scattering, force, body dynamics and experimental checks remain outside the bounded recorder and at their own evidence gates.
