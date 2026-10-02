@@ -34,6 +34,8 @@ Implemented foundations include a [versioned JSON/YAML input and evidence schema
 
 [FND-04](docs/work-items/FND-04.md) adds [ten L0 audit rules](docs/registers/mclf-l0-rules.md), structured diagnostics and human-readable reports. Missing model coverage and unverified external evidence remain explicit; a supplied success label cannot establish scientific acceptance. Higher audit levels and simulation solvers remain future work.
 
+[FND-05](docs/work-items/FND-05.md) verifies reference answers, JSON/YAML rejection diagnostics and acceptance-gate behavior through instrumented test hooks. The [B-01/B-02 report](docs/benchmarks/B01-B02-foundation-verification.md) records coverage and limits: actual runner integration and authenticated content hashes remain pending.
+
 ## Repository structure
 
 | Path | Purpose |

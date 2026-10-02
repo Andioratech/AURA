@@ -1,0 +1,15 @@
+{
+  "protocol": "B01-v1.0",
+  "provenance": "Hand-transcribed from docs/research/foundation-reference-values.md; manufactured arithmetic, not measurements.",
+  "relative_tolerance": 1e-12,
+  "absolute_tolerance": 1e-15,
+  "cases": [
+    {"id": "B01-01", "function": "wavelength_m", "args": [343, 70], "expected": 4.9},
+    {"id": "B01-02", "function": "wavelength_m", "args": [1500, 1000000], "expected": 0.0015},
+    {"id": "B01-03", "function": "wave_number_rad_m", "args": [2, 1], "expected": 3.141592653589793},
+    {"id": "B01-04", "function": "size_parameter_ka", "args": [0.5, 2], "expected": 1.5707963267948966},
+    {"id": "B01-05", "function": "plane_progressive_wave_intensity_w_m2", "args": [2, 2, 4], "expected": 0.5},
+    {"id": "B01-06", "function": "sinusoid_peak_to_rms", "args": [2], "expected": 1.4142135623730951},
+    {"id": "B01-08", "function": "radius_from_diameter_m", "args": [0.002], "expected": 0.001}
+  ]
+}

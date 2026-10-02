@@ -4,15 +4,15 @@ This is the planned mapping for [D03](../D03-requirements.md). Replace planned r
 
 | Requirement | Implementation and tasks | Planned verification evidence | Completion boundary |
 |---|---|---|---|
-| FR-001 versioned scenarios | `schema/models.py`, `schema/io.py`; FND-02 | B-02, valid JSON/YAML examples | Schema version and all required scenario components supported |
-| FR-002 pre-allocation validation | `schema/quantities.py`, `mclf/rules.py`; FND-03…FND-05 | Invalid fields, dimensional/range and allocation-not-started checks | Named failure code and no guessed physical values |
+| FR-001 versioned scenarios | Implemented `schema/models.py`, `schema/io.py`; FND-02 | [FND-05 B-02 structural report](../benchmarks/B01-B02-foundation-verification.md); `tests/test_schema.py`, `tests/test_foundation_verification.py` JSON/YAML cases | Verified for schema 1.0 supported geometries; no solver capability implied; canonical identity remains FND-07 |
+| FR-002 pre-allocation validation | Implemented `schema/quantities.py`, `mclf/rules.py`, evaluator and explicit gate; FND-03…FND-05 | [FND-05](../work-items/FND-05.md): 22 fault classes in both formats, exact diagnostics, no downstream hook calls | PARTIAL: test-only composition verified; actual runner integration required in RUN-01 and resource preflight in NUM-02 |
 | FR-003 fast field independent of FEM | `fields/analytic.py`, `fields/numerical.py`; ANA and NUM cards | B-03…B-07, convergence report | A verified fast backend exists, beyond just symbolic formulas |
 | FR-004 in-domain force/torque | `forces/*`, `mclf/regimes.py`; FOR-01…FOR-08 | B-08/B-09, regime rejection, torque reference when supported | Torque marked unsupported until justified; no automatic general completion from radial sphere force |
 | FR-005 translation and rotation | `dynamics/integrate.py`, `rotation.py`; MOT-03…MOT-05 | B-11 and time refinement, force/torque ledger | Translation-only milestone does not close full requirement |
 | FR-006 configured gravity | `dynamics/loads.py`; MOT-06 | B-12, consistent fluid/body Earth/zero/residual cases | No real microgravity claim from the zero setting alone |
 | FR-007 acceleration target/error | `control/targets.py`, `analysis/metrics.py`; CTL-01, CTL-06 | B-14, hand time-series metric and realized acceleration | Explicit time window, sampling and constraints |
 | FR-008 deterministic controller | `control/baseline.py`, allocation; CTL-03…CTL-07 | Open/closed loop, saturation, latency, held-out cases | Model/evidence gates remain applicable |
-| FR-009 MCLF before/after | `mclf/*`, `runs/execute.py`; FND-04, FOR-07, RUN-01, ADV-06 | Required rule verdicts and invalid promotion refusal | MCLF independent of solver success flag |
+| FR-009 MCLF before/after | Implemented L0 `mclf/*`; planned `runs/execute.py` and later levels; FND-04, FOR-07, RUN-01, ADV-06 | [FND-04](../work-items/FND-04.md), [FND-05](../work-items/FND-05.md): pre/post verdicts, refusal to promote adverse/uncovered results, supplied success cannot establish acceptance | PARTIAL: L0 declarations and gate composition verified; production lifecycle, authenticated artifacts and physical audit levels remain open |
 | FR-010 run identity | `runs/*`; FND-07, RUN-01/RUN-02 | B-02, exception retention, hash verification and replay | All D07 required fields populated |
 | FR-011 compute estimate | `preflight.py`; NUM-02, NUM-06 | Deliberate budget rejection; pilot actual/predicted | Estimate occurs before allocation |
 | FR-012 compute/backend portability (SHOULD) | Backend context, environment record; FND-08, NUM-06, IND-03 | CPU baseline; optional backend equivalence | GPU/remote implementation only if scientifically justified |

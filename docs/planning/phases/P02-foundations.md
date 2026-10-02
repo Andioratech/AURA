@@ -88,7 +88,7 @@ Use [00](../00-execution-protocol.md), the [task template](../templates/task-rec
 
 ## FND-05 — Build independent known-answer and invalid-input verification
 
-**Current state:** READY; FND-04 is complete. **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
+**Current state:** DONE — [verification and limitations](../../work-items/FND-05.md). **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
 
 **Inputs / predecessors:** FND-04
 
@@ -107,7 +107,7 @@ Use [00](../00-execution-protocol.md), the [task template](../templates/task-rec
 
 ## FND-06 — Expose configuration validation through the CLI
 
-**Initial state:** BLOCKED by predecessors / applicable gates. **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
+**Current state:** READY; FND-05 is complete. **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
 
 **Inputs / predecessors:** FND-05
 

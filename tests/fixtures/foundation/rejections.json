@@ -1,0 +1,28 @@
+{
+  "protocol": "FND05-v1.0",
+  "provenance": "Hand-authored single-fault scenarios against CONV-1.0, schema 1.0 and L0-1.0; no production-generated expectations.",
+  "cases": [
+    {"id": "version", "path": "/schema_version", "value": "2.0", "reader_code": "SCHEMA_VERSION", "rule": "R-001", "audit_code": "SCHEMA_INVALID"},
+    {"id": "boolean-density", "path": "/medium/density/value", "value": true, "reader_code": "SCHEMA_INVALID", "rule": "R-001", "audit_code": "SCHEMA_INVALID"},
+    {"id": "string-density", "path": "/medium/density/value", "value": "1000", "reader_code": "SCHEMA_INVALID", "rule": "R-001", "audit_code": "SCHEMA_INVALID"},
+    {"id": "unknown-density", "path": "/medium/density/value", "value": null, "reader_code": "SCHEMA_INVALID", "rule": "R-001", "audit_code": "SCHEMA_INVALID"},
+    {"id": "negative-density", "path": "/medium/density/value", "value": -1, "reader_code": "SCHEMA_INVALID", "rule": "R-005", "audit_code": "SCHEMA_INVALID"},
+    {"id": "missing-temperature", "path": "/medium/temperature", "operation": "remove", "reader_code": "SCHEMA_INVALID", "rule": "R-002", "audit_code": "MISSING_FIELD"},
+    {"id": "missing-gravity", "path": "/gravity", "operation": "remove", "reader_code": "SCHEMA_INVALID", "rule": "R-002", "audit_code": "MISSING_FIELD"},
+    {"id": "missing-solver", "path": "/solver", "operation": "remove", "reader_code": "SCHEMA_INVALID", "rule": "R-002", "audit_code": "MISSING_FIELD"},
+    {"id": "missing-boundary", "path": "/domain/boundary_model", "operation": "remove", "reader_code": "SCHEMA_INVALID", "rule": "R-002", "audit_code": "MISSING_FIELD"},
+    {"id": "missing-body-mass", "path": "/bodies/0/mass", "operation": "remove", "reader_code": "SCHEMA_INVALID", "rule": "R-002", "audit_code": "MISSING_FIELD"},
+    {"id": "gravity-unit", "path": "/gravity/unit", "value": "m/s", "reader_code": "UNIT_MISMATCH", "rule": "R-003", "audit_code": "SCHEMA_INVALID"},
+    {"id": "radius-unit", "path": "/bodies/0/geometry/radius/unit", "value": "mm", "reader_code": "UNIT_MISMATCH", "rule": "R-003", "audit_code": "SCHEMA_INVALID"},
+    {"id": "gravity-shape", "path": "/gravity/value", "value": [0, 0], "reader_code": "SCHEMA_INVALID", "rule": "R-006", "audit_code": "SCHEMA_INVALID"},
+    {"id": "source-normal", "path": "/sources/elements/0/normal/value", "value": [2, 0, 0], "reader_code": "INCONSISTENT", "rule": "R-006", "audit_code": "UNIT_NORM"},
+    {"id": "body-orientation", "path": "/bodies/0/initial_state/orientation/value", "value": [0, 0, 0, 0], "reader_code": "INCONSISTENT", "rule": "R-006", "audit_code": "UNIT_NORM"},
+    {"id": "pressure-convention", "path": "/sources/amplitude_convention", "value": "rms", "reader_code": "SCHEMA_INVALID", "rule": "R-007", "audit_code": "SCHEMA_INVALID"},
+    {"id": "harmonic-convention", "path": "/sources/phasor_convention", "value": "exp(+iwt)", "reader_code": "SCHEMA_INVALID", "rule": "R-007", "audit_code": "SCHEMA_INVALID"},
+    {"id": "pressure-limit", "path": "/sources/elements/0/pressure_amplitude/value", "value": 11, "diagnostic_path": "/sources/elements/0/pressure_amplitude", "reader_code": "INCONSISTENT", "rule": "R-005", "audit_code": "SOURCE_LIMIT"},
+    {"id": "zero-window-end", "path": "/target/window/end/value", "value": 0, "reader_code": "SCHEMA_INVALID", "rule": "R-005", "audit_code": "SCHEMA_INVALID"},
+    {"id": "time-window", "path": "/target/window/start/value", "value": 1, "diagnostic_path": "/target/window", "reader_code": "INCONSISTENT", "rule": "R-005", "audit_code": "TIME_WINDOW"},
+    {"id": "body-center", "path": "/bodies/0/initial_state/position/value", "value": [2, 0, 0], "diagnostic_path": "/bodies/0/initial_state/position", "reader_code": "INCONSISTENT", "rule": "R-005", "audit_code": "DOMAIN_CENTER"},
+    {"id": "diameter-field", "path": "/bodies/0/geometry/diameter", "value": {"value": 0.00002, "unit": "m"}, "diagnostic_path": "/bodies/0/geometry", "reader_code": "SCHEMA_INVALID", "rule": "R-001", "audit_code": "SCHEMA_INVALID"}
+  ]
+}

@@ -1,0 +1,6 @@
+# Foundation verification fixtures
+
+- `known-answers.json`: seven scalar answers transcribed from [B01-v1.0](../../../docs/research/foundation-reference-values.md). Equivalent length conversion and zero gravity are exercised separately. Values and tolerances are manufactured arithmetic references, not measured material properties or simulation acceptance thresholds.
+- `rejections.json`: 22 hand-authored edits to the existing [scenario fixture](../../../examples/schema/manufactured-scenario.json), with exact reader and L0 expectations. `operation: remove` omits a field; otherwise `value` replaces or adds it. `diagnostic_path` overrides the edited path when a consistency error names the enclosing object. The auditor prefixes scenario paths with `/scenario`.
+
+The original zero-end time-window case and the reason for correcting its expected diagnostic are preserved in [FND-05](../../../docs/work-items/FND-05.md). The fixtures are not generated from implementation outputs. They do not define a production mutation or serialization API. See the [B-01/B-02 report](../../../docs/benchmarks/B01-B02-foundation-verification.md) for coverage, test-hook limitations and deferred hash authentication.
