@@ -1,6 +1,6 @@
 # AURA-D00: Document Control and Scientific Baseline
 
-**Version:** 1.0 · **Status:** DRAFT · **Date:** 2026-10-01 · **Owner:** Andiora Research
+**Version:** 1.0 · **Status:** BASELINE · **Date:** 2026-10-01 · **Owner:** Andiora Research
 
 ## Purpose
 
@@ -56,6 +56,10 @@ When a document conflicts with physical law or a primary source, do not resolve 
 
 Use MAJOR.MINOR versions. Increase MAJOR when requirements, accepted equations, falsification criteria, data contracts or decisions could change prior results. Increase MINOR for clarifications or additions that do not change the interpretation of accepted runs.
 
+## Baseline approval
+
+On 2026-10-01, the project owner approved D00-D09 and PLAN-01 as the controlled development baseline. The decision is recorded in [DEC-001](decisions/DEC-001-p0-baseline-approval.md) against commit `8cbd2e2e50a17e96299fd00dbba667b5c3b24ed4`. G01-G05 remain DRAFT pending procedure review. This approval authorizes the gated research workflow; it does not validate AURA's hypothesis, establish feasibility, or mean the software is ready for scientific runs. The Definition of Ready items below remain separate implementation gates.
+
 ## Definition of ready
 
 - D00-D09 and G01-G05 are available and versioned.
@@ -76,8 +80,8 @@ Three supplied PDFs were inspected: the 74-page baseline, the 15-page architectu
 
 Review findings and resolutions:
 
-1. **Status ambiguity:** the source calls the baseline operational while several requirements, thresholds and roadmap items remain proposals. This repository marks every document `DRAFT` pending owner review.
-2. **Version drift:** the standalone architecture is v0.1, the MCLF is v0.1, and baseline copies are presented as v1.0. The English documents retain baseline IDs but do not imply technical approval.
+1. **Status ambiguity:** the source calls the baseline operational while several requirements, thresholds and roadmap items remain proposals. The owner has approved D00-D09 as the controlled development baseline; the scientific hypothesis and feasibility remain unvalidated, and all procedures G01-G05 remain `DRAFT` pending their own review.
+2. **Version drift:** the standalone architecture is v0.1, the MCLF is v0.1, and baseline copies are presented as v1.0. The English documents retain baseline IDs and v1.0 versions; the owner's approval establishes them as project development contracts, not as independently validated physics or demonstrated performance.
 3. **Acceptance thresholds lack derivation:** proposed error thresholds (including 2% for simple wave cases) need benchmark-specific justification and must not be universal tolerances.
 4. **Force bound scope:** `F <= kappa P/c`, with `kappa` up to 2, only applies under stated incident-wave and momentum-transfer assumptions. It must not be used as a universal bound for arbitrary standing fields, multiple sources, cavities or stored energy. D02 records it as conditional.
 5. **Acceleration interpretation:** `F_ac = m a*` is a control objective for the selected object and interval, not proof that an extended body experiences uniform gravity-like loading. D01 makes that scope explicit.

@@ -1,6 +1,6 @@
 # AURA-D03: Scientific and System Requirements
 
-**Version:** 1.0 · **Status:** DRAFT · **Date:** 2026-10-01
+**Version:** 1.0 · **Status:** BASELINE · **Date:** 2026-10-01
 
 ## Scope and conventions
 

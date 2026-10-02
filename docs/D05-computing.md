@@ -1,6 +1,6 @@
 # AURA-D05: Computing Resources and Environments
 
-**Version:** 1.0 · **Status:** DRAFT · **Date:** 2026-10-01
+**Version:** 1.0 · **Status:** BASELINE · **Date:** 2026-10-01
 
 ## Policy
 

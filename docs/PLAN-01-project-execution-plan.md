@@ -1,6 +1,6 @@
 # PLAN-01: AURA Phase-Gated Master Work Plan
 
-**Version:** 1.0 · **Status:** DRAFT · **Owner:** AURA project owner · **Last updated:** 2026-10-01
+**Version:** 1.0 · **Status:** BASELINE · **Owner:** AURA project owner · **Last updated:** 2026-10-01
 
 ## 1. Purpose
 
@@ -57,8 +57,9 @@ Do not combine phases to save time. A phase may split into subphases only by a r
 
 | Phase | Status | Blocking condition / next action |
 |---|---|---|
-| P0 | REVIEW | Repository and document checks pass in a fresh clone of the configured remote; project-owner acceptance of the controlled scientific baseline and this plan is pending |
-| P1-P10 | BLOCKED | Start P1 only after P0 receives a recorded PASS decision |
+| P0 | PASS | Owner acceptance recorded in DEC-001; repository, source provenance, links, local quality checks, and remote CI passed |
+| P1 | ACTIVE | P1.1 dossier is complete and awaits review; next score the three candidates under P1.2, without implementation |
+| P2-P10 | BLOCKED | Advance only after the preceding phase receives a recorded PASS decision |
 
 ## 5. Phase details
 
@@ -81,7 +82,7 @@ Do not combine phases to save time. A phase may split into subphases only by a r
 
 **Stop conditions:** missing provenance, conflicting claims with no decision, uncertain ownership/license, or unstable repository identity. Do not start solver implementation while these remain unresolved.
 
-**Current state (2026-10-01):** the source archive contains the three original PDFs, with page counts and SHA-256 values recorded in its README; all three checksums verify. Relative Markdown links in README, docs, guides, and the source archive resolve. Ruff passes, the available test suite passes (1 test), and the required-document checks in CI pass. CodeGraph 1.6.1 is installed, its local index reports current, and its installation, use, and ignore policy are documented in G01. A fresh clone of `origin/main` at `0498b779b7758261d9a4a010c809061e02651dc0` was clean and matched this filesystem copy except for the P0 documentation updates and ignored local/generated files; its configured author and committer match the owner identity. The byte-identical root logo duplicate has been removed. P0 remains in REVIEW until the owner records acceptance of the controlled scientific baseline and this plan. The scientific documents remain DRAFT, and no scientific implementation is authorized until the P0 PASS decision is recorded.
+**Decision and evidence:** P0 PASS was recorded on 2026-10-01 after owner approval, source checksum verification, repository review, local quality checks, and successful remote CI. See [DEC-001](decisions/DEC-001-p0-baseline-approval.md). The accepted baseline is D00-D09 and this plan at commit `8cbd2e2e50a17e96299fd00dbba667b5c3b24ed4`; G01-G05 remain DRAFT. Baseline approval authorizes phase-gated research only; it does not mean a solver or benchmark has been validated.
 
 ### P1 — Bounded question and benchmark selection
 
@@ -350,7 +351,7 @@ Changes to phase order, gates, primary observables, acceptance thresholds, model
 
 ## 11. Immediate next actions
 
-1. Complete P0 file organization and source inventory.
-2. Review and approve the English baseline statuses and this plan.
-3. Start P1 only after P0 PASS: identify candidate published benchmarks and select one using the criteria in P1.
-4. Do not implement acoustic propagation, radiation force, control, AI optimization, or high-fidelity solvers before the applicable gate.
+1. Review the P1.1 dossier in `docs/benchmarks/P1.1-benchmark-candidates.md`; it documents three sources and deliberately selects no winner.
+2. Complete P1.2 by scoring candidates against the criteria in this plan; keep scoring evidence traceable to each source.
+3. Select one primary and one backup only in P1.3 after comparing the dossiers; obtain owner approval of the frozen domain at the P1 exit gate.
+4. Do not start implementation before P1 PASS or implement acoustic propagation, radiation force, control, AI optimization, or high-fidelity solvers before the applicable gate.

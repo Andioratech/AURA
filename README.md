@@ -26,7 +26,7 @@ Answers must be scoped to the tested objects, materials, geometry, medium, frequ
 
 ## Project maturity
 
-This repository currently contains the English scientific specifications and a software scaffold. It does not yet contain a validated acoustic solver, an experimentally demonstrated system, or evidence that AURA achieves its research objective. Specifications remain DRAFT until approved through documented scientific review.
+This repository contains an owner-approved English development baseline (D00-D09 and PLAN-01) and a software scaffold. The supporting procedures G01-G05 remain DRAFT. It does not yet contain a validated acoustic solver, an experimentally demonstrated system, or evidence that AURA achieves its research objective. Baseline approval controls the research process; it does not establish physical feasibility or validate a model.
 
 ## Repository structure
 
@@ -48,6 +48,8 @@ This repository currently contains the English scientific specifications and a s
 - [D01: System architecture](docs/D01-system-architecture.md)
 - [D02: Mathematical Bounds and Limits Framework](docs/D02-mclf.md)
 - [PLAN-01: Phase-gated master work plan](docs/PLAN-01-project-execution-plan.md)
+- [DEC-001: P0 baseline approval](docs/decisions/DEC-001-p0-baseline-approval.md)
+- [P1.1: Published benchmark candidate dossier](docs/benchmarks/P1.1-benchmark-candidates.md)
 - [G01: Contributor workflow](guides/G01-contributor-workflow.md)
 
 The full document register and precedence rules are maintained in D00. Physical-law and SI definitions take precedence over project specifications; conflicts must be investigated and versioned rather than resolved silently.

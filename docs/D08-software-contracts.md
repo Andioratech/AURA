@@ -1,6 +1,6 @@
 # AURA-D08: Software Architecture and Contracts
 
-**Version:** 1.0 · **Status:** DRAFT · **Date:** 2026-10-01
+**Version:** 1.0 · **Status:** BASELINE · **Date:** 2026-10-01
 
 ## Proposed package boundaries
 

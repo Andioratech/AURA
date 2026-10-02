@@ -1,6 +1,6 @@
 # AURA-D06: Verification and Validation
 
-**Version:** 1.0 · **Status:** DRAFT · **Date:** 2026-10-01
+**Version:** 1.0 · **Status:** BASELINE · **Date:** 2026-10-01
 
 Verification asks whether the equations are solved correctly. Validation asks whether the chosen model represents the physical question. Passing either alone is insufficient for a scientific claim.
 
