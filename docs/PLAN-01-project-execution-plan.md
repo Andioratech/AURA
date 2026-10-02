@@ -354,11 +354,12 @@ Changes to phase order, gates, primary observables, acceptance thresholds, model
 ## 11. Immediate next actions
 
 1. DEC-002 records the owner's approval of the Andrade et al. 50 mm sphere force measurement as AURA's first measurable force-model check. DEC-003 records the owner's direction to keep progressing while source uncertainty remains open.
-2. P1 remains open for source uncertainty and benchmark review. Its current figure comparison is descriptive and INDETERMINATE; it no longer blocks foundation work.
-3. Start P2.1–P2.8: unit conventions, small versioned schemas, pure dimensional/acoustic calculations, and the first MCLF L0 rule table. Do not add acoustic PDE solvers, force calculations or target-control logic in P2.
+2. P1 remains open for source uncertainty and benchmark review. Its current figure comparison is descriptive and INDETERMINATE; it no longer blocks foundation work. The executable task board and subplans are in [docs/planning/README.md](planning/README.md).
+3. Start P2.1–P2.8 through FND-01 in the detailed plan: unit conventions, small versioned schemas, pure dimensional/acoustic calculations, and the first MCLF L0 rule table. Do not add acoustic PDE solvers, force calculations or target-control logic in P2.
 4. After P2 review, proceed to P3 analytical wave cases. Treat them as equation/code verification, not experimental validation of AURA.
-5. Do not infer microgravity performance, multi-element control or behavior of heavier bodies from this first benchmark. At each later gate, search for evidence suited to that capability.
-6. Do not implement acoustic propagation, radiation force, control, AI optimization, or high-fidelity solvers before their applicable gates and solver-specific resource preflight.
+5. Use the detailed decision tree and failure playbooks to branch when evidence is missing, a model leaves its domain, a run fails, or a limitation appears. Preserve the original result and create a new experiment when assumptions change.
+6. Do not infer microgravity performance, multi-element control or behavior of heavier bodies from this first benchmark. At each later gate, search for evidence suited to that capability.
+7. Do not implement acoustic propagation, radiation force, control, AI optimization, or high-fidelity solvers before their applicable gates and solver-specific resource preflight.
 
 ## 12. Benchmark progression toward the microgravity objective
 

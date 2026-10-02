@@ -48,6 +48,7 @@ This repository contains an owner-approved English development baseline (D00-D09
 - [D01: System architecture](docs/D01-system-architecture.md)
 - [D02: Mathematical Bounds and Limits Framework](docs/D02-mclf.md)
 - [PLAN-01: Phase-gated master work plan](docs/PLAN-01-project-execution-plan.md)
+- [Detailed simulator and falsification plan](docs/planning/README.md)
 - [DEC-001: P0 baseline approval](docs/decisions/DEC-001-p0-baseline-approval.md)
 - [P1.1: Published benchmark candidate dossier](docs/benchmarks/P1.1-benchmark-candidates.md)
 - [G01: Contributor workflow](guides/G01-contributor-workflow.md)
