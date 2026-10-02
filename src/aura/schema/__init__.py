@@ -14,6 +14,7 @@ from .models import (
     TransducerArray,
     validate_document,
 )
+from .quantities import canonical_quantity
 
 __all__ = [
     "Body",
@@ -26,6 +27,7 @@ __all__ = [
     "Scenario",
     "SolverSpec",
     "TransducerArray",
+    "canonical_quantity",
     "dumps_document",
     "load_document",
     "loads_document",

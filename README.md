@@ -30,7 +30,7 @@ Small particles in water are the first implementation campaign. The research obj
 
 This repository contains an owner-approved English development baseline (D00-D09 and PLAN-01) and a software scaffold. The supporting procedures G01-G05 remain DRAFT. It does not yet contain a validated acoustic solver, an experimentally demonstrated system, or evidence that AURA achieves its research objective. Baseline approval controls the research process; it does not establish physical feasibility or validate a model.
 
-The first implemented foundation is a [versioned JSON/YAML input and evidence schema](docs/research/schema-contract.md), with explicit units, geometry and gravity, typed immutable records, and rejection checks. [FND-01](docs/work-items/FND-01.md) and [FND-02](docs/work-items/FND-02.md) record the delivered work and limitations. P2 is still open; accepting an input does not validate its physical model.
+Implemented foundations include a [versioned JSON/YAML input and evidence schema](docs/research/schema-contract.md) and [safe SI arithmetic with explicit conversions](docs/research/numerical-domain-and-conversions.md). [FND-01](docs/work-items/FND-01.md), [FND-02](docs/work-items/FND-02.md) and [FND-03](docs/work-items/FND-03.md) record the delivered work, verification and limitations. P2 is still open; accepting an input or passing an arithmetic check does not validate its physical model.
 
 ## Repository structure
 

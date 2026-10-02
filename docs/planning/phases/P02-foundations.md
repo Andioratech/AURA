@@ -50,7 +50,7 @@ Use [00](../00-execution-protocol.md), the [task template](../templates/task-rec
 
 ## FND-03 — Extend safe SI calculations and conversion boundaries
 
-**Current state:** READY; FND-02 is complete. **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
+**Current state:** DONE — [implementation and arithmetic verification](../../work-items/FND-03.md). **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
 
 **Inputs / predecessors:** FND-02
 
@@ -69,7 +69,7 @@ Use [00](../00-execution-protocol.md), the [task template](../templates/task-rec
 
 ## FND-04 — Implement stable MCLF L0 rules and typed errors
 
-**Initial state:** BLOCKED by predecessors / applicable gates. **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
+**Current state:** READY; FND-03 is complete. **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
 
 **Inputs / predecessors:** FND-03
 

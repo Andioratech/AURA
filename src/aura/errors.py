@@ -14,3 +14,7 @@ class InvalidInputError(ValueError):
 
     def as_dict(self) -> dict[str, str]:
         return {"code": self.code, "path": self.path, "message": self.message}
+
+
+class NumericalDomainError(InvalidInputError):
+    """Valid finite operands have a result outside the supported numeric range."""

@@ -25,7 +25,7 @@ All other fields are rejected. Sphere geometry requires a positive radius in met
 
 ## Quantities and cross-field checks
 
-Dimensional values use `{"value": number, "unit": "canonical SI symbol"}`; vectors use fixed-length arrays. Bare numbers, numeric strings, booleans, null required values, incompatible units and nonfinite numbers fail. Canonical symbols and quantity shapes are defined in [quantities.py](../../src/aura/schema/quantities.py). Alternate-unit conversion belongs to FND-03. Zero viscosity/attenuation, zero pressure amplitude and explicit zero gravity are representable idealizations, not assertions that such conditions are experimentally achieved.
+Dimensional values use `{"value": number, "unit": "canonical SI symbol"}`; vectors use fixed-length arrays. Bare numbers, numeric strings, booleans, null required values, incompatible units and nonfinite numbers fail. Canonical symbols and quantity shapes are defined in [quantities.py](../../src/aura/schema/quantities.py). FND-03 now provides an [opt-in quantity conversion API](numerical-domain-and-conversions.md); the version-1.0 reader itself remains canonical-only. Zero viscosity/attenuation, zero pressure amplitude and explicit zero gravity are representable idealizations, not assertions that such conditions are experimentally achieved.
 
 Implemented cross-field checks:
 

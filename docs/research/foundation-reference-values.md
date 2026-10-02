@@ -20,3 +20,5 @@ All values below are manufactured arithmetic checks, not measured water properti
 | B01-12 | finite operands whose result cannot be represented | Controlled numerical-domain error in FND-03 | No accepted infinity/NaN/zero from unsupported arithmetic underflow |
 
 The existing loose approximate ka check for the air sphere is a domain illustration, not a model validation benchmark. It does not replace the independent manufactured checks here. No experiment/run identity is assigned to these unit-check fixtures; scientific solver runs do not yet exist.
+
+Execution status: [FND-03](../work-items/FND-03.md) implements and verifies these B-01 cases and adds separately specified extreme-range cases. The original normal-scale fixture values and tolerances above are unchanged. FND-05 still owns the broader foundation verification/reporting gate, including audit and allocation-boundary behavior.

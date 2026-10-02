@@ -2,7 +2,7 @@
 
 ## Implementation rule
 
-Paths below describe the construction target; consult the work board and task records for actual availability. FND-02 implements the initial schema boundary and input error type; scientific solvers remain unimplemented. Preserve the working CLI and SI helpers. Build modules in the task order; optional branches are implemented only when the regime/evidence requires them. No notebook is the sole implementation of a scientific result.
+Paths below describe the construction target; consult the work board and task records for actual availability. FND-02 implements the initial schema boundary and input error type; FND-03 adds safe scalar arithmetic, explicit conversions and numerical-domain errors. Scientific solvers remain unimplemented. Preserve the working CLI and SI helpers. Build modules in the task order; optional branches are implemented only when the regime/evidence requires them. No notebook is the sole implementation of a scientific result.
 
 Core remains CPU-first. FND-02 records the [initial schema dependency review](../research/schema-contract.md); FND-08 completes environment locking and compatibility review. NumPy/SciPy and array-storage libraries remain candidates. A new backend needs a documented need and decision. Keep optional expensive solvers behind extras and narrow adapters.
 
@@ -14,7 +14,7 @@ Core remains CPU-first. FND-02 records the [initial schema dependency review](..
 | `schema/quantities.py` | Parse external value/unit pairs; convert once to canonical SI; reject unsupported dimensions | FND-02, FND-03 | Unit mismatch, unknown unit, overflow, bool-as-number policy |
 | `schema/models.py` | Medium, Body, SourceArray, Scenario, SolverSpec, Experiment, RunManifest; version and cross-field validation | FND-02 | Required fields; vectors/shapes; radius/diameter; incomplete inputs |
 | `schema/io.py` | Strict JSON/YAML input and deterministic canonical JSON; prohibit executable YAML tags | FND-02, FND-07 | Duplicate keys, nonfinite values, unknown fields, canonical ordering |
-| `errors.py` | Typed input/domain/resource/convergence/evidence errors with stable machine codes | FND-04 | CLI propagation; no false success |
+| `errors.py` | Input/numeric-domain errors implemented; resource/convergence/evidence errors remain planned | FND-02, FND-03, FND-04 | Stable field/code diagnostics; CLI propagation; no false success |
 | `mclf/rules.py` | Stable R-001…R-010 L0 registry, predicates, assumptions and tolerance references | FND-04 | Valid, invalid, boundary and uncovered regime cases |
 | `mclf/evaluate.py` | Independent pre/post audit and per-rule verdict report | FND-04, FOR-07, ADV-06 | Severity precedence; no solver success override |
 | `mclf/balances.py` | Model-specific energy/momentum/symmetry checks, with defined control surface and terms | ANA-06, FOR-07 | Incomplete control volume; conditional-bound misuse |

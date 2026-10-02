@@ -1,6 +1,6 @@
 # Equation and Convention Register
 
-**Register version:** 1.0 · **Date:** 2026-10-02
+**Register version:** 1.1 · **Date:** 2026-10-02
 
 This register records current algebra and representation choices. Source review, implementation verification and experimental validation are distinct statuses. No force model or simulator is validated by this table.
 
@@ -14,10 +14,10 @@ SRC-E01: M. Settnes and H. Bruus, *Physical Review E* 85, 016327 (2012), [DOI](h
 | EQ-002 | `k = 2*pi*f/c = 2*pi/lambda`, rad/m | Same ansatz and one full phase turn over a wavelength; fixed harmonic convention | `aura.units.wave_number_rad_m`; B01-03 |
 | EQ-003 | `ka = k*a`, dimensionless | Definition using spherical radius a; indicator only, not an applicability proof | `aura.units.size_parameter_ka`; B01-04; unrelated geometries need their own length definition |
 | EQ-004 | `I = p_rms^2/(rho*c)`, W/m² | From SRC-E01 Eq. (6) in an inviscid homogeneous progressive plane wave: velocity in phase with pressure and amplitude ratio 1/(rho*c); average pressure times velocity with Eq. (11) | `aura.units.plane_progressive_wave_intensity_w_m2`; B01-05; not a cavity/standing-wave conversion |
-| EQ-005 | `q_rms = abs(q_hat)/sqrt(2)` | Integrate squared real sinusoid over one period using SRC-E01 Eq. (8)/(9); peak complex phasor, zero mean | Conversion planned for FND-03; B01-06 |
+| EQ-005 | `q_rms = abs(q_hat)/sqrt(2)` | Integrate squared real sinusoid over one period using SRC-E01 Eq. (8)/(9); peak complex phasor, zero mean | `sinusoid_peak_to_rms` / `sinusoid_rms_to_peak` accept nonnegative amplitude magnitudes; B01-06 |
 | CONV-001 | `Re(q_hat*exp(-i*omega*t))` | SRC-E01 Eq. (8); source-phase sign and amplitude convention chosen for the project | Frozen in CONV-1.0; field implementation later |
-| CONV-002 | `A(x)/A(0) = exp(-alpha_amp*x)` | Project definition of amplitude attenuation; the factor two for squared-amplitude decay follows algebraically | Validation of convention in FND-02; conversion work in FND-03 |
+| CONV-002 | `A(x)/A(0) = exp(-alpha_amp*x)` | Project definition of amplitude attenuation; the factor two for squared-amplitude decay follows algebraically | `amplitude_to_intensity_attenuation_per_m` and its inverse implement the coefficient convention; not a loss model |
 
 ## Implementation status and limitations
 
-EQ-001–EQ-004 already have basic tests. Their numerical-domain edge cases are incomplete and are assigned to FND-03. New externally serialized inputs must follow CONV-1.0; algebraic agreement alone cannot establish model applicability or experimental agreement. The [fixture specification](../research/foundation-reference-values.md) contains manufactured values, tolerances and anticipated invalid-input outcomes.
+FND-03 hardens EQ-001–EQ-004 and implements the explicit EQ-005/CONV-002 adapters without changing their equations or assumptions. The [numeric-domain contract](../research/numerical-domain-and-conversions.md) records the supported input/output range and conversion limitations. New externally serialized inputs must follow CONV-1.0; algebraic agreement alone cannot establish model applicability or experimental agreement. The [fixture specification](../research/foundation-reference-values.md) contains manufactured values, tolerances and rejection criteria; [FND-03](../work-items/FND-03.md) records their execution. This minor register revision updates implementation status, not scientific evidence.
