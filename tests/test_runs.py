@@ -632,19 +632,91 @@ def test_b03_01_metrics_pass_for_integrity_checked_record(analytical_inputs, obs
     assert report["tolerance_normalized"] == TOLERANCE
     assert report["metrics"]["pressure"]["E_max"] == pytest.approx(0, abs=1e-15)
     assert report["metrics"]["velocity"]["criterion"] == "PASS"
-    assert report["mean_intensity_w_m2"] == pytest.approx([1 / 750_000, 0, 0])
+    assert report["mean_intensity_w_m2"][0] == pytest.approx([1 / 750_000, 0, 0])
 
 
 def test_b03_01_reference_rejects_a_different_sample(analytical_inputs):
-    from aura.analysis.ana07_metrics import _require_b03_01
+    from aura.analysis.ana07_metrics import _validate_case_inputs, frozen_case
 
     scenario = json.loads(analytical_inputs[0].read_bytes())
+    _, case, _ = frozen_case("B03-01")
     request = {
         "contract": "FIELD-REQUEST-1.0",
         "case_id": "B03-01",
-        "box_min_m": [-0.0015, -0.0015, -0.0015],
-        "box_max_m": [0.0015, 0.0015, 0.0015],
+        "box_min_m": case["box_min_m"],
+        "box_max_m": case["box_max_m"],
         "coordinates_m": [[0.000375, 0, 0]],
     }
-    with pytest.raises(ValueError, match="frozen only"):
-        _require_b03_01(scenario, request)
+    with pytest.raises(ValueError, match="Stored request differs"):
+        _validate_case_inputs("B03", case, scenario, request)
+
+
+@pytest.mark.parametrize("case_id", ["B03-PHASE", "B04-PHASE", "B05-COMMON-PHASE"])
+def test_recorded_frozen_cases_compare_for_each_plane_family(analytical_inputs, observed, case_id):
+    from aura.analysis.ana07_metrics import analyze_recorded_case, frozen_case
+
+    family, case, _ = frozen_case(case_id)
+    scenario_path, experiment_path, output = analytical_inputs
+    scenario = json.loads(scenario_path.read_bytes())
+    scenario["id"] = "SCENARIO-ANA07-" + case_id
+    sources = scenario["sources"]
+    medium = scenario["medium"]
+    first_wave = case["wave"] if family == "B03" else case.get("forward", case.get("first"))
+    medium["density"]["value"] = first_wave["density_kg_m3"]
+    medium["sound_speed"]["value"] = first_wave["sound_speed_m_s"]
+    medium["dynamic_viscosity"]["value"] = 0
+    medium["amplitude_attenuation"]["value"] = 0
+    sources["frequency"]["value"] = first_wave["frequency_hz"]
+    reference_waves = [first_wave] if family == "B03" else (
+        [case["forward"], case["backward"]] if family == "B04" else
+        [case["first"], case["second"]]
+    )
+    base_element = copy.deepcopy(sources["elements"][0])
+    sources["elements"] = []
+    for index, wave in enumerate(reference_waves):
+        element = copy.deepcopy(base_element)
+        element["id"] = f"SOURCE-{index + 1}"
+        element["position"]["value"] = wave["reference_m"]
+        element["normal"]["value"] = wave["direction"]
+        element["phase"]["value"] = wave["phase_rad"]
+        element["pressure_amplitude"]["value"] = wave["peak_pressure_pa"]
+        sources["elements"].append(element)
+    low, high = case["box_min_m"], case["box_max_m"]
+    scenario["domain"]["origin"]["value"] = low
+    scenario["domain"]["size"]["value"] = [b - a for a, b in zip(low, high, strict=True)]
+    scenario["bodies"][0]["initial_state"]["position"]["value"] = [0, 0, 0]
+    scenario["solver"].update(
+        model_id="analytic-plane-field", model_version="1.0",
+        equation_ids=["EQ-007"] if family == "B03" else ["EQ-008"],
+        regime=["Manufactured ideal plane-wave comparison"], precision="complex128", parameters={},
+    )
+    scenario["resources"] = {
+        "ram_bytes": 4 * 1024**3, "disk_bytes": 16 * 1024**2,
+        "wall_time": {"value": 30, "unit": "s"},
+    }
+    request = {
+        "contract": "FIELD-REQUEST-1.0", "case_id": case_id,
+        "box_min_m": low, "box_max_m": high, "coordinates_m": case["coordinates_m"],
+    }
+    request_bytes = encode(request)
+    request_path = scenario_path.parent / "field-request.json"
+    request_path.write_bytes(request_bytes)
+    experiment = json.loads(experiment_path.read_bytes())
+    experiment["id"] = "EXP-ANA07-" + case_id
+    experiment["scenario_id"] = scenario["id"]
+    from aura.schema import Scenario, document_sha256
+
+    experiment["scenario_sha256"] = document_sha256(Scenario(scenario))
+    experiment["protocol"]["sha256"] = digest(request_bytes)
+    experiment["provenance"] = scenario["provenance"]
+    scenario_path.write_bytes(encode(scenario))
+    experiment_path.write_bytes(encode(experiment))
+
+    execution = execute(scenario_path, experiment_path, output=output, seed=None)
+    report = analyze_recorded_case(output, expected_manifest_sha256=execution["manifest_sha256"])
+    assert report["case_id"] == case_id
+    assert report["family"] == family
+    assert report["sample_count"] == len(case["coordinates_m"])
+    assert report["integrity"] == "VERIFIED"
+    assert report["numerical_comparison"] == "PASS", report["metrics"]
+    assert report["physical_validation"] == "NOT_ESTABLISHED"

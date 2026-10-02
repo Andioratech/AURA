@@ -1,0 +1,979 @@
+{
+  "contract": "B03-FIXTURE-1.0",
+  "purpose": "Manufactured software verification; no experiment or scientific run.",
+  "protocol": "ANA-REF-1.0",
+  "normalized_tolerance": 4.547473508864641e-13,
+  "scale_amplitude_pa": 2,
+  "cases": [
+    {
+      "id": "B03-AXIAL",
+      "wave": {
+        "density_kg_m3": 1000,
+        "sound_speed_m_s": 1500,
+        "frequency_hz": 1000000,
+        "peak_pressure_pa": 2,
+        "direction": [
+          1,
+          0,
+          0
+        ],
+        "reference_m": [
+          0,
+          0,
+          0
+        ],
+        "phase_rad": 0,
+        "dynamic_viscosity_pa_s": 0,
+        "amplitude_attenuation_per_m": 0
+      },
+      "coordinates_m": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0.000375,
+          0,
+          0
+        ],
+        [
+          0.00075,
+          0,
+          0
+        ],
+        [
+          0.001125,
+          0,
+          0
+        ],
+        [
+          0.0015,
+          0,
+          0
+        ]
+      ],
+      "box_min_m": [
+        -0.0015,
+        -0.0015,
+        -0.0015
+      ],
+      "box_max_m": [
+        0.0015,
+        0.0015,
+        0.0015
+      ],
+      "workspace_bytes": 2097152
+    },
+    {
+      "id": "B03-REVERSE",
+      "wave": {
+        "density_kg_m3": 1000,
+        "sound_speed_m_s": 1500,
+        "frequency_hz": 1000000,
+        "peak_pressure_pa": 2,
+        "direction": [
+          -1,
+          0,
+          0
+        ],
+        "reference_m": [
+          0,
+          0,
+          0
+        ],
+        "phase_rad": 0,
+        "dynamic_viscosity_pa_s": 0,
+        "amplitude_attenuation_per_m": 0
+      },
+      "coordinates_m": [
+        [
+          0.000375,
+          0,
+          0
+        ]
+      ],
+      "box_min_m": [
+        -0.0015,
+        -0.0015,
+        -0.0015
+      ],
+      "box_max_m": [
+        0.0015,
+        0.0015,
+        0.0015
+      ],
+      "workspace_bytes": 2097152
+    },
+    {
+      "id": "B03-OBLIQUE",
+      "wave": {
+        "density_kg_m3": 1000,
+        "sound_speed_m_s": 1500,
+        "frequency_hz": 1000000,
+        "peak_pressure_pa": 2,
+        "direction": [
+          0.6,
+          0.8,
+          0
+        ],
+        "reference_m": [
+          0,
+          0,
+          0
+        ],
+        "phase_rad": 0,
+        "dynamic_viscosity_pa_s": 0,
+        "amplitude_attenuation_per_m": 0
+      },
+      "coordinates_m": [
+        [
+          0.000625,
+          0,
+          0
+        ]
+      ],
+      "box_min_m": [
+        -0.0015,
+        -0.0015,
+        -0.0015
+      ],
+      "box_max_m": [
+        0.0015,
+        0.0015,
+        0.0015
+      ],
+      "workspace_bytes": 2097152
+    },
+    {
+      "id": "B03-ROTATED",
+      "wave": {
+        "density_kg_m3": 1000,
+        "sound_speed_m_s": 1500,
+        "frequency_hz": 1000000,
+        "peak_pressure_pa": 2,
+        "direction": [
+          0,
+          0,
+          1
+        ],
+        "reference_m": [
+          0,
+          0,
+          0
+        ],
+        "phase_rad": 0,
+        "dynamic_viscosity_pa_s": 0,
+        "amplitude_attenuation_per_m": 0
+      },
+      "coordinates_m": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0.000375
+        ],
+        [
+          0,
+          0,
+          0.00075
+        ],
+        [
+          0,
+          0,
+          0.001125
+        ],
+        [
+          0,
+          0,
+          0.0015
+        ]
+      ],
+      "box_min_m": [
+        -0.0015,
+        -0.0015,
+        -0.0015
+      ],
+      "box_max_m": [
+        0.0015,
+        0.0015,
+        0.0015
+      ],
+      "workspace_bytes": 2097152
+    },
+    {
+      "id": "B03-OBLIQUE-ROTATED",
+      "wave": {
+        "density_kg_m3": 1000,
+        "sound_speed_m_s": 1500,
+        "frequency_hz": 1000000,
+        "peak_pressure_pa": 2,
+        "direction": [
+          0.8,
+          0,
+          0.6
+        ],
+        "reference_m": [
+          0,
+          0,
+          0
+        ],
+        "phase_rad": 0,
+        "dynamic_viscosity_pa_s": 0,
+        "amplitude_attenuation_per_m": 0
+      },
+      "coordinates_m": [
+        [
+          0,
+          0,
+          0.000625
+        ]
+      ],
+      "box_min_m": [
+        -0.0015,
+        -0.0015,
+        -0.0015
+      ],
+      "box_max_m": [
+        0.0015,
+        0.0015,
+        0.0015
+      ],
+      "workspace_bytes": 2097152
+    },
+    {
+      "id": "B03-TRANSLATED",
+      "wave": {
+        "density_kg_m3": 1000,
+        "sound_speed_m_s": 1500,
+        "frequency_hz": 1000000,
+        "peak_pressure_pa": 2,
+        "direction": [
+          1,
+          0,
+          0
+        ],
+        "reference_m": [
+          0.000375,
+          0,
+          0
+        ],
+        "phase_rad": 0,
+        "dynamic_viscosity_pa_s": 0,
+        "amplitude_attenuation_per_m": 0
+      },
+      "coordinates_m": [
+        [
+          0.000375,
+          0,
+          0
+        ],
+        [
+          0.00075,
+          0,
+          0
+        ],
+        [
+          0.001125,
+          0,
+          0
+        ],
+        [
+          0.0015,
+          0,
+          0
+        ]
+      ],
+      "box_min_m": [
+        -0.0015,
+        -0.0015,
+        -0.0015
+      ],
+      "box_max_m": [
+        0.0015,
+        0.0015,
+        0.0015
+      ],
+      "workspace_bytes": 2097152
+    },
+    {
+      "id": "B03-PHASE",
+      "wave": {
+        "density_kg_m3": 1000,
+        "sound_speed_m_s": 1500,
+        "frequency_hz": 1000000,
+        "peak_pressure_pa": 2,
+        "direction": [
+          1,
+          0,
+          0
+        ],
+        "reference_m": [
+          0,
+          0,
+          0
+        ],
+        "phase_rad": 1.5707963267948966,
+        "dynamic_viscosity_pa_s": 0,
+        "amplitude_attenuation_per_m": 0
+      },
+      "coordinates_m": [
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "box_min_m": [
+        -0.0015,
+        -0.0015,
+        -0.0015
+      ],
+      "box_max_m": [
+        0.0015,
+        0.0015,
+        0.0015
+      ],
+      "workspace_bytes": 2097152
+    },
+    {
+      "id": "B03-ZERO",
+      "wave": {
+        "density_kg_m3": 1000,
+        "sound_speed_m_s": 1500,
+        "frequency_hz": 1000000,
+        "peak_pressure_pa": 0,
+        "direction": [
+          1,
+          0,
+          0
+        ],
+        "reference_m": [
+          0,
+          0,
+          0
+        ],
+        "phase_rad": 0,
+        "dynamic_viscosity_pa_s": 0,
+        "amplitude_attenuation_per_m": 0
+      },
+      "coordinates_m": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0.000375,
+          0,
+          0
+        ],
+        [
+          0.00075,
+          0,
+          0
+        ],
+        [
+          0.001125,
+          0,
+          0
+        ],
+        [
+          0.0015,
+          0,
+          0
+        ]
+      ],
+      "box_min_m": [
+        -0.0015,
+        -0.0015,
+        -0.0015
+      ],
+      "box_max_m": [
+        0.0015,
+        0.0015,
+        0.0015
+      ],
+      "workspace_bytes": 2097152
+    },
+    {
+      "id": "B03-PHASE-GRID",
+      "wave": {
+        "density_kg_m3": 1000,
+        "sound_speed_m_s": 1500,
+        "frequency_hz": 1000000,
+        "peak_pressure_pa": 2,
+        "direction": [
+          1,
+          0,
+          0
+        ],
+        "reference_m": [
+          0,
+          0,
+          0
+        ],
+        "phase_rad": 0,
+        "dynamic_viscosity_pa_s": 0,
+        "amplitude_attenuation_per_m": 0
+      },
+      "coordinates_m": [
+        [
+          -0.0015,
+          0,
+          0
+        ],
+        [
+          -0.00140625,
+          0,
+          0
+        ],
+        [
+          -0.0013125,
+          0,
+          0
+        ],
+        [
+          -0.00121875,
+          0,
+          0
+        ],
+        [
+          -0.001125,
+          0,
+          0
+        ],
+        [
+          -0.00103125,
+          0,
+          0
+        ],
+        [
+          -0.0009375,
+          0,
+          0
+        ],
+        [
+          -0.00084375,
+          0,
+          0
+        ],
+        [
+          -0.00075,
+          0,
+          0
+        ],
+        [
+          -0.00065625,
+          0,
+          0
+        ],
+        [
+          -0.0005625,
+          0,
+          0
+        ],
+        [
+          -0.00046875,
+          0,
+          0
+        ],
+        [
+          -0.000375,
+          0,
+          0
+        ],
+        [
+          -0.00028125,
+          0,
+          0
+        ],
+        [
+          -0.0001875,
+          0,
+          0
+        ],
+        [
+          -9.375e-05,
+          0,
+          0
+        ],
+        [
+          0.0,
+          0,
+          0
+        ],
+        [
+          9.375e-05,
+          0,
+          0
+        ],
+        [
+          0.0001875,
+          0,
+          0
+        ],
+        [
+          0.00028125,
+          0,
+          0
+        ],
+        [
+          0.000375,
+          0,
+          0
+        ],
+        [
+          0.00046875,
+          0,
+          0
+        ],
+        [
+          0.0005625,
+          0,
+          0
+        ],
+        [
+          0.00065625,
+          0,
+          0
+        ],
+        [
+          0.00075,
+          0,
+          0
+        ],
+        [
+          0.00084375,
+          0,
+          0
+        ],
+        [
+          0.0009375,
+          0,
+          0
+        ],
+        [
+          0.00103125,
+          0,
+          0
+        ],
+        [
+          0.001125,
+          0,
+          0
+        ],
+        [
+          0.00121875,
+          0,
+          0
+        ],
+        [
+          0.0013125,
+          0,
+          0
+        ],
+        [
+          0.00140625,
+          0,
+          0
+        ],
+        [
+          0.0015,
+          0,
+          0
+        ]
+      ],
+      "box_min_m": [
+        -0.0015,
+        -0.0015,
+        -0.0015
+      ],
+      "box_max_m": [
+        0.0015,
+        0.0015,
+        0.0015
+      ],
+      "workspace_bytes": 2097152
+    },
+    {
+      "id": "B03-FOUR-PI",
+      "wave": {
+        "density_kg_m3": 1000,
+        "sound_speed_m_s": 1500,
+        "frequency_hz": 1000000,
+        "peak_pressure_pa": 2,
+        "direction": [
+          1,
+          0,
+          0
+        ],
+        "reference_m": [
+          -0.0015,
+          0,
+          0
+        ],
+        "phase_rad": 0,
+        "dynamic_viscosity_pa_s": 0,
+        "amplitude_attenuation_per_m": 0
+      },
+      "coordinates_m": [
+        [
+          0.0015,
+          0,
+          0
+        ]
+      ],
+      "box_min_m": [
+        -0.0015,
+        -0.0015,
+        -0.0015
+      ],
+      "box_max_m": [
+        0.0015,
+        0.0015,
+        0.0015
+      ],
+      "workspace_bytes": 2097152
+    },
+    {
+      "id": "B03-ROUNDING-NEIGHBORS",
+      "wave": {
+        "density_kg_m3": 1000,
+        "sound_speed_m_s": 1500,
+        "frequency_hz": 1000000,
+        "peak_pressure_pa": 2,
+        "direction": [
+          1,
+          0,
+          0
+        ],
+        "reference_m": [
+          0,
+          0,
+          0
+        ],
+        "phase_rad": 0,
+        "dynamic_viscosity_pa_s": 0,
+        "amplitude_attenuation_per_m": 0
+      },
+      "coordinates_m": [
+        [
+          0.00037499999999999995,
+          0,
+          0
+        ],
+        [
+          0.00037500000000000006,
+          0,
+          0
+        ]
+      ],
+      "box_min_m": [
+        -0.0015,
+        -0.0015,
+        -0.0015
+      ],
+      "box_max_m": [
+        0.0015,
+        0.0015,
+        0.0015
+      ],
+      "workspace_bytes": 2097152
+    }
+  ],
+  "hand_normalized": {
+    "B03-AXIAL": {
+      "pressure": [
+        [
+          1,
+          0
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          -1,
+          0
+        ],
+        [
+          0,
+          -1
+        ],
+        [
+          1,
+          0
+        ]
+      ],
+      "velocity": [
+        [
+          [
+            1,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ]
+        ],
+        [
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ]
+        ],
+        [
+          [
+            -1,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ]
+        ],
+        [
+          [
+            0,
+            -1
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ]
+        ],
+        [
+          [
+            1,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ]
+        ]
+      ],
+      "pressure_gradient": [
+        [
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ]
+        ],
+        [
+          [
+            -1,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ]
+        ],
+        [
+          [
+            0,
+            -1
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ]
+        ],
+        [
+          [
+            1,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ]
+        ],
+        [
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ]
+        ]
+      ]
+    },
+    "B03-REVERSE": {
+      "pressure": [
+        [
+          0,
+          -1
+        ]
+      ],
+      "velocity": [
+        [
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ]
+        ]
+      ],
+      "pressure_gradient": [
+        [
+          [
+            -1,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ]
+        ]
+      ]
+    },
+    "B03-OBLIQUE": {
+      "pressure": [
+        [
+          0,
+          1
+        ]
+      ],
+      "velocity": [
+        [
+          [
+            0,
+            0.6
+          ],
+          [
+            0,
+            0.8
+          ],
+          [
+            0,
+            0
+          ]
+        ]
+      ],
+      "pressure_gradient": [
+        [
+          [
+            -0.6,
+            0
+          ],
+          [
+            -0.8,
+            0
+          ],
+          [
+            0,
+            0
+          ]
+        ]
+      ]
+    },
+    "B03-PHASE": {
+      "pressure": [
+        [
+          0,
+          1
+        ]
+      ],
+      "velocity": [
+        [
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ]
+        ]
+      ],
+      "pressure_gradient": [
+        [
+          [
+            -1,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ]
+        ]
+      ]
+    }
+  }
+}
