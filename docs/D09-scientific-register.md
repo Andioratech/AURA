@@ -18,10 +18,10 @@ For every equation record symbol definitions and units, source and page/section,
 
 The source PDFs suggest the following starting points. Metadata has been checked against publisher, journal or scholarly index records; equation applicability still requires full-text review:
 
-- L. P. Gor'kov, “Forces acting on a small particle in an acoustic field within an ideal fluid,” Doklady Akademii Nauk SSSR, 140(1), 88-91 (1961); English translation cited as Soviet Physics Doklady 6, 773 (1962). The source proposal's title/year pairing should be normalized when a specific edition is cited.
-- H. Bruus, “Acoustofluidics 7: The acoustic radiation force on small particles,” Lab on a Chip 12, 1014-1021 (2012), DOI 10.1039/C2LC21068A.
-- M. Settnes and H. Bruus, “Forces acting on a small particle in an acoustical field in a viscous fluid,” Physical Review E 85, 016327 (2012), DOI 10.1103/PhysRevE.85.016327.
-- A. Marzo et al., “Holographic acoustic elements for manipulation of levitated objects,” Nature Communications 6, 8661 (2015), DOI 10.1038/ncomms9661.
+- L. P. Gor'kov, “Forces acting on a small particle in an acoustic field within an ideal fluid,” Doklady Akademii Nauk SSSR, 140(1), 88-91 (1961); English translation cited as Soviet Physics Doklady 6, 773 (1962). See the [MathNet publication record](https://www.mathnet.ru/eng/dan/v140/i1/p88). The source proposal's title/year pairing should be normalized when a specific edition is cited.
+- H. Bruus, “Acoustofluidics 7: The acoustic radiation force on small particles,” Lab on a Chip 12, 1014-1021 (2012), DOI 10.1039/C2LC21068A. See the [RSC publisher record](https://doi.org/10.1039/C2LC21068A).
+- M. Settnes and H. Bruus, “Forces acting on a small particle in an acoustical field in a viscous fluid,” Physical Review E 85, 016327 (2012), DOI 10.1103/PhysRevE.85.016327. See the [APS DOI record](https://doi.org/10.1103/PhysRevE.85.016327).
+- A. Marzo et al., “Holographic acoustic elements for manipulation of levitated objects,” Nature Communications 6, 8661 (2015), DOI 10.1038/ncomms9661. See the [Nature publisher record](https://doi.org/10.1038/ncomms9661).
 
 These sources address small-particle radiation force or levitated-object manipulation in specific configurations; none alone validates AURA's proposed extended-body acceleration or scale-up. Add authoritative sources for acoustic momentum/stress formulations, numerical methods and safety as the relevant models are chosen.
 
