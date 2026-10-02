@@ -1,0 +1,49 @@
+# ANA-06 — Independent Energy-Balance Audits
+
+**State:** ACTIVE · **Protocol frozen:** 2026-10-02 · **Owner role:** research implementer
+
+## Authority and question
+
+Starting revision: `5307de120e2301d52743c452e1096153bbdc851a`. ANA-05 is DONE; P3 is still open. Apply D00/D02/D04-D08, FIELD-1.0, ANA-REF-1.0, EQ-006/009/010/011, DEC-003/004 and G01-G05 as applicable. For bounded lossless incident fields, does the time-averaged acoustic energy flux balance on the specified closed surfaces, and does the audit expose missing terms or corrupted flux?
+
+This is an energy-accounting check for ideal fluid fields. It is neither a momentum balance nor the force on a body. No universal force bound or gravity-generation claim follows. The recorder continues to support software diagnostics only.
+
+## Frozen model and volume matrix
+
+The medium is the existing manufactured ideal fluid: rho=1000 kg/m^3, c=1500 m/s, f=1 MHz, lambda=0.0015 m, Z=1.5e6 kg/(m^2 s), zero modeled loss, CONV-1.0 peak phasors `Re(q_hat exp(-i omega t))`. These values are not a measured water-state calibration. No body, wall, physical radiator aperture, material absorption, scattering or transient storage is present in an admitted control volume.
+
+Four bounded source setups reuse existing protocols: one +x progressive plane wave (B-03 base; A=2 Pa); equal +x/-x waves (B-04 base; A=2 Pa each); equal +x/+y coherent waves (B-05 axial; A=2 Pa each); one outgoing spherical wave (B-06 base; A=2 Pa, reference/minimum radius 0.000375 m, center origin, zero phase). Do not add or alter B-03…B-06 recorder configurations; 11+8+8+5 remains 32. The energy surfaces below are post-audit evaluations of those same source definitions, not new recorder experiments or a parameter sweep.
+
+1. **Closed sphere, radius lambda/4, center origin.** For each of the three plane-source setups, use the six exactly antipodal axis points `(+/-R,0,0)`, `(0,+/-R,0)`, `(0,0,+/-R)`, normals pointing radially outward and equal area weights `4*pi*R^2/6`. The expected total outward time-mean energy flux is zero: the enclosed volume has no sources or sinks, and incident equal-phase plane-wave flux at antipodal points is even under spatial inversion. Equal opposing waves also have zero flux at every point. Use a fixed source-power term of 0 W for these prescribed incident-field control volumes.
+2. **Spherical shell, center origin, inner radius 2*r_ref=0.00075 m and outer radius 2.5*r_ref=0.0009375 m.** Apply the same six-point full-sphere quadrature to each boundary. The shell excludes the source point and the entire selected r_min region. The outward normal of the shell is radial on the outer surface and negative radial on the inner. Expected net boundary flux is zero. For each sphere, the independent reference outward power is `4*pi*R^2 * [A^2/(2 Z)] * (r_ref/R)^2 = 4*pi*r_ref^2*A^2/(2 Z)`. No physical transducer or power calibration is inferred.
+3. Every surface has six samples; each FIELD-1.0 object is N=6, under the existing 256-sample limit. The farthest spherical point is inside the frozen observation box and satisfies its source exclusion and phase preflight. One CPU, no GPU/randomness; no new runtime dependency; <30 s per clean-source report and <16 MiB retained bundle. Preserve all cases and failures.
+
+The six-point rule integrates area and the first angular moments exactly. For the frozen plane cases, pressure and velocity share the same centered, zero-phase linear harmonic convention; inversion pairs give even mean-flux vectors and opposite normals, so the signed sum cancels independently of local angular variation. Equal areas exactly cover the sphere by construction. For the isotropic spherical case, radial flux is constant on each sphere, so the weighted surface integral is exact up to binary64 arithmetic. The independent derivation uses the real-harmonic period integral, not the auditor's field-product helper.
+
+## Equations, terms and output contract
+
+SRC-E01 Eq. (6) supplies the homogeneous inviscid linear momentum and continuity equations; combine them with the exact period mean to obtain the local lossless, source-free identity `div(I)=0`, where `I=Re(p_hat*conj(v_hat))/2` (SRC-E03 Eq. (3.4)). SRC-E03 Eqs. (3.11)-(3.14), conjugated to CONV-1.0 and checked in EQ-010, give the exact radial flux for B-06. EQ-011 follows by integrating that radial flux over a complete sphere. These are ideal-model identities; they do not describe unknown physical absorption or a body's momentum transfer.
+
+For a steady harmonic control volume with explicit terms, define the scalar residual
+
+```
+residual_W = sum(signed_boundary_power_W) + absorbed_power_W - internal_source_power_W
+```
+
+A closed sphere uses its single outward surface power. A spherical shell uses outer outward power minus inner outward power. Plane-wave cases have no physical source inside the mathematical control volume; their phase-reference points do not describe hardware. Both internal source and absorption terms are supplied explicitly, including an explicit 0 W assumption for this ideal lossless test. A missing/unknown term yields `INDETERMINATE` and a named diagnostic; it is never coerced to zero. Report the signed boundary contributions, terms, residual, global reference power scale, normalized absolute residual and threshold. Results are scoped comparison diagnostics, not an overall MCLF verdict or `ACCEPTED` physical evidence.
+
+The fixed error scale is `P_scale = 4*pi*R_ref^2 * A^2/(2 Z)` for the spherical-shell comparison and `P_scale = 4*pi*R^2 * C^2/(2 Z)` for each plane closed sphere, with C the sum of the stated peak amplitudes. This scale remains positive even when exact net flux is zero. Require `abs(residual_W)/P_scale <= 8192*e`, `e=2^-52` (approximately 1.819e-12). Derivation: existing B-03…B-06 pointwise flux components are bounded at 2048e on `C^2/(2Z)` (B-06 uses its more conservative reactive scale but flux uses `A^2/(2Z)`). The axis surface has one nonzero normal component per point; each normalized weighted contribution therefore inherits that pointwise bound. For the shell, bound both surface errors against the same radius-independent power scale. Reserve a conservative 128e per surface for area-weight generation, products and compensated summation at six terms. The resulting two-surface bound is below 4352e; round the total envelope upward to 8192e. This allowance is specific to this fixed matrix, not an arbitrary discretized surface or a physical-accuracy tolerance.
+
+## Implementation and independent verification plan
+
+- Add `src/aura/mclf/balances.py` as a small pure module. It will construct only the explicit six-point sphere; integrate supplied FIELD-1.0 intensity through checked unit normals/area weights; validate that field coordinates match the frozen surface; require the exact one-sphere or concentric two-sphere topology; and evaluate the explicit energy ledger. Use typed errors for malformed/nonfinite geometry, missing surfaces, mismatched samples, invalid weights/terms and out-of-scope topology.
+- Return a versioned balance result with a separate comparison state `PASS`, `FAIL` or `INDETERMINATE`. Do not silently provide absent term defaults. Keep it separate from `MclfReport`; no new L1 acceptance integration is claimed in this task.
+- In tests, independently compute plane expected zero from the linear energy identity and antipodal surface pairing; compare the measured area integral with the Decimal real-harmonic/Euler flux at each selected point. Independently compute each B-06 radius power from the formula above using Decimal constants/guarded pi and radial pressure amplitude. Do not call the production audit or `mean_intensity_w_m2` to generate expected values.
+- Test boundary orientation, source/loss signs, equal-power shell cancellation, each plane family, and exact six-point area closure. Deliberately reverse a field velocity or inject an inconsistent source-power term and require `FAIL`. Remove a required shell surface or pass unknown absorption/source power and require a typed rejection or explicit `INDETERMINATE`; prove it cannot be labeled PASS. Retest empty/malformed/duplicated surfaces and sample-coordinate mismatch before integration.
+- Focused balance checks <10 s; full Quality <60 s. Clean-source rerun timeout 30 s. No hidden retrial; after two failures of the same cause, record root cause before a third feature attempt. There is no mesh/time convergence study for a solver here; quadrature exactness is restricted to the named six-point cases.
+
+## Acceptance and handoff
+
+Expected: all frozen model-specific balances satisfy the unchanged derived 8192e limit; materially inconsistent terms/orientation fail; missing terms remain uncovered. Required artifacts are the public balance contract, `mclf/balances.py`, worked example, independent calculation/tests, numerical report, immutable clean-source evidence and artifact review. Run full current local Quality before each owner-identity commit, inspect the exact staged diff/private-file exclusion and current remote CI, push under the existing authorization, then confirm CI for that exact commit.
+
+If the balance fails, retain the exact attempt and use F-06 to inspect surface orientation, omitted/source terms and reference independence. If successful, ANA-06 becomes DONE and ANA-07 becomes READY; P3 is not closed until the required recorder/source/sampling/gradient/provenance/checker/post-audit campaign is admitted and reviewed. Force, body momentum, experimental validation, water calibration, larger-mass/object extrapolation and microgravity remain outside this task.
