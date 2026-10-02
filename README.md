@@ -46,6 +46,8 @@ Implemented foundations include a [versioned JSON/YAML input and evidence schema
 
 [ANA-01](docs/work-items/ANA-01.md) specifies [analytical field outputs](docs/research/analytical-field-contract.md) and [four independent reference protocols](docs/benchmarks/B03-B06-analytical-protocols.md). The new immutable container carries pressure, full fluid velocity and pressure gradients with explicit units and conventions. Acoustic solvers, physical run admission and execution of those reference cases remain pending.
 
+The [ANA-01 artifact review](docs/reviews/ANA-01-field-contract.md) records 1,033 passing software checks. ANA-02 is READY to implement the first progressive plane wave; P3 verification and physical validation remain open.
+
 ## Repository structure
 
 | Path | Purpose |

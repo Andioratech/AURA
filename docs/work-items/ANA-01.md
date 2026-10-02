@@ -1,6 +1,6 @@
 # ANA-01 — Analytical Field Contract and Reference Matrix
 
-**State:** ACTIVE · **Protocol frozen:** 2026-10-02 · **Owner role:** research implementer
+**State:** DONE · **Protocol frozen:** 2026-10-02 · **Owner role:** research implementer
 
 ## Authority and question
 
@@ -31,3 +31,9 @@ ANA-02 becomes READY only after this artifact review. P3, physical model coverag
 The first focused representation suite passed 114 tests. Lint identified a closure over a loop variable in the serializer; explicitly binding that value resolved the finding. During additional boundary-test insertion, a test block was temporarily placed in the wrong function: lint reported an undefined test variable and the focused run recorded 121 passes / 1 failure (NameError). The block was restored to its owning test; no implementation behavior, expected field value or acceptance tolerance was relaxed to address it.
 
 The final focused suite contains 122 representation cases, including maximum sample count, extreme finite encodings, detached snapshots, invalid metadata/numbers/shapes, required complex pairs and refusal to interpret component records as schema-1.0 documents. Scientific case comparisons remain NOT_RUN. Full workflow and publication evidence are recorded in the subsequent artifact review.
+
+## Outcome and handoff
+
+Revision `c22f4859703611d5ed6c300acb8ce89a3a8cb411` delivered the named artifacts and passed the complete local workflow (1,033 tests, 19.84 s) and [exact remote Quality](https://github.com/Andioratech/AURA/actions/runs/37037149159) (1,033 tests, 16.92 s). [The artifact review](../reviews/ANA-01-field-contract.md) closes this representation/reference specification card. No scientific run IDs exist for this task, and no B-03…B-06 solver comparison has passed yet.
+
+ANA-01 is DONE and ANA-02 is READY. P3, model coverage, experimental comparison and scale-up evidence remain open. The next implementation is the single progressive plane wave with independently checked pressure, full fluid velocity and pressure gradient; no new owner decision is needed. Closure documentation receives its own complete local and exact remote CI checks before delivery.

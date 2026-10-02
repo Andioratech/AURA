@@ -4,7 +4,7 @@
 
 ## Entry condition
 
-P2 PASS and [RUN-01 complete](../../reviews/RUN-01-lifecycle.md): ANA-01 is ACTIVE. Analytical cases may proceed without conclusive P1 measurement uncertainty. The current recorder supports software diagnostics; analytical driver admission and output/resource contracts must be fixed below before model execution.
+P2 PASS and [RUN-01 complete](../../reviews/RUN-01-lifecycle.md); [ANA-01 is complete](../../reviews/ANA-01-field-contract.md) and ANA-02 is READY. Analytical cases may proceed without conclusive P1 measurement uncertainty. The current recorder supports software diagnostics; analytical driver admission must implement the specified output/resource contracts before model execution through the recorder.
 
 ## Working contract
 
@@ -12,7 +12,7 @@ Use [00](../00-execution-protocol.md), the [task template](../templates/task-rec
 
 ## ANA-01 — Specify field outputs and the analytic case matrix
 
-**Current state:** ACTIVE — [task record](../../work-items/ANA-01.md). **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
+**Current state:** DONE — [artifact review](../../reviews/ANA-01-field-contract.md), [task record](../../work-items/ANA-01.md). **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
 
 **Inputs / predecessors:** FND-08, RUN-01
 
@@ -31,7 +31,7 @@ Use [00](../00-execution-protocol.md), the [task template](../templates/task-rec
 
 ## ANA-02 — Implement a progressive plane wave and its velocity
 
-**Initial state:** BLOCKED by predecessors / applicable gates. **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
+**Current state:** READY; ANA-01 artifacts reviewed. **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
 
 **Inputs / predecessors:** ANA-01
 
