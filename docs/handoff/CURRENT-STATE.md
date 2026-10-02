@@ -1,6 +1,6 @@
 # Current Research Checkpoint
 
-**As of:** 2026-10-02 · **Last development delivery:** `17d2ad30250a675aa881f3c9bcfe631de6d2c687` · **Main next task:** ANA-07
+**As of:** 2026-10-02 · **Last development delivery:** `4e24c75d7fa941a5b586bc60b984a95c272d15c8` · **Main next task:** ANA-07
 
 This checkpoint includes the ANA-07 plane recorder and its scope correction. Later documentation commits may contain this handoff itself. Reconcile it with actual history and the [live work board](../planning/10-work-board.md); do not treat this snapshot as an instruction to revert newer work.
 
@@ -24,7 +24,7 @@ Investigate whether controlled acoustic forcing can produce prescribed accelerat
 | ANA-04 | Two coherent plane waves, noncollinear interference and vector symmetries | [B-05 report](../benchmarks/B05-interference-verification.md) |
 | ANA-05 | Outgoing spherical field with full reactive velocity and explicit source exclusion | [B-06 report](../benchmarks/B06-spherical-verification.md), [review](../reviews/ANA-05-spherical.md) |
 | ANA-06 | Fixed-domain closed-sphere and spherical-shell energy ledgers | [ANA-06 report](../benchmarks/ANA-06-energy-balance-verification.md), [review](../reviews/ANA-06-energy-balance.md) |
-| ANA-07 | Versioned plane-field recorder and 27 passing B-03/B-04/B-05 recorded comparisons; post-audits and B-06 remain | [ANA-07 task](../work-items/ANA-07.md) |
+| ANA-07 | Versioned plane-field recorder, 27 passing B-03/B-04/B-05 comparisons, and one passing fresh reproduction; post-audits and B-06 remain | [ANA-07 task](../work-items/ANA-07.md) |
 
 Fifteen board tasks are DONE. ANA-07 is ACTIVE; LIT-01 and SC-01 are READY. LIT/SC are separate evidence/scale tracks, not permission to skip P3. Other BLOCKED cards mostly await ordinary predecessors; the project is not globally blocked.
 
@@ -41,7 +41,8 @@ Fifteen board tasks are DONE. ANA-07 is ACTIVE; LIT-01 and SC-01 are READY. LIT/
 - Clean-source smoke bundle: `RUN-20261002-b1e2f315f5b94c099f8fc56c5ed1596e`, manifest SHA-256 `edc3a71b1149cbf4cad5f18a4bd517921a9bec8518b3a79aafde9f2c61be637f`, integrity `VERIFIED`, execution `completed`, verdict `INDETERMINATE`.
 - Historical first comparison: B03-01 at the origin had zero normalized error for its exact reference values; its report remains in the ignored `results/verification/ANA-07/ANA07-METRICS-B03-01-0fa1114.json`. The broader 27-configuration matrix is the current result below.
 - Generalized metrics and the matrix runner: [`17d2ad30250a675aa881f3c9bcfe631de6d2c687`](https://github.com/Andioratech/AURA/commit/17d2ad30250a675aa881f3c9bcfe631de6d2c687), [exact Quality PASS](https://github.com/Andioratech/AURA/actions/runs/37062947897): full local Quality passed Ruff and 1,378 tests; remote Quality passed.
-- The first clean-source B-03/B-04/B-05 matrix ran 27 frozen configurations and compared 248 samples. Execution, output integrity and every numeric criterion passed. Maximum normalized errors: pressure `9.0206e-16`, velocity `7.9409e-16`, gradient `7.5994e-16`, mean intensity `1.5882e-16`; fixed tolerance `4.5475e-13`. Maximum runtime 3.745 s, largest bundle 111,490 bytes, highest RAM preflight estimate 1,008,906,240 bytes. The ignored index is `results/verification/ANA-07/PLANE-MATRIX-ANA-REF-1.0-17d2ad3/index.json`, SHA-256 `bae0d88a21a5eaf6c0fcd4c2795a9626a3516ed0ee620ae653de7476c416d748`. B-06 source admission, applicable energy/post-audits, a fresh reproduction and the P3 gate review remain open.
+- The first clean-source B-03/B-04/B-05 matrix ran 27 frozen configurations and compared 248 samples. Execution, output integrity and every numeric criterion passed. Maximum normalized errors: pressure `9.0206e-16`, velocity `7.9409e-16`, gradient `7.5994e-16`, mean intensity `1.5882e-16`; fixed tolerance `4.5475e-13`. Maximum runtime 3.745 s, largest bundle 111,490 bytes, highest RAM preflight estimate 1,008,906,240 bytes. The ignored index is `results/verification/ANA-07/PLANE-MATRIX-ANA-REF-1.0-17d2ad3/index.json`, SHA-256 `bae0d88a21a5eaf6c0fcd4c2795a9626a3516ed0ee620ae653de7476c416d748`. B-06 source admission, applicable energy/post-audits and the P3 gate review remain open.
+- Fresh reproduction utility: `tools/reproduce_ana07_case.py`. B03-AXIAL replay run `RUN-20261002-0b24dbe1337a458e858d847675c189d8` exactly matched its original inputs, four field artifacts and frozen metrics. The report is in ignored local results at `results/verification/ANA-07/REPRO-B03-AXIAL-4e24c75/reproduction.json`, SHA-256 `b457a09e11174d08971829d95ca7c94e6d02c37ff754964e4dcbea7b127c8018`. This checks deterministic analytic software only; physical validation remains unestablished.
 
 These are historical observed results. Rerun the required checks for new work; never quote this count as a fresh test result.
 
@@ -71,4 +72,4 @@ The owner requests incremental commits, complete CI before each commit, exact re
 
 ## Unresolved gates
 
-ANA-07 still needs the B-06 recorder/source contract, applicable post-audits, a fresh reproduction and review before P3 can close. Numerical backend work, coupled forces, motion, control, adversarial studies and scale progression retain their planned dependencies. RUN-02 replay is still pending. Water measurement selection/uncertainty, physical source calibration, boundary/loss effects, suitable larger-body models and independent scientific review remain evidence work. Never fill a missing physical parameter or term with an invented value or a zero. ANA-06's PASS is an energy-accounting comparison for the fixed ideal cases; it supplies no momentum balance, body force or physical validation.
+ANA-07 still needs the B-06 recorder/source contract, applicable post-audits, plotted-data review and gate review before P3 can close. One fresh reproduction has passed; general RUN-02 replay remains pending. Numerical backend work, coupled forces, motion, control, adversarial studies and scale progression retain their planned dependencies. Water measurement selection/uncertainty, physical source calibration, boundary/loss effects, suitable larger-body models and independent scientific review remain evidence work. Never fill a missing physical parameter or term with an invented value or a zero. ANA-06's PASS is an energy-accounting comparison for the fixed ideal cases; it supplies no momentum balance, body force or physical validation.
