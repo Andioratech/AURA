@@ -121,7 +121,7 @@ Use [00](../00-execution-protocol.md), the [task template](../templates/task-rec
 
 ## ANA-07 — Publish P3 verification evidence and close the gate
 
-**Current state:** ACTIVE — the recorded B-03/B-04/B-05 matrix passes across 27 configurations and 248 samples. A fresh B03-AXIAL replay also matches the original input hashes, four field files and frozen metrics. B-06 source admission, applicable post-audits and full P3 gate review remain pending. See [ANA-07 task record](../../work-items/ANA-07.md). **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
+**Current state:** ACTIVE — the recorded B-03/B-04/B-05 matrix passes across 27 configurations and 248 samples. A fresh B03-AXIAL replay also matches the original input hashes, four field files and frozen metrics. ANA-06's four energy ledgers are completed for their exact source cases, with limits recorded in ANA-07. B-06 recorder admission, remaining post-audits and full P3 gate review remain pending. See [ANA-07 task record](../../work-items/ANA-07.md). **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
 
 **Inputs / predecessors:** ANA-06
 
@@ -129,7 +129,7 @@ Use [00](../00-execution-protocol.md), the [task template](../templates/task-rec
 
 1. Implement and cross-check the versioned analytical field recorder and companion gradient index.
 2. Admit an explicit spherical-source input bound to Scenario; do not represent it as a piston or plane wave.
-3. Compare the admitted B-03/B-04/B-05 recorder matrix with its frozen references; then complete the applicable model post-audits, precision/cancellation sensitivity and resource observations.
+3. Compare the admitted B-03/B-04/B-05 recorder matrix with its frozen references; map ANA-06's completed balances to their exact source cases without calling them bundle-derived audits. Review any remaining post-audits and precision/cancellation sensitivity; matrix resource observations are recorded.
 4. Reproduce a selected case. **Done for B03-AXIAL:** report `results/verification/ANA-07/REPRO-B03-AXIAL-4e24c75/reproduction.json`, checksum `b457a09e11174d08971829d95ca7c94e6d02c37ff754964e4dcbea7b127c8018`.
 5. Complete the applicable post-audits and assemble the separate P3 gate review, including limitations and failures.
 
