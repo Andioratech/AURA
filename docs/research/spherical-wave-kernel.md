@@ -21,7 +21,11 @@ The medium is homogeneous, stationary, unbounded, linear, inviscid and lossless.
 
 ## Explicit API and numerical domain
 
-`SphericalWave` is an immutable keyword-only specification: density_kg_m3, sound_speed_m_s, frequency_hz, peak_pressure_pa (at reference radius), center_m, reference_radius_m, minimum_radius_m, phase_rad, dynamic_viscosity_pa_s, amplitude_attenuation_per_m. No defaults. Positive medium/frequency/radii; reference_radius_m>=minimum_radius_m; nonnegative amplitude and explicit zero losses. The reference sphere belongs to the admitted model domain. No plane-wave or finite-piston schema is repurposed; RUN driver admission remains pending.
+`SphericalWave` is an immutable keyword-only specification: density_kg_m3, sound_speed_m_s, frequency_hz, peak_pressure_pa (at reference radius), center_m, reference_radius_m, minimum_radius_m, phase_rad, dynamic_viscosity_pa_s, amplitude_attenuation_per_m. No defaults. Positive medium/frequency/radii; reference_radius_m>=minimum_radius_m; nonnegative amplitude and explicit zero losses. The reference sphere belongs to the admitted model domain. No plane-wave or finite-piston schema is repurposed.
+
+### Recorded input binding (ANA-07)
+
+The recorder maps a single Scenario source with `model: ideal_spherical_wave` and `model_contract: SPHERICAL-WAVE-1.0` to this specification. The source uses explicit `center` (m), `reference_radius` (m), `minimum_radius` (m), phase and peak `pressure_amplitude` at the reference radius; its normal, plane reference position and piston aperture are absent. `reference_radius >= minimum_radius > 0`, pressure limit, zero loss, B-06 source identity, finite observation box and sample exclusion are checked before field evaluation. Solver `analytic-spherical-field` 1.0 declares EQ-010; `ANALYTIC-RUN-1.1` distinguishes this additive driver from the unchanged plane policy `ANALYTIC-RUN-1.0`. The source is an ideal mathematical model and does not describe a physical radiator.
 
 `evaluate_spherical_wave(wave, coordinates_m, *, box_min_m, box_max_m, workspace_bytes)` returns FIELD-1.0 in the original sample order, retaining duplicates. Require exact SphericalWave type, 1..256 points, finite built-in numeric triples, a strictly ordered finite box with inclusive membership, and integer workspace>=4096*N+4096. Check every point before trig or complex output allocation. Reject r<r_min, including zero. Boundary comparison uses the computed binary64 norm without padding or silently moving samples.
 
