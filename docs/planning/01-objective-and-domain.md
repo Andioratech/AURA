@@ -1,10 +1,16 @@
 # 01 — Scientific Objective, Domain and Claim Contract
 
-## Question to operationalize
+## Program objective and first operational question
+
+The program investigates whether controlled acoustic forcing can produce a prescribed acceleration for selected bodies across explicitly investigated mass, size and geometry domains, toward microgravity operation. Small particles in water are the first campaign. Greater masses and larger or differently shaped objects are an explicit research objective under [DEC-004](../decisions/DEC-004-staged-mass-and-size-expansion.md); follow [11](11-scale-progression.md) to investigate each transition.
+
+The first operational question is:
 
 For a specified small particle suspended in water, can an admissible ultrasonic actuation policy make its resolved center-of-mass acceleration follow a predeclared vector over a finite interval and a bounded workspace, with an independently checked force/motion model and uncertainty budget?
 
 The long-term environment is microgravity. Earth-gravity comparisons are development controls. Setting a gravity vector to zero is a modeled idealization; it is not evidence about a real flight environment. AURA remains an unvalidated hypothesis.
+
+The hypothesis table and domain fields below describe the initial campaign. For each larger-body campaign, register new body/model-specific instances of these hypotheses, include torque/orientation/loading observables when required, and repeat the relevant evidence gates. Neither success nor failure of the initial particle case determines all other scales.
 
 ## Hypothesis hierarchy
 

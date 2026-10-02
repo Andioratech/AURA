@@ -1,12 +1,14 @@
 # AURA-D01: System Architecture
 
-**Version:** 1.1 · **Status:** BASELINE · **Date:** 2026-10-02
+**Version:** 1.2 · **Status:** BASELINE · **Date:** 2026-10-02
 
 ## Purpose and hypothesis
 
 AURA investigates whether controlled ultrasonic fields can apply object-specific acoustic radiation forces that keep the acceleration of free bodies near a prescribed vector within a limited domain. The working hypothesis is conditional and falsifiable: closed-loop control may achieve a sufficiently common target acceleration for selected objects after adjusting the force on each object. Failure to identify a viable domain or a quantitative limit is an acceptable scientific outcome.
 
 Acoustic pseudogravity means mechanically induced acceleration. Acoustic forces depend on field, material, geometry and boundary conditions, whereas gravitational acceleration couples universally to mass. AURA does not claim to generate gravity.
+
+Small particles in water are the first implementation campaign. Greater masses, larger objects and other geometries are explicit research objectives toward microgravity, as clarified in [DEC-004](decisions/DEC-004-staged-mass-and-size-expansion.md). Each candidate uses a bounded model and independent evidence; initial particle results alone do not decide the larger-body question.
 
 ## System loop
 
@@ -51,9 +53,11 @@ Scenario, field, force, dynamics, control, MCLF and evidence modules communicate
 
 ## Initial research campaign
 
-Start with SI/schema/MCLF foundations and analytical wavelength, interference, spreading and power-balance checks. These can proceed while a separate published benchmark has unresolved measurement details, provided the missing information is not silently replaced. The Andrade sphere curve remains a first exploratory force reference; any comparison limited by its missing measurement uncertainty remains INDETERMINATE. Do not combine controller or AI development with the first force-model work. Array control, prescribed acceleration and ideal microgravity cases remain behind their applicable force-model, dynamics and evidence gates. See [DEC-003](decisions/DEC-003-nonblocking-foundation-work.md) and [PLAN-01 v1.2](PLAN-01-project-execution-plan.md).
+Start with SI/schema/MCLF foundations and analytical wavelength, interference, spreading and power-balance checks. These can proceed while a separate published benchmark has unresolved measurement details, provided the missing information is not silently replaced. The Andrade sphere curve remains a first exploratory force reference; any comparison limited by its missing measurement uncertainty remains INDETERMINATE. Do not combine controller or AI development with the first force-model work. Array control, prescribed acceleration and ideal microgravity cases remain behind their applicable force-model, dynamics and evidence gates. See [DEC-003](decisions/DEC-003-nonblocking-foundation-work.md) and [PLAN-01 v1.3](PLAN-01-project-execution-plan.md).
 
 ## Scale-up boundary
+
+The [scale progression track](planning/11-scale-progression.md) separately investigates increased mass, dimensions and geometric complexity. Research can start alongside foundations. Each numerical candidate must pass the applicable model, field, force/torque, dynamics, resource and independent-evidence gates. Software interfaces must support explicit body geometry and model capabilities without treating all objects as small particles.
 
 A proposed 5 m cubic station is a future study question. It requires array aperture and power budgets, acoustic attenuation, chamber modes, spatial acceleration uniformity, thermal and safety analyses, body-specific coupling and an independent feasibility review. No human-scale feasibility is inferred from point-particle simulations.
 

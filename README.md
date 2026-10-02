@@ -16,6 +16,8 @@ Can an actively controlled ultrasonic field, together with state estimation and 
 
 Answers must be scoped to the tested objects, materials, geometry, medium, frequency range, field regime, solver fidelity, uncertainty, and time interval. Results for small particles do not establish performance for macroscopic or human bodies.
 
+Small particles in water are the first implementation campaign. The research objective explicitly includes greater masses, larger objects and other geometries through a [staged scale progression plan](docs/planning/11-scale-progression.md). Each new domain requires an appropriate physical model and independent evidence before its performance can be claimed.
+
 ## Scientific approach
 
 1. **Define the model and domain.** State the governing equations, approximations, boundary conditions, units, assumptions, and intended observables.

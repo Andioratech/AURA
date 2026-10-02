@@ -2,7 +2,7 @@
 
 ## Authority and current facts
 
-Read [D00](../D00-document-control.md), the phase's relevant D documents, and G01–G05. [DEC-003](../decisions/DEC-003-nonblocking-foundation-work.md) permits foundation work while benchmark evidence remains incomplete. The original P1 benchmark remains a 50 mm sphere in air; the intended application discussed by the owner is small particles in water progressing toward microgravity. Keep those domains explicit and separate.
+Read [D00](../D00-document-control.md), the phase's relevant D documents, and G01–G05. [DEC-003](../decisions/DEC-003-nonblocking-foundation-work.md) permits foundation work while benchmark evidence remains incomplete. The original P1 benchmark remains a 50 mm sphere in air. Small particles in water are the first implementation campaign; [DEC-004](../decisions/DEC-004-staged-mass-and-size-expansion.md) records greater masses, larger objects and other geometries as an explicit research objective toward microgravity. Keep each benchmark and candidate domain separate; use [11](11-scale-progression.md) for scale transitions.
 
 The code inventory was inspected at commit `aaf4aba7bff3774e645b3640784ebdcdbd14a7db`: CLI status, four SI helper functions, and nine passing tests. No field, force, motion or control solver is implemented. All other paths in this pack are planned unless marked existing.
 

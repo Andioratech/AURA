@@ -46,6 +46,7 @@ Arrows denote work dependencies, not automatic scientific PASS. An exploratory a
 | D-13 | Ideal zero-gravity case works; residual case fails | Map sensitivity and record the conditional ideal result | Reduce target/domain or improve observation/actuation only in a versioned experiment | Residual-environment assumptions and robustness checks pass |
 | D-14 | Single-particle case works | Close only that domain | Multi-particle/material/shape expansion needs interaction/observability research and independent evidence | Scope decision plus updated model and validation plan |
 | D-15 | Independent methods disagree | Freeze the claim and align inputs/definitions first | Review shared omissions, independent derivations and reference calibration | Difference resolved or claim remains LIMITED/INDETERMINATE |
+| D-16 | Investigate greater mass, larger dimensions or another body shape under DEC-004 | Start SC-01/SC-02 source and model-applicability research; retain initial foundation work | SC-03/SC-04 execute the selected new case only after their model-specific gates; do not require a favorable particle result to research another regime | New domain, equations, independent reference and resource protocol support the applicable phase review |
 
 ## Owner decisions versus implementation decisions
 

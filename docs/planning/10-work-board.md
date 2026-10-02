@@ -10,7 +10,7 @@
 4. Build RUN-01, then ANA-01…ANA-07. Complete RUN-02 before NUM-07 closes P4.
 5. Follow the remaining phase gates and decision tree. Do not start controller implementation before the required force/dynamics gates.
 
-The board includes planned tasks, not finished deliverables. Only FND-01 and LIT-01 are immediately READY. Existing helpers/tests are PARTIAL starting evidence for P2; none of the phase cards is automatically DONE. BLOCKED below means a normal dependency has not yet been delivered, not that the whole project must stop.
+The board includes planned tasks, not finished deliverables. FND-01 and LIT-01 are immediately READY; SC-01 is also READY for larger-body research under DEC-004. Existing helpers/tests are PARTIAL starting evidence for P2; none of the phase cards is automatically DONE. BLOCKED below means a normal dependency has not yet been delivered, not that the whole project must stop.
 
 ## Dependency and status table
 
@@ -85,6 +85,11 @@ The board includes planned tasks, not finished deliverables. Only FND-01 and LIT
 | EXP-05 | Close the planning-to-evidence chain and hand off | EXP-04 | BLOCKED | [EXP](phases/P10-experiment-decision.md) |
 | RUN-01 | Immutable minimal run lifecycle | FND-08 and P2 PASS | BLOCKED | [Cross-cutting card](08-reproducibility-and-ci.md) |
 | RUN-02 | Replay, comparison and evidence reporting | RUN-01, ANA-07 | BLOCKED | [Cross-cutting card](08-reproducibility-and-ci.md) |
+| SC-01 | Register candidate mass, size and shape campaigns | DEC-004; LIT-01 inventory when available | READY for research | [Scale progression](11-scale-progression.md) |
+| SC-02 | Establish whether a model change is needed | SC-01; relevant source/applicability review | BLOCKED | [Scale progression](11-scale-progression.md) |
+| SC-03 | Verify and compare larger-body forces | SC-02 and candidate foundation/field gates | BLOCKED | [Scale progression](11-scale-progression.md) |
+| SC-04 | Test acceleration and rotational behavior | SC-03 and candidate force/dynamics gates | BLOCKED | [Scale progression](11-scale-progression.md) |
+| SC-05 | Publish limits across investigated scales | SC-04 outcome or reviewed earlier limitation | BLOCKED | [Scale progression](11-scale-progression.md) |
 
 ## Review queue and external dependencies
 
@@ -98,5 +103,7 @@ The board includes planned tasks, not finished deliverables. Only FND-01 and LIT
 When a task changes state, record date, responsible role/person, evidence paths, commit, actual checks, open limitations and next branch in its work-item record. Update predecessor/gate references if a reviewed decision changes sequencing. A card with an INDETERMINATE research finding may be DONE as an investigation; its scientific comparison/gate remains INDETERMINATE.
 
 ## Parking list
+
+Greater masses, larger objects and other body geometries belong to the planned SC track above. They are not excluded from the program. Exact candidate domains and numerical campaigns still need their own evidence review.
 
 Human-scale use; arbitrary body-independent acceleration; a 5 m station; hardware procurement/operation; learning controllers; web/cloud product; multi-particle optimization without interaction evidence; multiple high-fidelity backends without a discriminating question. Add a proposal with scientific benefit and required gate before moving any into active scope.

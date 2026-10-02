@@ -1,10 +1,12 @@
 # AURA Simulator, Evidence and Falsification Execution Pack
 
-**Version:** 1.0 · **Prepared:** 2026-10-02 · **Status:** Execution planning; scientific choices remain subject to their gates
+**Version:** 1.1 · **Prepared:** 2026-10-02 · **Status:** Execution planning; scientific choices remain subject to their gates
 
 ## Intended result
 
-Build a reproducible simulator that can investigate controlled acoustic acceleration of small particles in water, prepare validation against measurements, and actively seek counterexamples and physical or mathematical limitations. Progress toward an explicitly modeled microgravity environment. A supported restricted domain, a negative finding, or a documented evidence gap are all legitimate outcomes.
+Build a reproducible simulator that can investigate controlled acoustic forcing and prescribed acceleration for selected bodies, starting with small particles in water and explicitly researching greater masses, larger objects and other geometries. Prepare validation against measurements and actively seek counterexamples and physical or mathematical limitations while progressing toward an explicitly modeled microgravity environment. A supported restricted domain, a negative finding, or a documented evidence gap are all legitimate outcomes.
+
+The particle campaign is the starting case. The required [scale progression track](11-scale-progression.md), recorded in [DEC-004](../decisions/DEC-004-staged-mass-and-size-expansion.md), keeps larger-body research within the project objective; each new regime needs its own applicable model and evidence.
 
 This pack decomposes [PLAN-01](../PLAN-01-project-execution-plan.md); [D00](../D00-document-control.md) through D09 retain precedence. It supplies research tasks, implementation specifications, verification work, decision branches, failure recovery, and report templates. It does not claim that the planned software exists or that a numerical tolerance, particle size, actuator, or experimental design has already been approved.
 
@@ -35,6 +37,7 @@ The pack is intended to make the next action unambiguous. Research outcomes cann
 | [08 — Reproduction and delivery](08-reproducibility-and-ci.md) | Preserve runs, environments, data, CI checks and owner commit identity |
 | [09 — Requirement traceability](09-requirement-traceability.md) | Map D03 requirements to code, tasks, tests and evidence |
 | [10 — Work board](10-work-board.md) | Find task order, current state and dependency gates |
+| [11 — Scale progression](11-scale-progression.md) | Investigate greater masses, larger dimensions and other body geometries with explicit transition gates |
 | [Phase cards](phases/P02-foundations.md) | Execute the individual work packages |
 | [Templates](templates/task-record.md) | Create consistent task, experiment, gate, decision, anomaly and claim records |
 
@@ -54,4 +57,4 @@ M3 cannot be called experimentally validated while its required water measuremen
 
 ## Pack completion versus project completion
 
-This folder is the planning deliverable. Task checkboxes describe future work, not completed results. The simulator is complete for its first bounded research release only after P2–P9 evidence is traceable, all applicable MUST requirements are satisfied or formally scoped in a reviewed release, and a reproduction bundle exists. A smaller one-particle demonstrator is an intermediate milestone, not completion of all D03 requirements.
+This folder is the planning deliverable. Task checkboxes describe future work, not completed results. The simulator is complete for its first bounded research release only after P2–P9 evidence is traceable, all applicable MUST requirements are satisfied or formally scoped in a reviewed release, and a reproduction bundle exists. A smaller one-particle demonstrator is an intermediate milestone, not completion of all D03 requirements or of the larger-body research objective. SC-01–SC-05 track subsequent scale investigations and reuse the applicable phase gates for each candidate.

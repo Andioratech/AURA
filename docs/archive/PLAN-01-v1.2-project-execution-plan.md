@@ -1,6 +1,6 @@
 # PLAN-01: AURA Phase-Gated Master Work Plan
 
-**Version:** 1.3 · **Status:** BASELINE · **Owner:** AURA project owner · **Last updated:** 2026-10-02
+**Version:** 1.2 · **Status:** BASELINE · **Owner:** AURA project owner · **Last updated:** 2026-10-02
 
 ## 1. Purpose
 
@@ -373,11 +373,3 @@ The first benchmark is an empirical anchor for one force calculation, not a redu
 | M4 — broader target domain | Consider denser/heavier bodies, other shapes, multiple bodies or longer operating times only as separately bounded cases | New source search and owner decision for each scope expansion | Every changed material, scale, geometry, medium or operating claim |
 
 These steps are a research path, not performance promises. Advancement requires the applicable phase gate, independent evidence and an owner-reviewed decision. The 50 mm sphere result cannot be used to predict performance for a denser body or the eventual microgravity case by itself.
-
-## 13. Scale progression as an explicit research objective
-
-[DEC-004](decisions/DEC-004-staged-mass-and-size-expansion.md) records the owner's clarification that small particles in water are the initial implementation case, while the project also investigates greater masses, larger objects and other geometries toward microgravity. The [SC-01–SC-05 track](planning/11-scale-progression.md) supplies concrete research, model-transition and evidence tasks.
-
-Begin scale-candidate research alongside P2 foundations. For each selected numerical campaign, repeat the applicable P3–P9 gates with its own domain, equations, resources and reference evidence; reuse earlier infrastructure only where its contracts remain valid. Neither a favorable nor an unfavorable small-particle result automatically decides a distinct larger-body hypothesis. Mass, dimensions and shape are recorded separately; no maximum achievable scale is assumed.
-
-Version 1.3 clarifies program scope and links this track without changing existing equations, tolerances or evidence gates. The previous [PLAN-01 v1.2](archive/PLAN-01-v1.2-project-execution-plan.md) is retained as a historical snapshot. The M1–M4 reference leads above remain scoped examples, not a requirement to switch the water campaign into air.

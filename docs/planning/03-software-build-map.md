@@ -39,7 +39,7 @@ Core remains CPU-first. Review dependency licenses and current compatibility in 
 | `control/baseline.py` | One deterministic controller with actuator limits/anti-windup where applicable | CTL-04 | Open-loop baseline, saturation, delay and holdout |
 | `sensors/virtual.py` | Exact-state reference then sampled noisy/delayed observation | CTL-05 | Units, latency, stale/dropout timestamps |
 | `estimation/baseline.py` | Minimal estimator matched to observation; no oracle leakage | CTL-05 | Independent synthetic truth; held-out noise |
-| `runs/manifest.py` | Immutable run metadata, input/environment/source identity and output hash index | FND-07, RUN-01 |
+| `runs/manifest.py` | Immutable run metadata, input/environment/source identity and output hash index | FND-07, RUN-01 | Hash mismatch, missing identity and immutable output checks |
 | `runs/execute.py` | Validate → preflight → run → checks → atomic finalize; keep failures | RUN-01, RUN-02 | Exception/interrupt/resume policy; never overwrite |
 | `runs/reproduce.py` | Verify inputs/environment and replay a stored experiment into a new run | RUN-02, IND-03 | Hash mismatch, unavailable inputs, backend variation |
 | `analysis/metrics.py` | D03 metrics with units, applicability, time weights and uncertainty | ANA-07, MOT-08, CTL-06 | Hand time series; zero denominator; missing window |
@@ -94,3 +94,9 @@ Until a command is implemented and documented by its owning card, use the existi
 ## Scope of the initial usable simulator
 
 CLI plus documented configurations, pressure/velocity field plots, per-force and trajectory plots, comparison reports and the operating-limit map are required. A web application, animation engine, cloud service and AI controller are optional later product work. They do not resolve the scientific gates and are excluded from this construction sequence.
+
+## Planned support for greater masses and larger objects
+
+The initial particle implementation is one model behind the common `Body`, field, force and dynamics interfaces. FND-02 must preserve explicit geometry/material/mass/inertia metadata and capability checks; it must not make every possible body an implicit point particle. Unsupported body/model combinations fail explicitly.
+
+SC-02–SC-03 in [11](11-scale-progression.md) select and verify the required later implementation: a geometry adapter, an appropriate scattering/body-field backend, force/torque evaluation and any loading diagnostics required by the candidate claim. Proposed locations are `geometry/`, `fields/scattering.py` and `forces/body.py`; these are planned, unimplemented components. Select the actual method and numerical library only after source review and resource preflight. Reuse the existing run/audit/reporting infrastructure while repeating the applicable model and evidence gates.
