@@ -56,7 +56,7 @@ The [B-03 numerical report](docs/benchmarks/B03-plane-wave-verification.md) reco
 |---|---|
 | docs/ | Controlled scientific, numerical, and software specifications (D00-D09) |
 | guides/ | Procedures for contribution, experiments, anomaly handling, reproduction, and review (G01-G05) |
-| src/aura/ | Foundations, diagnostic recorder and bounded analytical plane-wave kernel |
+| src/aura/ | Foundations, diagnostic recorder and bounded analytical plane and spherical kernels |
 | tests/ | Starting point for software and scientific verification cases |
 | examples/ | Versioned experiment configurations |
 | data/ | Data provenance and retention policy |
@@ -65,6 +65,8 @@ The [B-03 numerical report](docs/benchmarks/B03-plane-wave-verification.md) reco
 | assets/ | README and project identity assets |
 
 ## Start here
+
+- [Resume the project: current checkpoint and next task](docs/handoff/README.md)
 
 - [Install and validate a configuration](docs/cli-usage.md)
 - [D00: Document control and scientific baseline](docs/D00-document-control.md)

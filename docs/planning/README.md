@@ -12,6 +12,8 @@ This pack decomposes [PLAN-01](../PLAN-01-project-execution-plan.md); [D00](../D
 
 ## Start and follow
 
+Joining or resuming work? Read [the continuity entry point](../handoff/README.md) for the current checkpoint, evidence and next task, then reconcile it with the work board.
+
 1. Read [execution rules](00-execution-protocol.md) and [scientific objective](01-objective-and-domain.md).
 2. Open [the work board](10-work-board.md) and select the next READY task; completed tasks link their actual evidence. LIT-01 may proceed as a separate evidence task.
 3. Open the linked phase card. Carry out its numbered steps and produce every named artifact.

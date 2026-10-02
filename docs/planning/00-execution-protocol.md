@@ -4,7 +4,7 @@
 
 Read [D00](../D00-document-control.md), the phase's relevant D documents, and G01–G05. [DEC-003](../decisions/DEC-003-nonblocking-foundation-work.md) permits foundation work while benchmark evidence remains incomplete. The original P1 benchmark remains a 50 mm sphere in air. Small particles in water are the first implementation campaign; [DEC-004](../decisions/DEC-004-staged-mass-and-size-expansion.md) records greater masses, larger objects and other geometries as an explicit research objective toward microgravity. Keep each benchmark and candidate domain separate; use [11](11-scale-progression.md) for scale transitions.
 
-The code inventory was inspected at commit `aaf4aba7bff3774e645b3640784ebdcdbd14a7db`: CLI status, four SI helper functions, and nine passing tests. No field, force, motion or control solver is implemented. All other paths in this pack are planned unless marked existing.
+The original planning inventory at `aaf4aba7bff3774e645b3640784ebdcdbd14a7db` contained CLI status, four SI helpers and nine passing tests. That is a historical starting point, not the current capability inventory. At the [ANA-05 checkpoint](../handoff/CURRENT-STATE.md), foundations, the diagnostic recorder and bounded plane/spherical field kernels are implemented; force, motion and control remain pending. Use the [work board](10-work-board.md), linked artifact reviews and inspected source for current status. Planned paths do not establish implementation.
 
 ## Execute a task
 
