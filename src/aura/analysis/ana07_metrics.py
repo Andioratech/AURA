@@ -20,10 +20,11 @@ FAMILY_FIXTURES = {
     "B03": "ANA-REF-1.0-B03.json",
     "B04": "ANA-REF-1.0-B04.json",
     "B05": "ANA-REF-1.0-B05.json",
+    "B06": "ANA-REF-1.0-B06.json",
 }
 CASE_ALIASES = {"B03-01": ("B03-AXIAL", 0)}
 ORACLES = {"B03": references.reference_b03, "B04": references.reference_b04,
-           "B05": references.reference_b05}
+           "B05": references.reference_b05, "B06": references.reference_b06}
 
 
 def _fixture(family: str) -> tuple[dict, bytes]:
@@ -72,6 +73,22 @@ def _scenario_wave(scenario: dict, element: dict) -> dict:
     }
 
 
+def _scenario_spherical_wave(scenario: dict, element: dict) -> dict:
+    medium, sources = scenario["medium"], scenario["sources"]
+    return {
+        "density_kg_m3": _qvalue(medium, "density"),
+        "sound_speed_m_s": _qvalue(medium, "sound_speed"),
+        "frequency_hz": _qvalue(sources, "frequency"),
+        "peak_pressure_pa": _qvalue(element, "pressure_amplitude"),
+        "center_m": _qvalue(element, "center"),
+        "reference_radius_m": _qvalue(element, "reference_radius"),
+        "minimum_radius_m": _qvalue(element, "minimum_radius"),
+        "phase_rad": _qvalue(element, "phase"),
+        "dynamic_viscosity_pa_s": _qvalue(medium, "dynamic_viscosity"),
+        "amplitude_attenuation_per_m": _qvalue(medium, "amplitude_attenuation"),
+    }
+
+
 def _validate_case_inputs(family: str, case: dict, scenario: dict, request: dict) -> None:
     if request != {
         "contract": "FIELD-REQUEST-1.0",
@@ -87,7 +104,14 @@ def _validate_case_inputs(family: str, case: dict, scenario: dict, request: dict
     if any(_qvalue(scenario["medium"], key) != 0 for key in (
         "dynamic_viscosity", "amplitude_attenuation"
     )):
-        raise ValueError("The frozen plane-wave comparisons require explicit zero loss")
+        raise ValueError("The frozen comparisons require explicit zero loss")
+    if family == "B06":
+        elements = sources["elements"]
+        if len(elements) != 1 or elements[0]["model"] != "ideal_spherical_wave" or (
+            elements[0].get("model_contract") != "SPHERICAL-WAVE-1.0"
+        ) or _scenario_spherical_wave(scenario, elements[0]) != case["wave"]:
+            raise ValueError(f"Stored spherical source inputs differ from frozen case {case['id']}")
+        return
     reference_sources = [case["wave"]] if family == "B03" else (
         [case["forward"], case["backward"]] if family == "B04" else
         [case["first"], case["second"]]
@@ -212,7 +236,7 @@ def analyze_recorded_case(run_folder, *, expected_manifest_sha256: str | None = 
         "mean_intensity_w_m2": intensity_observed,
         "physical_validation": "NOT_ESTABLISHED",
         "limitations": [
-            "Manufactured ideal plane-wave fields in the exact homogeneous, lossless regimes of ANA-REF-1.0.",
+            "Manufactured ideal plane or outgoing spherical-wave fields in the exact homogeneous, lossless regimes of ANA-REF-1.0.",
             "No measured water, physical source, body coupling, force, motion, or microgravity result.",
         ],
     }

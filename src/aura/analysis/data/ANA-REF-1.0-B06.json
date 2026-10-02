@@ -1,0 +1,248 @@
+{
+  "contract": "SPHERICAL-WAVE-1.0",
+  "protocol": "ANA-REF-1.0",
+  "normalized_tolerance": 4.547473508864641e-13,
+  "cases": [
+    {
+      "id": "B06-AXIAL",
+      "wave": {
+        "density_kg_m3": 1000,
+        "sound_speed_m_s": 1500,
+        "frequency_hz": 1000000,
+        "peak_pressure_pa": 2,
+        "center_m": [
+          0,
+          0,
+          0
+        ],
+        "reference_radius_m": 0.000375,
+        "minimum_radius_m": 0.000375,
+        "phase_rad": 0,
+        "dynamic_viscosity_pa_s": 0,
+        "amplitude_attenuation_per_m": 0
+      },
+      "coordinates_m": [
+        [
+          0.000375,
+          0,
+          0
+        ],
+        [
+          0.00075,
+          0,
+          0
+        ],
+        [
+          0.001125,
+          0,
+          0
+        ]
+      ],
+      "box_min_m": [
+        -0.0015,
+        -0.0015,
+        -0.0015
+      ],
+      "box_max_m": [
+        0.0015,
+        0.0015,
+        0.0015
+      ],
+      "workspace_bytes": 2097152
+    },
+    {
+      "id": "B06-DIRECTIONS",
+      "wave": {
+        "density_kg_m3": 1000,
+        "sound_speed_m_s": 1500,
+        "frequency_hz": 1000000,
+        "peak_pressure_pa": 2,
+        "center_m": [
+          0,
+          0,
+          0
+        ],
+        "reference_radius_m": 0.000375,
+        "minimum_radius_m": 0.000375,
+        "phase_rad": 0,
+        "dynamic_viscosity_pa_s": 0,
+        "amplitude_attenuation_per_m": 0
+      },
+      "coordinates_m": [
+        [
+          -0.000375,
+          0,
+          0
+        ],
+        [
+          0,
+          0.000375,
+          0
+        ],
+        [
+          0,
+          0,
+          -0.000375
+        ],
+        [
+          0.00045,
+          0.0006,
+          0
+        ]
+      ],
+      "box_min_m": [
+        -0.0015,
+        -0.0015,
+        -0.0015
+      ],
+      "box_max_m": [
+        0.0015,
+        0.0015,
+        0.0015
+      ],
+      "workspace_bytes": 2097152
+    },
+    {
+      "id": "B06-COMMON-PHASE",
+      "wave": {
+        "density_kg_m3": 1000,
+        "sound_speed_m_s": 1500,
+        "frequency_hz": 1000000,
+        "peak_pressure_pa": 2,
+        "center_m": [
+          0,
+          0,
+          0
+        ],
+        "reference_radius_m": 0.000375,
+        "minimum_radius_m": 0.000375,
+        "phase_rad": 1.5707963267948966,
+        "dynamic_viscosity_pa_s": 0,
+        "amplitude_attenuation_per_m": 0
+      },
+      "coordinates_m": [
+        [
+          0.000375,
+          0,
+          0
+        ],
+        [
+          0.00075,
+          0,
+          0
+        ],
+        [
+          0.001125,
+          0,
+          0
+        ]
+      ],
+      "box_min_m": [
+        -0.0015,
+        -0.0015,
+        -0.0015
+      ],
+      "box_max_m": [
+        0.0015,
+        0.0015,
+        0.0015
+      ],
+      "workspace_bytes": 2097152
+    },
+    {
+      "id": "B06-TRANSLATED",
+      "wave": {
+        "density_kg_m3": 1000,
+        "sound_speed_m_s": 1500,
+        "frequency_hz": 1000000,
+        "peak_pressure_pa": 2,
+        "center_m": [
+          0,
+          0.0001875,
+          0
+        ],
+        "reference_radius_m": 0.000375,
+        "minimum_radius_m": 0.000375,
+        "phase_rad": 0,
+        "dynamic_viscosity_pa_s": 0,
+        "amplitude_attenuation_per_m": 0
+      },
+      "coordinates_m": [
+        [
+          0.000375,
+          0.0001875,
+          0
+        ],
+        [
+          0.00075,
+          0.0001875,
+          0
+        ],
+        [
+          0.001125,
+          0.0001875,
+          0
+        ]
+      ],
+      "box_min_m": [
+        -0.0015,
+        -0.0015,
+        -0.0015
+      ],
+      "box_max_m": [
+        0.0015,
+        0.0015,
+        0.0015
+      ],
+      "workspace_bytes": 2097152
+    },
+    {
+      "id": "B06-ZERO",
+      "wave": {
+        "density_kg_m3": 1000,
+        "sound_speed_m_s": 1500,
+        "frequency_hz": 1000000,
+        "peak_pressure_pa": 0,
+        "center_m": [
+          0,
+          0,
+          0
+        ],
+        "reference_radius_m": 0.000375,
+        "minimum_radius_m": 0.000375,
+        "phase_rad": 0,
+        "dynamic_viscosity_pa_s": 0,
+        "amplitude_attenuation_per_m": 0
+      },
+      "coordinates_m": [
+        [
+          0.000375,
+          0,
+          0
+        ],
+        [
+          0.00075,
+          0,
+          0
+        ],
+        [
+          0.001125,
+          0,
+          0
+        ]
+      ],
+      "box_min_m": [
+        -0.0015,
+        -0.0015,
+        -0.0015
+      ],
+      "box_max_m": [
+        0.0015,
+        0.0015,
+        0.0015
+      ],
+      "workspace_bytes": 2097152
+    }
+  ],
+  "amendment": "A1: oblique positive sample at 2*r_ref; original boundary retained as rejection test"
+}

@@ -26,7 +26,7 @@ VERSION = "RUN-1.0"
 DRIVERS = {
     "lifecycle-receipt": "1.0",
     "lifecycle-failure": "1.0",
-    analytic.DRIVER: analytic.DRIVER_VERSION,
+    **analytic.DRIVERS,
 }
 LIMITATION = "Software diagnostic only; no physical simulation or scientific acceptance."
 
@@ -86,7 +86,7 @@ def execute(scenario_path, experiment_path, *, output=None, seed):
         fail("RUN_SEED", "Specify a nonnegative integer or explicit no-randomness null.")
     solver = config["solver"]
     model_id = solver["model_id"]
-    analytical = model_id == analytic.DRIVER
+    analytical = analytic.is_analytical_driver(model_id)
     if DRIVERS.get(model_id) != solver["model_version"]:
         fail("RUN_MODEL", "Only a registered versioned run driver is available.")
     if not analytical and (
@@ -147,7 +147,7 @@ def execute(scenario_path, experiment_path, *, output=None, seed):
         "mclf_pre": {"status": "completed", "verdict": pre.verdict,
                      "report": {"uri": "audit-pre.json", "sha256": digest(encode(pre.to_dict()))}},
         "mclf_post": {"status": "not_run"}, "failure_code": None,
-        "operator_notes": (analytic.SCOPE if analytical else LIMITATION)
+        "operator_notes": (analytic.scope_for(model_id) if analytical else LIMITATION)
         + " Exploratory permission: DEC-003; seed is recorded but unused.",
     }
     verify_manifest_configuration(RunManifest(manifest), scenario, experiment=experiment)
@@ -203,15 +203,15 @@ def execute(scenario_path, experiment_path, *, output=None, seed):
              "logical_cpu_count": os.cpu_count(), "gpu_used": False,
              "driver_artifact_bytes": sum((destination / ref["uri"]).stat().st_size for ref in outputs),
              "expected_driver_outputs": sorted(analytic.OUTPUT_NAMES) if analytical else ["receipt.json"],
-             "seed_used": False, "scope": analytic.SCOPE if analytical else LIMITATION,
+             "seed_used": False, "scope": analytic.scope_for(model_id) if analytical else LIMITATION,
              "backend": "analytic-closed-form" if analytical else "software-diagnostic",
-             "run_policy": analytic.RUN_POLICY if analytical else "SOFTWARE-DIAGNOSTIC-1.0"}
+             "run_policy": analytic.run_policy_for(model_id) if analytical else "SOFTWARE-DIAGNOSTIC-1.0"}
     emit("execution.json", usage)
     post = {"audit_version": "RUN-POST-1.0", "run_id": run_id,
             "verdict": "INDETERMINATE" if state == "completed" else "INVALIDATED",
             "execution_status": state, "pre_verdict": pre.verdict,
             "artifact_check": "PASS" if state == "completed" else "NOT_ESTABLISHED",
-            "physical_result": "NOT_REQUESTED", "scope": analytic.SCOPE if analytical else LIMITATION,
+            "physical_result": "NOT_REQUESTED", "scope": analytic.scope_for(model_id) if analytical else LIMITATION,
             "limitations": [
                 "Lifecycle integrity postcheck only; independent numerical comparison and physical-result audits are unavailable."
                 if analytical else
@@ -230,4 +230,4 @@ def execute(scenario_path, experiment_path, *, output=None, seed):
     return {"lifecycle_version": VERSION, "run_id": run_id, "output": str(destination),
             "execution_status": state, "verdict": post["verdict"], "error": error,
             "manifest_sha256": ref["sha256"], "exit_code": code,
-            "scope": analytic.SCOPE if analytical else LIMITATION}
+            "scope": analytic.scope_for(model_id) if analytical else LIMITATION}

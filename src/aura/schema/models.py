@@ -72,7 +72,14 @@ def _cross_checks(kind: str, data: dict, path: str = "") -> None:
         _unique(data["elements"], path + "/elements")
         for index, element in enumerate(data["elements"]):
             base = f"{path}/elements/{index}"
-            _unit_vector(element["normal"]["value"], base + "/normal/value")
+            if element["model"] != "ideal_spherical_wave":
+                _unit_vector(element["normal"]["value"], base + "/normal/value")
+            if element["model"] == "ideal_spherical_wave":
+                _require(
+                    element["minimum_radius"]["value"] <= element["reference_radius"]["value"],
+                    base + "/reference_radius/value",
+                    "Reference radius must be at or outside the exclusion radius.",
+                )
             _require(
                 element["pressure_amplitude"]["value"] <= element["pressure_limit"]["value"],
                 base + "/pressure_amplitude",

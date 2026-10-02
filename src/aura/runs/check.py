@@ -95,14 +95,14 @@ def check_run(folder, *, expected_sha256=None):
         fail("RUN_AUDIT", "Pre-audit identity or diagnostic verdict differs.")
     if DRIVERS.get(data["solver"]["model_id"]) != data["solver"]["model_version"]:
         fail("RUN_MODEL", "Unrecognized recorded diagnostic model.")
-    analytical = data["solver"]["model_id"] == analytic.DRIVER
+    analytical = analytic.is_analytical_driver(data["solver"]["model_id"])
     request = None
     if analytical:
         request = analytic.parse_request(content[protocol_uri])
         analytic.check_preflight(decode(content["preflight.json"]), scenario, request)
         if sum(len(value) for value in content.values()) > 16 * 1024**2:
             fail("RUN_RESOURCE", "Analytical bundle inputs/artifacts exceed the 16 MiB cap.")
-    scope = analytic.SCOPE if analytical else LIMITATION
+    scope = analytic.scope_for(data["solver"]["model_id"]) if analytical else LIMITATION
     if not terminal:
         return {"lifecycle_version": VERSION, "run_id": data["id"], "integrity": "INCOMPLETE",
                 "execution_status": "running", "verdict": "INDETERMINATE", "exit_code": 3,
@@ -150,8 +150,9 @@ def check_run(folder, *, expected_sha256=None):
             state == "completed" and analytical_outputs != allowed
         ):
             fail("FIELD_OUTPUTS", "Analytical run output index is incomplete or changed.")
-        if usage["scope"] != analytic.SCOPE or usage["backend"] != "analytic-closed-form" or (
-            usage["run_policy"] != analytic.RUN_POLICY or (
+        driver_id = data["solver"]["model_id"]
+        if usage["scope"] != analytic.scope_for(driver_id) or usage["backend"] != "analytic-closed-form" or (
+            usage["run_policy"] != analytic.run_policy_for(driver_id) or (
                 usage["expected_driver_outputs"] != sorted(analytic.OUTPUT_NAMES)
             )
         ):

@@ -231,3 +231,57 @@ def reference_b05(case, digits=60):
                 "intensity": scale**2 / (2 * impedance),
             },
         }
+
+
+def reference_b06(case, digits=60):
+    """Independent real radial differentiation, Euler and period-mean flux."""
+    with localcontext() as context:
+        context.prec = digits + 12
+        wave = case["wave"]
+        rho = decimal_value(wave["density_kg_m3"])
+        speed = decimal_value(wave["sound_speed_m_s"])
+        omega = 2 * pi(digits) * decimal_value(wave["frequency_hz"])
+        k, impedance = omega / speed, rho * speed
+        amplitude = decimal_value(wave["peak_pressure_pa"])
+        reference_radius = decimal_value(wave["reference_radius_m"])
+        center = [decimal_value(value) for value in wave["center_m"]]
+        pressure, velocity, gradient, intensity = [], [], [], []
+        for point in case["coordinates_m"]:
+            delta = [decimal_value(value) - origin for value, origin in zip(point, center, strict=True)]
+            radius = sum(value * value for value in delta).sqrt()
+            direction = [value / radius for value in delta]
+            sine, cosine = sin_cos(
+                k * (radius - reference_radius) + decimal_value(wave["phase_rad"]), digits
+            )
+            local_pressure = amplitude * reference_radius / radius
+            pressure.append((local_pressure * cosine, local_pressure * sine))
+            derivatives = [
+                (
+                    normal * (-local_pressure * cosine / radius - k * local_pressure * sine),
+                    normal * (-local_pressure * sine / radius + k * local_pressure * cosine),
+                )
+                for normal in direction
+            ]
+            gradient.append(derivatives)
+            velocity.append([
+                (imaginary / (omega * rho), -real / (omega * rho))
+                for real, imaginary in derivatives
+            ])
+            intensity.append([
+                amplitude**2 * reference_radius**2 * normal / (2 * impedance * radius**2)
+                for normal in direction
+            ])
+        scale = amplitude or Decimal(2)
+        reactive = 1 + 2 / pi(digits)
+        return {
+            "pressure": pressure,
+            "velocity": velocity,
+            "pressure_gradient": gradient,
+            "intensity": intensity,
+            "scales": {
+                "pressure": scale,
+                "velocity": scale / impedance * reactive,
+                "pressure_gradient": k * scale * reactive,
+                "intensity": scale**2 / (2 * impedance),
+            },
+        }

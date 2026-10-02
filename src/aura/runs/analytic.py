@@ -8,8 +8,10 @@ from aura.errors import InvalidInputError
 from aura.fields import (
     FieldSamples,
     PlaneWave,
+    SphericalWave,
     evaluate_plane_wave,
     evaluate_plane_wave_pair,
+    evaluate_spherical_wave,
 )
 from aura.schema import FieldResult, Scenario
 
@@ -17,12 +19,20 @@ from .manifest import decode, digest, encode, fail
 
 DRIVER = "analytic-plane-field"
 DRIVER_VERSION = "1.0"
+SPHERICAL_DRIVER = "analytic-spherical-field"
+SPHERICAL_DRIVER_VERSION = "1.0"
+DRIVERS = {DRIVER: DRIVER_VERSION, SPHERICAL_DRIVER: SPHERICAL_DRIVER_VERSION}
 RUN_POLICY = "ANALYTIC-RUN-1.0"
+SPHERICAL_RUN_POLICY = "ANALYTIC-RUN-1.1"
 REQUEST_CONTRACT = "FIELD-REQUEST-1.0"
 INDEX_CONTRACT = "FIELD-INDEX-1.0"
 SCOPE = (
     "Analytical incident-field software verification only; no body coupling, force, "
     "motion, physical transducer, or experimental validation."
+)
+SPHERICAL_SCOPE = (
+    "Analytical outgoing spherical-field software verification only; no physical radiator, "
+    "body coupling, force, motion, or experimental validation."
 )
 OUTPUT_NAMES = {
     "field-coordinates.json",
@@ -36,6 +46,31 @@ OUTPUT_NAMES = {
 
 def _invalid(code: str, path: str, message: str) -> None:
     raise InvalidInputError(code, path, message)
+
+
+def is_analytical_driver(driver_id: str) -> bool:
+    return driver_id in DRIVERS
+
+
+def run_policy_for(driver_id: str) -> str:
+    if driver_id == DRIVER:
+        return RUN_POLICY
+    if driver_id == SPHERICAL_DRIVER:
+        return SPHERICAL_RUN_POLICY
+    _invalid("RUN_MODEL", "/solver/model_id", "Analytical driver is not admitted.")
+
+
+def scope_for(driver_id: str) -> str:
+    if driver_id == DRIVER:
+        return SCOPE
+    if driver_id == SPHERICAL_DRIVER:
+        return SPHERICAL_SCOPE
+    _invalid("RUN_MODEL", "/solver/model_id", "Analytical driver is not admitted.")
+
+
+def _field_regime(driver_id: str) -> list[str]:
+    model = "ideal-spherical-wave" if driver_id == SPHERICAL_DRIVER else "ideal-plane-wave"
+    return [model, "homogeneous", "linear", "stationary", "lossless", "uncoupled"]
 
 
 def parse_request(raw: bytes) -> dict:
@@ -70,21 +105,23 @@ def parse_request(raw: bytes) -> dict:
     return request
 
 
-def admit(scenario: Scenario, request: dict) -> tuple[list[PlaneWave], int]:
-    """Bind a request to schema-1.0 plane-source inputs and check preconditions."""
+def admit(scenario: Scenario, request: dict) -> tuple[list[PlaneWave] | SphericalWave, int]:
+    """Bind the frozen plane or spherical request to explicit Scenario sources."""
     config = scenario.to_dict()
     medium = config["medium"]
     sources = config["sources"]
     solver = config["solver"]
-    if solver["model_id"] != DRIVER or solver["model_version"] != DRIVER_VERSION:
+    driver_id = solver["model_id"]
+    if DRIVERS.get(driver_id) != solver["model_version"]:
         _invalid("RUN_MODEL", "/solver", "Analytical driver/version is not admitted.")
     count = len(sources["elements"])
     family = request["case_id"].split("-", 1)[0]
-    expected_equations = {
-        ("B03", 1): ["EQ-007"],
-        ("B04", 2): ["EQ-008"],
-        ("B05", 2): ["EQ-008"],
-    }
+    expected_equations = {("B03", 1): ["EQ-007"], ("B04", 2): ["EQ-008"],
+                          ("B05", 2): ["EQ-008"]}
+    if driver_id == SPHERICAL_DRIVER:
+        expected_equations[("B06", 1)] = ["EQ-010"]
+    elif family == "B06":
+        _invalid("RUN_MODEL", "/solver/model_id", "B-06 requires the spherical-field driver.")
     if solver["parameters"] or solver["precision"] != "complex128" or (
         expected_equations.get((family, count)) != solver["equation_ids"]
     ):
@@ -99,29 +136,58 @@ def admit(scenario: Scenario, request: dict) -> tuple[list[PlaneWave], int]:
     expected_low, expected_high = request["box_min_m"], request["box_max_m"]
     if origin != expected_low or [a + b for a, b in zip(origin, size)] != expected_high:
         _invalid("FIELD_DOMAIN", "/domain", "Request box must equal the declared scenario box.")
-    waves = []
     elements = sources["elements"]
-    if not 1 <= len(elements) <= 2:
-        _invalid("FIELD_MODEL", "/sources/elements", "Admit one or two ideal plane waves.")
-    for index, element in enumerate(elements):
-        path = f"/sources/elements/{index}"
-        if element["model"] != "ideal_plane_wave":
-            _invalid("FIELD_MODEL", path + "/model", "Only explicit ideal plane waves are admitted.")
+    if driver_id == SPHERICAL_DRIVER:
+        if family != "B06" or count != 1:
+            _invalid("FIELD_MODEL", "/sources/elements", "B-06 admits exactly one spherical source.")
+        element = elements[0]
+        path = "/sources/elements/0"
+        if element["model"] != "ideal_spherical_wave" or (
+            element["model_contract"] != "SPHERICAL-WAVE-1.0"
+        ):
+            _invalid("FIELD_MODEL", path, "Expected the versioned SPHERICAL-WAVE-1.0 source.")
         amplitude = element["pressure_amplitude"]["value"]
         if amplitude > element["pressure_limit"]["value"]:
             _invalid("FIELD_MODEL", path + "/pressure_amplitude", "Source exceeds its declared limit.")
-        waves.append(PlaneWave(
+        wave = SphericalWave(
             density_kg_m3=medium["density"]["value"],
             sound_speed_m_s=medium["sound_speed"]["value"],
             frequency_hz=frequency,
             peak_pressure_pa=amplitude,
-            direction=tuple(element["normal"]["value"]),
-            reference_m=tuple(element["position"]["value"]),
+            center_m=tuple(element["center"]["value"]),
+            reference_radius_m=element["reference_radius"]["value"],
+            minimum_radius_m=element["minimum_radius"]["value"],
             phase_rad=element["phase"]["value"],
             dynamic_viscosity_pa_s=medium["dynamic_viscosity"]["value"],
             amplitude_attenuation_per_m=medium["amplitude_attenuation"]["value"],
-        ))
-    workspace = 4096 * len(request["coordinates_m"]) + 4096 * len(waves)
+        )
+        waves: list[PlaneWave] | SphericalWave = wave
+        source_count = 1
+    else:
+        if not 1 <= count <= 2:
+            _invalid("FIELD_MODEL", "/sources/elements", "Admit one or two ideal plane waves.")
+        plane_waves = []
+        for index, element in enumerate(elements):
+            path = f"/sources/elements/{index}"
+            if element["model"] != "ideal_plane_wave":
+                _invalid("FIELD_MODEL", path + "/model", "Only explicit ideal plane waves are admitted.")
+            amplitude = element["pressure_amplitude"]["value"]
+            if amplitude > element["pressure_limit"]["value"]:
+                _invalid("FIELD_MODEL", path + "/pressure_amplitude", "Source exceeds its declared limit.")
+            plane_waves.append(PlaneWave(
+                density_kg_m3=medium["density"]["value"],
+                sound_speed_m_s=medium["sound_speed"]["value"],
+                frequency_hz=frequency,
+                peak_pressure_pa=amplitude,
+                direction=tuple(element["normal"]["value"]),
+                reference_m=tuple(element["position"]["value"]),
+                phase_rad=element["phase"]["value"],
+                dynamic_viscosity_pa_s=medium["dynamic_viscosity"]["value"],
+                amplitude_attenuation_per_m=medium["amplitude_attenuation"]["value"],
+            ))
+        waves = plane_waves
+        source_count = len(plane_waves)
+    workspace = 4096 * len(request["coordinates_m"]) + 4096 * source_count
     resources = config["resources"]
     if resources["wall_time"]["value"] > 30 or resources["disk_bytes"] > 16 * 1024**2:
         _invalid("RUN_RESOURCE", "/resources", "Analytical run exceeds the frozen time or bundle cap.")
@@ -133,17 +199,18 @@ def admit(scenario: Scenario, request: dict) -> tuple[list[PlaneWave], int]:
 def preflight(scenario: Scenario, request: dict) -> dict:
     waves, workspace = admit(scenario, request)
     count = len(request["coordinates_m"])
+    source_count = 1 if isinstance(waves, SphericalWave) else len(waves)
     # Include the already-imported recorder/runtime footprint with 2x headroom.
     baseline_rss = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss * 1024
     ram_estimate = 2 * baseline_rss + workspace
     return {
-        "ram_bytes": max(ram_estimate, 4096 * count + 4096 * len(waves)),
+        "ram_bytes": max(ram_estimate, 4096 * count + 4096 * source_count),
         "disk_bytes": 16 * 1024**2,
         "wall_time_s": 30.0,
         "cpu_workers": 1,
         "gpu": False,
         "field_samples": count,
-        "source_count": len(waves),
+        "source_count": source_count,
         "workspace_bytes": workspace,
         "basis": "FIELD-1.0 bounded analytic point evaluation; conservative contract estimate, not a measured solver cost.",
     }
@@ -152,13 +219,14 @@ def preflight(scenario: Scenario, request: dict) -> dict:
 def check_preflight(record: dict, scenario: Scenario, request: dict) -> None:
     """Check the frozen workload estimate's policy fields, not host memory again."""
     waves, workspace = admit(scenario, request)
+    source_count = 1 if isinstance(waves, SphericalWave) else len(waves)
     expected = {
         "disk_bytes": 16 * 1024**2,
         "wall_time_s": 30.0,
         "cpu_workers": 1,
         "gpu": False,
         "field_samples": len(request["coordinates_m"]),
-        "source_count": len(waves),
+        "source_count": source_count,
         "workspace_bytes": workspace,
         "basis": "FIELD-1.0 bounded analytic point evaluation; conservative contract estimate, not a measured solver cost.",
     }
@@ -178,15 +246,19 @@ def check_preflight(record: dict, scenario: Scenario, request: dict) -> None:
 def execute_field(scenario: Scenario, request: dict, run_id: str, emit) -> None:
     waves, workspace = admit(scenario, request)
     cfg = scenario.to_dict()
+    driver_id = cfg["solver"]["model_id"]
     kwargs = {
         "coordinates_m": request["coordinates_m"],
         "box_min_m": request["box_min_m"],
         "box_max_m": request["box_max_m"],
         "workspace_bytes": workspace,
     }
-    samples = evaluate_plane_wave(waves[0], **kwargs) if len(waves) == 1 else evaluate_plane_wave_pair(
-        waves[0], waves[1], **kwargs
-    )
+    if isinstance(waves, SphericalWave):
+        samples = evaluate_spherical_wave(waves, **kwargs)
+    elif len(waves) == 1:
+        samples = evaluate_plane_wave(waves[0], **kwargs)
+    else:
+        samples = evaluate_plane_wave_pair(waves[0], waves[1], **kwargs)
     artifacts = samples.to_artifacts()
     refs = {}
     filenames = {
@@ -203,9 +275,9 @@ def execute_field(scenario: Scenario, request: dict, run_id: str, emit) -> None:
         "id": run_id + "-FIELD",
         "run_id": run_id,
         "frame": "chamber",
-        "model_id": DRIVER,
-        "model_version": DRIVER_VERSION,
-        "regime": ["ideal-plane-wave", "homogeneous", "linear", "stationary", "lossless", "uncoupled"],
+        "model_id": driver_id,
+        "model_version": DRIVERS[driver_id],
+        "regime": _field_regime(driver_id),
         "coordinates": {"artifact": {"uri": refs["coordinates"]["uri"], "sha256": refs["coordinates"]["sha256"]}, "unit": "m", "shape": [len(samples.coordinates_m), 3], "dtype": "float64"},
         "pressure": {"artifact": {"uri": refs["pressure"]["uri"], "sha256": refs["pressure"]["sha256"]}, "unit": "Pa", "shape": [len(samples.coordinates_m)], "dtype": "complex128"},
         "velocity": {"artifact": {"uri": refs["velocity"]["uri"], "sha256": refs["velocity"]["sha256"]}, "unit": "m/s", "shape": [len(samples.coordinates_m), 3], "dtype": "complex128"},
@@ -217,7 +289,7 @@ def execute_field(scenario: Scenario, request: dict, run_id: str, emit) -> None:
     field_ref = emit("field-result.json", field_result.to_dict())
     index = {
         "contract": INDEX_CONTRACT,
-        "run_policy": RUN_POLICY,
+        "run_policy": run_policy_for(driver_id),
         "run_id": run_id,
         "field_result_id": field_result.to_dict()["id"],
         "field_result_sha256": field_ref["sha256"],
@@ -227,7 +299,7 @@ def execute_field(scenario: Scenario, request: dict, run_id: str, emit) -> None:
             "artifact": {"uri": refs["pressure_gradient"]["uri"], "sha256": refs["pressure_gradient"]["sha256"]},
             "unit": "Pa/m", "shape": [len(samples.coordinates_m), 3], "dtype": "complex128",
         },
-        "scope": SCOPE,
+        "scope": scope_for(driver_id),
     }
     emit("field-index.json", index)
 
@@ -262,8 +334,10 @@ def check_field_outputs(run_id: str, config: dict, request: dict, refs: list[dic
     result_data = result.to_dict()
     if result_data["run_id"] != run_id or result_data["id"] != run_id + "-FIELD":
         fail("FIELD_RESULT_ID", "FieldResult does not identify this run.")
-    if result_data["model_id"] != DRIVER or result_data["model_version"] != DRIVER_VERSION or (
+    driver_id = config["solver"]["model_id"]
+    if result_data["model_id"] != driver_id or result_data["model_version"] != DRIVERS.get(driver_id) or (
         result_data["frame"] != "chamber"
+        or result_data["regime"] != _field_regime(driver_id)
         or result_data["phasor_convention"] != "exp(-iwt)"
         or result_data["amplitude_convention"] != "peak"
     ):
@@ -276,7 +350,7 @@ def check_field_outputs(run_id: str, config: dict, request: dict, refs: list[dic
     }:
         fail("FIELD_INDEX", "FIELD-INDEX-1.0 has missing or unexpected fields.")
     field_result_ref = by_name["field-result.json"]
-    if index["contract"] != INDEX_CONTRACT or index["run_policy"] != RUN_POLICY or (
+    if index["contract"] != INDEX_CONTRACT or index["run_policy"] != run_policy_for(driver_id) or (
         index["run_id"] != run_id
     ) or (
         index["field_result_id"] != result_data["id"]
@@ -292,7 +366,7 @@ def check_field_outputs(run_id: str, config: dict, request: dict, refs: list[dic
     }:
         fail("FIELD_INDEX", "Gradient reference differs from stored component bytes.")
     if index["case_id"] != request["case_id"] or index["frequency_hz"] != expected_frequency or (
-        index["scope"] != SCOPE
+        index["scope"] != scope_for(driver_id)
     ):
         fail("FIELD_INDEX", "FIELD-INDEX request identity or frequency differs.")
     for key, quantity, filename in (

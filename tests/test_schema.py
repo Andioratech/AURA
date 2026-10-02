@@ -289,6 +289,26 @@ def test_piston_aperture_required(scenario):
     validate_document(scenario)
 
 
+def test_versioned_spherical_source_contract(scenario):
+    source = scenario["sources"]["elements"][0]
+    source.pop("position")
+    source.pop("normal")
+    source.update(
+        model="ideal_spherical_wave", model_contract="SPHERICAL-WAVE-1.0",
+        center={"value": [0, 0, 0], "unit": "m"},
+        reference_radius={"value": 0.000375, "unit": "m"},
+        minimum_radius={"value": 0.000375, "unit": "m"},
+    )
+    validate_document(scenario)
+    source["minimum_radius"]["value"] = 0.0005
+    with pytest.raises(InvalidInputError, match="INCONSISTENT"):
+        validate_document(scenario)
+    source["minimum_radius"]["value"] = 0.000375
+    source["model_contract"] = "SPHERICAL-WAVE-0.9"
+    with pytest.raises(InvalidInputError, match="SCHEMA_INVALID"):
+        validate_document(scenario)
+
+
 @pytest.mark.parametrize(
     "kind,path,value",
     [

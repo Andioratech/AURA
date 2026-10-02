@@ -651,8 +651,11 @@ def test_b03_01_reference_rejects_a_different_sample(analytical_inputs):
         _validate_case_inputs("B03", case, scenario, request)
 
 
-@pytest.mark.parametrize("case_id", ["B03-PHASE", "B04-PHASE", "B05-COMMON-PHASE"])
-def test_recorded_frozen_cases_compare_for_each_plane_family(analytical_inputs, observed, case_id):
+@pytest.mark.parametrize("case_id", [
+    "B03-PHASE", "B04-PHASE", "B05-COMMON-PHASE", "B06-AXIAL", "B06-DIRECTIONS",
+    "B06-COMMON-PHASE", "B06-TRANSLATED", "B06-ZERO",
+])
+def test_recorded_frozen_cases_compare_for_each_admitted_family(analytical_inputs, observed, case_id):
     from aura.analysis.ana07_metrics import analyze_recorded_case, frozen_case
 
     family, case, _ = frozen_case(case_id)
@@ -661,13 +664,13 @@ def test_recorded_frozen_cases_compare_for_each_plane_family(analytical_inputs, 
     scenario["id"] = "SCENARIO-ANA07-" + case_id
     sources = scenario["sources"]
     medium = scenario["medium"]
-    first_wave = case["wave"] if family == "B03" else case.get("forward", case.get("first"))
+    first_wave = case["wave"] if family in ("B03", "B06") else case.get("forward", case.get("first"))
     medium["density"]["value"] = first_wave["density_kg_m3"]
     medium["sound_speed"]["value"] = first_wave["sound_speed_m_s"]
     medium["dynamic_viscosity"]["value"] = 0
     medium["amplitude_attenuation"]["value"] = 0
     sources["frequency"]["value"] = first_wave["frequency_hz"]
-    reference_waves = [first_wave] if family == "B03" else (
+    reference_waves = [first_wave] if family in ("B03", "B06") else (
         [case["forward"], case["backward"]] if family == "B04" else
         [case["first"], case["second"]]
     )
@@ -676,19 +679,35 @@ def test_recorded_frozen_cases_compare_for_each_plane_family(analytical_inputs, 
     for index, wave in enumerate(reference_waves):
         element = copy.deepcopy(base_element)
         element["id"] = f"SOURCE-{index + 1}"
-        element["position"]["value"] = wave["reference_m"]
-        element["normal"]["value"] = wave["direction"]
-        element["phase"]["value"] = wave["phase_rad"]
-        element["pressure_amplitude"]["value"] = wave["peak_pressure_pa"]
+        if family == "B06":
+            element.pop("position")
+            element.pop("normal")
+            element.update(
+                model="ideal_spherical_wave", model_contract="SPHERICAL-WAVE-1.0",
+                center={"value": wave["center_m"], "unit": "m"},
+                reference_radius={"value": wave["reference_radius_m"], "unit": "m"},
+                minimum_radius={"value": wave["minimum_radius_m"], "unit": "m"},
+                phase={"value": wave["phase_rad"], "unit": "rad"},
+                pressure_amplitude={"value": wave["peak_pressure_pa"], "unit": "Pa"},
+            )
+        else:
+            element["position"]["value"] = wave["reference_m"]
+            element["normal"]["value"] = wave["direction"]
+            element["phase"]["value"] = wave["phase_rad"]
+            element["pressure_amplitude"]["value"] = wave["peak_pressure_pa"]
         sources["elements"].append(element)
     low, high = case["box_min_m"], case["box_max_m"]
     scenario["domain"]["origin"]["value"] = low
     scenario["domain"]["size"]["value"] = [b - a for a, b in zip(low, high, strict=True)]
     scenario["bodies"][0]["initial_state"]["position"]["value"] = [0, 0, 0]
+    spherical = family == "B06"
     scenario["solver"].update(
-        model_id="analytic-plane-field", model_version="1.0",
-        equation_ids=["EQ-007"] if family == "B03" else ["EQ-008"],
-        regime=["Manufactured ideal plane-wave comparison"], precision="complex128", parameters={},
+        model_id="analytic-spherical-field" if spherical else "analytic-plane-field",
+        model_version="1.0",
+        equation_ids=["EQ-010"] if spherical else (["EQ-007"] if family == "B03" else ["EQ-008"]),
+        regime=["Manufactured ideal spherical-wave comparison" if spherical else
+                "Manufactured ideal plane-wave comparison"],
+        precision="complex128", parameters={},
     )
     scenario["resources"] = {
         "ram_bytes": 4 * 1024**3, "disk_bytes": 16 * 1024**2,

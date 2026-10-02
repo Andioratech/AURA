@@ -79,17 +79,46 @@ SOURCE = obj(
         "phase": quantity("rad"),
         "pressure_amplitude": quantity("Pa", nonnegative=True),
         "pressure_limit": quantity("Pa", positive=True),
-        "model": {"enum": ["ideal_plane_wave", "circular_piston"]},
+        "model": {"enum": ["ideal_plane_wave", "circular_piston", "ideal_spherical_wave"]},
+        "model_contract": {"const": "SPHERICAL-WAVE-1.0"},
+        "center": quantity("m", size=3),
+        "reference_radius": quantity("m", positive=True),
+        "minimum_radius": quantity("m", positive=True),
         "aperture_radius": quantity("m", positive=True),
     },
-    optional=("aperture_radius",),
+    optional=(
+        "position", "normal", "model_contract", "center", "reference_radius",
+        "minimum_radius", "aperture_radius",
+    ),
 )
 SOURCE["allOf"] = [
     {
-        "if": {"properties": {"model": {"const": "circular_piston"}}},
-        "then": {"required": ["aperture_radius"]},
-        "else": {"not": {"required": ["aperture_radius"]}},
-    }
+        "if": {"properties": {"model": {"const": "ideal_plane_wave"}}, "required": ["model"]},
+        "then": {
+            "required": ["position", "normal"],
+            "not": {"anyOf": [{"required": [name]} for name in (
+                "model_contract", "center", "reference_radius", "minimum_radius", "aperture_radius"
+            )]},
+        },
+    },
+    {
+        "if": {"properties": {"model": {"const": "circular_piston"}}, "required": ["model"]},
+        "then": {
+            "required": ["position", "normal", "aperture_radius"],
+            "not": {"anyOf": [{"required": [name]} for name in (
+                "model_contract", "center", "reference_radius", "minimum_radius"
+            )]},
+        },
+    },
+    {
+        "if": {"properties": {"model": {"const": "ideal_spherical_wave"}}, "required": ["model"]},
+        "then": {
+            "required": ["model_contract", "center", "reference_radius", "minimum_radius"],
+            "not": {"anyOf": [{"required": [name]} for name in (
+                "position", "normal", "aperture_radius"
+            )]},
+        },
+    },
 ]
 CHECK_STATE = {
     "oneOf": [

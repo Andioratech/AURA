@@ -1,4 +1,4 @@
-"""Run the frozen 27-case B-03/B-04/B-05 recorder matrix into ignored results/."""
+"""Run the frozen ANA-REF-1.0 field recorder matrix into ignored results/."""
 
 from __future__ import annotations
 
@@ -20,7 +20,7 @@ from aura.runs.manifest import digest, encode
 from aura.schema import Scenario, document_sha256
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_OUTPUT = ROOT / "results" / "verification" / "ANA-07" / "PLANE-MATRIX-ANA-REF-1.0"
+DEFAULT_OUTPUT = ROOT / "results" / "verification" / "ANA-07" / "ANA-07-MATRIX-ANA-REF-1.0"
 
 
 def _source_wave(base_element: dict, wave: dict, index: int) -> dict:
@@ -34,11 +34,27 @@ def _source_wave(base_element: dict, wave: dict, index: int) -> dict:
     return element
 
 
+def _spherical_source(base_element: dict, wave: dict) -> dict:
+    element = copy.deepcopy(base_element)
+    element.pop("position", None)
+    element.pop("normal", None)
+    element.update(
+        model="ideal_spherical_wave",
+        model_contract="SPHERICAL-WAVE-1.0",
+        center={"value": wave["center_m"], "unit": "m"},
+        reference_radius={"value": wave["reference_radius_m"], "unit": "m"},
+        minimum_radius={"value": wave["minimum_radius_m"], "unit": "m"},
+        phase={"value": wave["phase_rad"], "unit": "rad"},
+        pressure_amplitude={"value": wave["peak_pressure_pa"], "unit": "Pa"},
+    )
+    return element
+
+
 def _prepare(case_id: str, family: str, case: dict, base: dict) -> tuple[dict, dict, bytes]:
     scenario = copy.deepcopy(base)
     scenario["id"] = "SCENARIO-ANA07-" + case_id
     medium, sources = scenario["medium"], scenario["sources"]
-    reference_waves = [case["wave"]] if family == "B03" else (
+    reference_waves = [case["wave"]] if family in ("B03", "B06") else (
         [case["forward"], case["backward"]] if family == "B04" else
         [case["first"], case["second"]]
     )
@@ -51,16 +67,24 @@ def _prepare(case_id: str, family: str, case: dict, base: dict) -> tuple[dict, d
     sources["frequency"]["value"] = primary["frequency_hz"]
     sources["elements"] = []
     for index, wave in enumerate(reference_waves):
-        sources["elements"].append(_source_wave(base_element, wave, index))
+        element = (
+            _spherical_source(base_element, wave) if family == "B06"
+            else _source_wave(base_element, wave, index)
+        )
+        sources["elements"].append(element)
     low, high = case["box_min_m"], case["box_max_m"]
     scenario["domain"]["origin"]["value"] = low
     scenario["domain"]["size"]["value"] = [b - a for a, b in zip(low, high, strict=True)]
     scenario["bodies"][0]["initial_state"]["position"]["value"] = [0, 0, 0]
+    spherical = family == "B06"
     scenario["solver"].update(
-        model_id="analytic-plane-field",
+        model_id="analytic-spherical-field" if spherical else "analytic-plane-field",
         model_version="1.0",
-        equation_ids=["EQ-007"] if family == "B03" else ["EQ-008"],
-        regime=["Manufactured ideal plane-wave field; no body coupling"],
+        equation_ids=["EQ-010"] if spherical else (
+            ["EQ-007"] if family == "B03" else ["EQ-008"]
+        ),
+        regime=["Manufactured ideal spherical-wave field; no body coupling"] if spherical else
+            ["Manufactured ideal plane-wave field; no body coupling"],
         precision="complex128",
         parameters={},
     )
@@ -193,7 +217,7 @@ def run_matrix(output: Path = DEFAULT_OUTPUT) -> dict:
                 )
             case_records.append(record)
     index = {
-        "contract": "ANA-07-PLANE-MATRIX-1.0",
+        "contract": "ANA-07-MATRIX-1.0",
         "protocol": "ANA-REF-1.0",
         "source_revision": revision,
         "campaign_runner_sha256": digest(Path(__file__).read_bytes()),
@@ -202,10 +226,10 @@ def run_matrix(output: Path = DEFAULT_OUTPUT) -> dict:
         "expected_sample_count": expected_samples,
         "sample_count_compared": sum(item.get("samples", 0) for item in case_records),
         "case_outcomes": case_records,
-        "execution": "PASS" if len(case_records) == 27 and all(
+        "execution": "PASS" if len(case_records) == 32 and all(
             item.get("execution_status") == "completed" for item in case_records
         ) else "FAIL_OR_INCOMPLETE",
-        "record_integrity": "PASS" if len(case_records) == 27 and all(
+        "record_integrity": "PASS" if len(case_records) == 32 and all(
             item.get("integrity") == "VERIFIED" for item in case_records
         ) else "FAIL_OR_INCOMPLETE",
         "numerical_comparison": "PASS" if all(
@@ -213,8 +237,8 @@ def run_matrix(output: Path = DEFAULT_OUTPUT) -> dict:
         ) else "FAIL_OR_INCOMPLETE",
         "physical_validation": "NOT_ESTABLISHED",
         "limits": [
-            "This 27-configuration slice covers only B-03, B-04 and B-05 ideal plane-wave cases.",
-            "No measured water, physical source, body coupling, force, motion or microgravity result.",
+            "This 32-configuration matrix covers frozen B-03/B-04/B-05 plane-wave and B-06 ideal spherical-wave cases.",
+            "No measured water, physical radiator, body coupling, force, motion or microgravity result.",
         ],
     }
     raw = (json.dumps(index, indent=2, sort_keys=True, allow_nan=False) + "\n").encode()

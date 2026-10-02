@@ -164,7 +164,9 @@ def evaluate_scenario(
                 add("R-006", "UNIT_NORM", path, "Quaternion norm violates CONV-1.0.")
         for index, source in enumerate(scenario["sources"]["elements"]):
             path = f"/scenario/sources/elements/{index}"
-            if abs(math.hypot(*source["normal"]["value"]) - 1) > 1e-12:
+            if source["model"] != "ideal_spherical_wave" and abs(
+                math.hypot(*source["normal"]["value"]) - 1
+            ) > 1e-12:
                 add(
                     "R-006",
                     "UNIT_NORM",
