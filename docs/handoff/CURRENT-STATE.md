@@ -1,8 +1,8 @@
 # Current Research Checkpoint
 
-**As of:** 2026-10-02 · **Last development delivery:** `a60c5417576299f9714cbc19860e05af967576b2` · **Main next task:** ANA-06
+**As of:** 2026-10-02 · **Last development delivery:** `260464a9e7975b4380cc223546a5b26304e6d303` · **Main next task:** ANA-07
 
-This checkpoint was written after ANA-05 and before ANA-06. Later documentation commits may contain this handoff itself. Reconcile it with actual history and the [live work board](../planning/10-work-board.md); do not treat this snapshot as an instruction to revert newer work.
+This checkpoint now includes the ANA-06 delivery. Later documentation commits may contain this handoff itself. Reconcile it with actual history and the [live work board](../planning/10-work-board.md); do not treat this snapshot as an instruction to revert newer work.
 
 ## Objective and present boundary
 
@@ -23,8 +23,9 @@ Investigate whether controlled acoustic forcing can produce prescribed accelerat
 | ANA-03 | Opposing-wave pair, standing-field nodes and signed flux | [B-04 report](../benchmarks/B04-counterpropagating-verification.md) |
 | ANA-04 | Two coherent plane waves, noncollinear interference and vector symmetries | [B-05 report](../benchmarks/B05-interference-verification.md) |
 | ANA-05 | Outgoing spherical field with full reactive velocity and explicit source exclusion | [B-06 report](../benchmarks/B06-spherical-verification.md), [review](../reviews/ANA-05-spherical.md) |
+| ANA-06 | Fixed-domain closed-sphere and spherical-shell energy ledgers | [ANA-06 report](../benchmarks/ANA-06-energy-balance-verification.md), [review](../reviews/ANA-06-energy-balance.md) |
 
-Fourteen board tasks are DONE. ANA-06, LIT-01 and SC-01 are READY; ANA-06 is the selected continuation of the main implementation sequence. LIT/SC are separate evidence/scale tracks, not permission to skip P3. Other BLOCKED cards mostly await ordinary predecessors; the project is not globally blocked.
+Fifteen board tasks are DONE. ANA-07, LIT-01 and SC-01 are READY; ANA-07 is the selected continuation of the main implementation sequence. LIT/SC are separate evidence/scale tracks, not permission to skip P3. Other BLOCKED cards mostly await ordinary predecessors; the project is not globally blocked.
 
 ## Exact latest evidence
 
@@ -33,6 +34,8 @@ Fourteen board tasks are DONE. ANA-06, LIT-01 and SC-01 are READY; ANA-06 is the
 - Clean-source B-06 verification: 63 tests in 0.24 s; five configurations / 16 observations; maximum normalized error 2.759772071e-16 against unchanged 2048e = 4.547473509e-13.
 - Immutable verification ID: `VERIFY-ANA05-9bfc7d4be81e468e9c4b7ac407ae61d1`. Local relative path: `results/verification/ANA-05/VERIFY-ANA05-9bfc7d4be81e468e9c4b7ac407ae61d1/` (ignored). Index SHA-256: `ddba4208d0f3054d7750f97695c6d062ae4311552ee03b5abf1189d5dda04b9e`.
 - The report contains source/environment observations, locks, inputs, raw samples, per-component errors, logs and artifact hashes. It is **software verification**, not a D07 RunManifest or experimental data. Source/environment observations matched before and after. Local operations/transfer-pack records locate raw evidence unavailable from a plain clone.
+- ANA-06 implementation: [`260464a9e7975b4380cc223546a5b26304e6d303`](https://github.com/Andioratech/AURA/commit/260464a9e7975b4380cc223546a5b26304e6d303), [exact Quality PASS](https://github.com/Andioratech/AURA/actions/runs/37055310149): environment/lock checks, Ruff and 1,366 tests in 21.50 s; full local Quality passed Ruff and 1,366 in 17.70 s.
+- ANA-06 checks three six-point antipodal plane-wave spheres and one two-boundary B-06 spherical shell. Clean-source focused verification passed 143 tests in 1.74 s; all four example ledgers PASS, with shell normalized residual 1.7141911890312011e-16 against 1.8189894035458565e-12. Immutable verification: `VERIFY-ANA06-6e3c0547cb364aef9d67e6518cc32b93`, ignored path `results/verification/ANA-06/VERIFY-ANA06-6e3c0547cb364aef9d67e6518cc32b93/`, index SHA-256 `beda8b9aca3d19525d10d3275ae91838dbe07f8c5f9c2a219a87a1bb670668f9`.
 
 These are historical observed results. Rerun the required checks for new work; never quote this count as a fresh test result.
 
@@ -62,4 +65,4 @@ The owner requests incremental commits, complete CI before each commit, exact re
 
 ## Unresolved gates
 
-ANA-06 balances and ANA-07's recorded analytical campaign precede the P3 review. Numerical backend work, coupled forces, motion, control, adversarial studies and scale progression retain their planned dependencies. RUN-02 replay is still pending. Water measurement selection/uncertainty, physical source calibration, boundary/loss effects, suitable larger-body models and independent scientific review remain evidence work. Never fill a missing physical parameter or term with an invented value or a zero.
+ANA-07's recorded analytical campaign and review are the remaining P3 work. Numerical backend work, coupled forces, motion, control, adversarial studies and scale progression retain their planned dependencies. RUN-02 replay is still pending. Water measurement selection/uncertainty, physical source calibration, boundary/loss effects, suitable larger-body models and independent scientific review remain evidence work. Never fill a missing physical parameter or term with an invented value or a zero. ANA-06's PASS is an energy-accounting comparison for the fixed ideal cases; it supplies no momentum balance, body force or physical validation.

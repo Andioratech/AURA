@@ -31,7 +31,7 @@ This is the planned mapping for [D03](../D03-requirements.md). Replace planned r
 | `error_accel_rms` | CTL-01, CTL-06 | Vector norm, time quadrature, sample/filter/window, transient policy |
 | `error_pos_rms` | MOT-08, CTL-06 | Target trajectory and frame; NOT_APPLICABLE when no position target exists |
 | `force_residual` | MOT-02, MOT-08 | Complete chosen motion equation; retained fluid-inertia terms and independent comparison |
-| `energy_balance_error` | ANA-06, FOR-07 | Control volume, stored/flux/loss/source terms and normalization |
+| `energy_balance_error` | ANA-06, FOR-07 | ANA-06 currently reports normalized residual for four frozen ideal incident-field volumes; source/absorption terms are explicit, six-point geometry and `8192*2^-52` threshold are fixed. Storage, momentum/body, arbitrary-boundary and physical loss/source validation remain uncovered. See [ENERGY-BALANCE-1.0](../research/energy-balance-audit.md). |
 | `momentum_balance_error` | FOR-07 | Surface/body/fluid/source/wall terms and numerical error budget |
 | `grid_convergence_ratio` | NUM-04 | Refinement parameter, primary observable and non-asymptotic interpretation |
 | `stability_margin` | CTL-04 | Controller/model-specific definition; not generic success percentage |

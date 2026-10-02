@@ -4,7 +4,7 @@
 
 ## Entry condition
 
-P2 PASS and [RUN-01 complete](../../reviews/RUN-01-lifecycle.md); [ANA-01](../../reviews/ANA-01-field-contract.md) and [ANA-02](../../reviews/ANA-02-plane-wave.md) are complete in their reviewed scopes. [ANA-03](../../reviews/ANA-03-counterpropagating.md) is complete in its bounded counterpropagating scope; [ANA-04](../../reviews/ANA-04-interference.md) is complete for bounded two-wave interference; [ANA-05](../../reviews/ANA-05-spherical.md) is complete for ideal spherical spreading; ANA-06 is ACTIVE — [task record](../../work-items/ANA-06.md). Analytical cases may proceed without conclusive P1 measurement uncertainty. The current recorder supports software diagnostics; analytical driver admission must implement the specified output/resource contracts before model execution through the recorder.
+P2 PASS and [RUN-01 complete](../../reviews/RUN-01-lifecycle.md); [ANA-01](../../reviews/ANA-01-field-contract.md) and [ANA-02](../../reviews/ANA-02-plane-wave.md) are complete in their reviewed scopes. [ANA-03](../../reviews/ANA-03-counterpropagating.md) is complete in its bounded counterpropagating scope; [ANA-04](../../reviews/ANA-04-interference.md) is complete for bounded two-wave interference; [ANA-05](../../reviews/ANA-05-spherical.md) is complete for ideal spherical spreading; [ANA-06](../../reviews/ANA-06-energy-balance.md) is complete for its frozen model-specific energy ledgers. ANA-07 is READY. Analytical cases may proceed without conclusive P1 measurement uncertainty. The current recorder supports software diagnostics; analytical driver admission must implement the specified output/resource contracts before model execution through the recorder.
 
 ## Working contract
 
@@ -103,7 +103,7 @@ Use [00](../00-execution-protocol.md), the [task template](../templates/task-rec
 
 ## ANA-06 — Add independent model-specific balance checks
 
-**Current state:** ACTIVE — [task record](../../work-items/ANA-06.md); ANA-05 review complete. **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
+**Current state:** DONE — [task record](../../work-items/ANA-06.md), [numerical report](../../benchmarks/ANA-06-energy-balance-verification.md), [artifact review](../../reviews/ANA-06-energy-balance.md). The four frozen model-specific ledgers pass their bounded error budget; missing terms stay INDETERMINATE. This does not close P3. **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
 
 **Inputs / predecessors:** ANA-05
 
@@ -115,13 +115,13 @@ Use [00](../00-execution-protocol.md), the [task template](../templates/task-rec
 
 **Required artifacts:** `mclf/balances.py`; balance protocols and negative checks.
 
-**Acceptance / decision:** Balances close to their declared error budget where defined; missing terms produce diagnostics instead of fabricated zeros.
+**Acceptance / decision:** Met for the frozen B-03/B-04/B-05 plane spheres and B-06 exterior shell; deliberately inconsistent flux/source terms fail, missing terms produce diagnostics instead of fabricated zeros. The result is a software numerical comparison only.
 
 **If unsuccessful:** F-06; review control volume and source terms.
 
 ## ANA-07 — Publish P3 verification evidence and close the gate
 
-**Initial state:** BLOCKED by predecessors / applicable gates. **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
+**Current state:** READY — ANA-06 is complete. **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
 
 **Inputs / predecessors:** ANA-06
 
