@@ -57,7 +57,7 @@ Do not combine phases to save time. A phase may split into subphases only by a r
 
 | Phase | Status | Blocking condition / next action |
 |---|---|---|
-| P0 | REVIEW | Repository cleanup and source archive are complete; project-owner review is needed to accept the controlled baseline and this plan |
+| P0 | REVIEW | Repository and document checks pass in a fresh clone of the configured remote; project-owner acceptance of the controlled scientific baseline and this plan is pending |
 | P1-P10 | BLOCKED | Start P1 only after P0 receives a recorded PASS decision |
 
 ## 5. Phase details
@@ -81,7 +81,7 @@ Do not combine phases to save time. A phase may split into subphases only by a r
 
 **Stop conditions:** missing provenance, conflicting claims with no decision, uncertain ownership/license, or unstable repository identity. Do not start solver implementation while these remain unresolved.
 
-**Current state:** original PDFs have been moved to the source archive with verified checksums; the byte-identical root logo duplicate has been removed; README, D00, CI document checks, local AI guidance, and CodeGraph ignores are aligned. P0 remains in REVIEW until the owner records acceptance.
+**Current state (2026-10-01):** the source archive contains the three original PDFs, with page counts and SHA-256 values recorded in its README; all three checksums verify. Relative Markdown links in README, docs, guides, and the source archive resolve. Ruff passes, the available test suite passes (1 test), and the required-document checks in CI pass. CodeGraph 1.6.1 is installed, its local index reports current, and its installation, use, and ignore policy are documented in G01. A fresh clone of `origin/main` at `0498b779b7758261d9a4a010c809061e02651dc0` was clean and matched this filesystem copy except for the P0 documentation updates and ignored local/generated files; its configured author and committer match the owner identity. The byte-identical root logo duplicate has been removed. P0 remains in REVIEW until the owner records acceptance of the controlled scientific baseline and this plan. The scientific documents remain DRAFT, and no scientific implementation is authorized until the P0 PASS decision is recorded.
 
 ### P1 — Bounded question and benchmark selection
 
