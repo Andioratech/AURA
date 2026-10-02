@@ -1,0 +1,36 @@
+{
+  "document_type": "experiment",
+  "schema_version": "1.0",
+  "id": "EXP-2026-RUN01-RECEIPT",
+  "scenario_id": "SCENARIO-RUN01-RECEIPT",
+  "scenario_sha256": "4d246d3cc3577ab8f44127a9175b652259c5605e3d813ab5be1e83cc1de1c871",
+  "hypothesis": "The recorder preserves the completed receipt and exact identities",
+  "claim_id": "SW-RUN01-RECEIPT",
+  "primary_observable": {
+    "name": "receipt_retained",
+    "unit": "1",
+    "definition": "Exact artifact/state presence after diagnostic execution; no physical observable or time window is evaluated",
+    "window": {
+      "start": {
+        "value": 0,
+        "unit": "s"
+      },
+      "end": {
+        "value": 1,
+        "unit": "s"
+      }
+    }
+  },
+  "acceptance_rule": "Exact software outcomes in RUN-01 protocol v1.0; scientific acceptance remains unavailable",
+  "uncertainty_plan": "No physical measurement; exact software identity and state assertions",
+  "protocol": {
+    "uri": "protocol.md",
+    "sha256": "44eca29d578dc771499329e984b1e83fbd8efbc501383761ffea0667f06ccd27"
+  },
+  "provenance": {
+    "basis": "manufactured",
+    "reference": "RUN-01 manufactured software diagnostic; values are not evaluated physically",
+    "uncertainty_status": "not_applicable",
+    "uncertainty_reference": null
+  }
+}

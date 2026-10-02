@@ -2,7 +2,7 @@
 
 **Interface:** CLI-1.0 · **Implemented by:** [FND-06](work-items/FND-06.md)
 
-The available commands are `status` and `validate-config`. Scientific solvers, resource preflight, simulation runs, replay and evidence export remain planned. The configuration command reads a scenario and checks its declarations; it does not demonstrate that AURA works.
+The available commands are `status`, `validate-config`, and the bounded software-diagnostic `run`/`check` pair described in the [RUN-1.0 contract](research/run-lifecycle.md) and [examples](../examples/runs/README.md). Scientific solvers, numerical resource preflight, physical simulation runs, replay and evidence export remain planned. The configuration command reads a scenario and checks its declarations; it does not demonstrate that AURA works.
 
 ## Install and inspect
 
@@ -82,4 +82,4 @@ Schema errors retain their stable library codes (for example `SCHEMA_VERSION`, `
 
 [CLI tests](../tests/test_cli.py) cover the 22 known input-fault classes in JSON/YAML, explicit zero/missing fields through the established fixtures, independent output assertions, separate streams, subprocess exit codes, file preservation, parser/file failures and forbidden simulation imports. FND-06 also records an installation into a fresh Python 3.12 environment without development extras, exercised outside the repository.
 
-[FND-07](work-items/FND-07.md) supplies separate canonical identity and bounded file-integrity library helpers. This configuration command does not call those file-verification APIs or authenticate run evidence. [FND-08](work-items/FND-08.md) delivers the reproducible environment and [P2 exit review](reviews/P2-foundation-exit.md). Before RUN-01/P3 begins, the owner will receive the requested plain-language explanation of the simulation system/core.
+[FND-07](work-items/FND-07.md) supplies separate canonical identity and bounded file-integrity library helpers. This configuration command does not call those file-verification APIs or authenticate run evidence. [FND-08](work-items/FND-08.md) delivers the reproducible environment and [P2 exit review](reviews/P2-foundation-exit.md). The owner received the requested plain-language system/core explanation at the P2 exit. RUN-01 implements the diagnostic recorder; analytical fields remain the next phase.

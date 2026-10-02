@@ -10,7 +10,7 @@
 4. At P2 exit, give the owner the requested plain-language explanation before starting the simulation system/core: components, inputs, outputs, first verification cases and limits. Then build RUN-01 and ANA-01…ANA-07. Complete RUN-02 before NUM-07 closes P4. This is an explanation checkpoint, not an additional approval gate.
 5. Follow the remaining phase gates and decision tree. Do not start controller implementation before the required force/dynamics gates.
 
-RUN-01 is the next READY implementation task after the requested explanation checkpoint. P2 is PASS within its reviewed foundation scope. LIT-01 and SC-01 remain READY for research. Only explicitly reviewed task records are DONE; production integration and scientific model validation remain pending. BLOCKED below means a normal dependency has not yet been delivered, not that the whole project must stop.
+RUN-01 is ACTIVE; the owner received the requested explanation at P2 exit. P2 is PASS within its reviewed foundation scope. LIT-01 and SC-01 remain READY for research. Only explicitly reviewed task records are DONE; production integration and scientific model validation remain pending. BLOCKED below means a normal dependency has not yet been delivered, not that the whole project must stop.
 
 ## Dependency and status table
 
@@ -83,7 +83,7 @@ RUN-01 is the next READY implementation task after the requested explanation che
 | EXP-03 | Estimate resources and review the actual hardware risks | EXP-02 | BLOCKED | [EXP](phases/P10-experiment-decision.md) |
 | EXP-04 | Review the design and record GO, REVISE or NO-GO | EXP-03 | BLOCKED | [EXP](phases/P10-experiment-decision.md) |
 | EXP-05 | Close the planning-to-evidence chain and hand off | EXP-04 | BLOCKED | [EXP](phases/P10-experiment-decision.md) |
-| RUN-01 | Immutable minimal run lifecycle | FND-08 and P2 PASS | READY | [Cross-cutting card](08-reproducibility-and-ci.md) |
+| RUN-01 | Immutable minimal run lifecycle | FND-08 and P2 PASS | ACTIVE — [record](../work-items/RUN-01.md) | [Cross-cutting card](08-reproducibility-and-ci.md) |
 | RUN-02 | Replay, comparison and evidence reporting | RUN-01, ANA-07 | BLOCKED | [Cross-cutting card](08-reproducibility-and-ci.md) |
 | SC-01 | Register candidate mass, size and shape campaigns | DEC-004; LIT-01 inventory when available | READY for research | [Scale progression](11-scale-progression.md) |
 | SC-02 | Establish whether a model change is needed | SC-01; relevant source/applicability review | BLOCKED | [Scale progression](11-scale-progression.md) |

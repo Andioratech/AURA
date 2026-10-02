@@ -1,0 +1,231 @@
+{
+  "document_type": "scenario",
+  "schema_version": "1.0",
+  "id": "SCENARIO-RUN01-FAILURE",
+  "conventions": "CONV-1.0",
+  "frame": "chamber",
+  "medium": {
+    "id": "EXAMPLE-MEDIUM-01",
+    "name": "Manufactured water-like medium; not measured water properties",
+    "temperature": {
+      "value": 300,
+      "unit": "K"
+    },
+    "density": {
+      "value": 1000,
+      "unit": "kg/m^3"
+    },
+    "sound_speed": {
+      "value": 1500,
+      "unit": "m/s"
+    },
+    "dynamic_viscosity": {
+      "value": 0.001,
+      "unit": "Pa*s"
+    },
+    "compressibility": {
+      "value": 4.4444444444444443e-10,
+      "unit": "1/Pa"
+    },
+    "amplitude_attenuation": {
+      "value": 0,
+      "unit": "1/m"
+    },
+    "provenance": {
+      "basis": "manufactured",
+      "reference": "FND-02 parser fixture; no measurement",
+      "uncertainty_status": "not_applicable",
+      "uncertainty_reference": null
+    }
+  },
+  "bodies": [
+    {
+      "id": "EXAMPLE-BODY-01",
+      "material": "Manufactured material; no selected experimental particle",
+      "geometry": {
+        "kind": "sphere",
+        "radius": {
+          "value": 1e-05,
+          "unit": "m"
+        }
+      },
+      "mass": {
+        "value": 4.188790204786391e-12,
+        "unit": "kg"
+      },
+      "density": {
+        "value": 1000,
+        "unit": "kg/m^3"
+      },
+      "compressibility": {
+        "value": 1e-10,
+        "unit": "1/Pa"
+      },
+      "initial_state": {
+        "position": {
+          "value": [
+            0.5,
+            0.5,
+            0.5
+          ],
+          "unit": "m"
+        },
+        "velocity": {
+          "value": [
+            0,
+            0,
+            0
+          ],
+          "unit": "m/s"
+        },
+        "orientation": {
+          "value": [
+            1,
+            0,
+            0,
+            0
+          ],
+          "unit": "1"
+        },
+        "angular_velocity": {
+          "value": [
+            0,
+            0,
+            0
+          ],
+          "unit": "rad/s"
+        }
+      },
+      "provenance": {
+        "basis": "manufactured",
+        "reference": "FND-02 parser fixture; no measurement",
+        "uncertainty_status": "not_applicable",
+        "uncertainty_reference": null
+      }
+    }
+  ],
+  "sources": {
+    "id": "EXAMPLE-ARRAY-01",
+    "frequency": {
+      "value": 1000000,
+      "unit": "Hz"
+    },
+    "amplitude_convention": "peak",
+    "phasor_convention": "exp(-iwt)",
+    "elements": [
+      {
+        "id": "EXAMPLE-SOURCE-01",
+        "position": {
+          "value": [
+            0,
+            0.5,
+            0.5
+          ],
+          "unit": "m"
+        },
+        "normal": {
+          "value": [
+            1,
+            0,
+            0
+          ],
+          "unit": "1"
+        },
+        "phase": {
+          "value": 0,
+          "unit": "rad"
+        },
+        "pressure_amplitude": {
+          "value": 2,
+          "unit": "Pa"
+        },
+        "pressure_limit": {
+          "value": 10,
+          "unit": "Pa"
+        },
+        "model": "ideal_plane_wave"
+      }
+    ],
+    "provenance": {
+      "basis": "manufactured",
+      "reference": "FND-02 parser fixture; no hardware selection",
+      "uncertainty_status": "not_applicable",
+      "uncertainty_reference": null
+    }
+  },
+  "solver": {
+    "id": "SOLVER-SOFTWARE-RUN01",
+    "model_id": "lifecycle-failure",
+    "model_version": "1.0",
+    "equation_ids": [
+      "SOFTWARE-RUN-01"
+    ],
+    "regime": [
+      "Software lifecycle diagnostic; no physical solver"
+    ],
+    "precision": "float64",
+    "parameters": {}
+  },
+  "domain": {
+    "origin": {
+      "value": [
+        0,
+        0,
+        0
+      ],
+      "unit": "m"
+    },
+    "size": {
+      "value": [
+        1,
+        1,
+        1
+      ],
+      "unit": "m"
+    },
+    "boundary_model": "fixture-only",
+    "boundary_reference": "No boundary physics is implemented"
+  },
+  "gravity": {
+    "value": [
+      0,
+      0,
+      0
+    ],
+    "unit": "m/s^2"
+  },
+  "target": {
+    "acceleration": {
+      "value": [
+        0,
+        0,
+        0.001
+      ],
+      "unit": "m/s^2"
+    },
+    "window": {
+      "start": {
+        "value": 0,
+        "unit": "s"
+      },
+      "end": {
+        "value": 1,
+        "unit": "s"
+      }
+    }
+  },
+  "resources": {
+    "ram_bytes": 1073741824,
+    "disk_bytes": 16777216,
+    "wall_time": {
+      "value": 30,
+      "unit": "s"
+    }
+  },
+  "provenance": {
+    "basis": "manufactured",
+    "reference": "RUN-01 manufactured software diagnostic; values are not evaluated physically",
+    "uncertainty_status": "not_applicable",
+    "uncertainty_reference": null
+  }
+}

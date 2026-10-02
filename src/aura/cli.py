@@ -90,6 +90,53 @@ def _emit_validation(output: dict, report_text: str, *, machine: bool) -> int:
     return code
 
 
+def _lifecycle(args):
+    import signal
+    import threading
+
+    from aura.errors import InvalidInputError
+    from aura.runs import check_run, execute
+
+    class Terminated(KeyboardInterrupt):
+        signal_number = signal.SIGTERM
+
+    def terminate(signum, frame):
+        raise Terminated("Termination requested")
+
+    try:
+        if args.command == "run":
+            previous = None
+            if threading.current_thread() is threading.main_thread():
+                previous = signal.signal(signal.SIGTERM, terminate)
+            try:
+                output = execute(args.path, args.experiment, output=args.output, seed=args.seed)
+            finally:
+                if previous is not None:
+                    signal.signal(signal.SIGTERM, previous)
+        else:
+            output = check_run(args.path, expected_sha256=args.sha256)
+    except KeyboardInterrupt as exc:
+        output = {"command": args.command, "error": {"code": "RUN_INTERRUPTED",
+                  "message": "Interrupted before terminal publication; preserve any partial directory."},
+                  "exit_code": 128 + getattr(exc, "signal_number", 2)}
+    except InvalidInputError as exc:
+        output = {"command": args.command, "error": exc.as_dict(), "exit_code": 1}
+    except OSError as exc:
+        output = {"command": args.command, "error": {"code": "RUN_IO", "message": str(exc)},
+                  "exit_code": 4}
+    except (ValueError, KeyError, TypeError) as exc:
+        if args.command != "check":
+            raise
+        output = {"command": "check", "error": {"code": "RUN_RECORD", "message": str(exc)},
+                  "exit_code": 1}
+    if args.json:
+        print(json.dumps(output, indent=2, ensure_ascii=True, allow_nan=False))
+    else:
+        print(json.dumps(output, indent=2, ensure_ascii=True, allow_nan=False),
+              file=sys.stdout if output["exit_code"] == 0 else sys.stderr)
+    return output["exit_code"]
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="aura", description="AURA scientific project tools")
     commands = parser.add_subparsers(dest="command", required=True)
@@ -101,11 +148,25 @@ def main(argv: list[str] | None = None) -> int:
     )
     validation.add_argument("path", help="scenario file with .json, .yaml or .yml extension")
     validation.add_argument("--json", action="store_true", help="emit a JSON validation report")
+    run = commands.add_parser("run", help="record a bounded software diagnostic", allow_abbrev=False)
+    run.add_argument("path", help="diagnostic scenario JSON/YAML")
+    run.add_argument("--experiment", required=True, help="frozen experiment JSON/YAML")
+    run.add_argument("--output", help="new directory; default results/<experiment>/<run-id>")
+    seeds = run.add_mutually_exclusive_group(required=True)
+    seeds.add_argument("--seed", type=int, help="explicit seed (unused by current diagnostics)")
+    seeds.add_argument("--no-randomness", action="store_true", help="explicitly record a null seed")
+    run.add_argument("--json", action="store_true", help="emit a structured execution result")
+    check = commands.add_parser("check", help="inspect recorded bundle integrity", allow_abbrev=False)
+    check.add_argument("path", help="recorded run directory")
+    check.add_argument("--sha256", help="separately retained final manifest digest")
+    check.add_argument("--json", action="store_true", help="emit a structured check result")
     args = parser.parse_args(argv)
+    if args.command in ("run", "check"):
+        return _lifecycle(args)
     if args.command == "status":
         print("AURA scaffold initialized; scientific solvers are not implemented yet.")
         print("Available: strict scenario schemas, SI helpers, L0 audits and validate-config.")
-        print("Model coverage, authenticated run artifacts and simulation commands remain unavailable.")
+        print("Available: run/check for immutable software diagnostics; scientific verdicts remain unresolved.")
         return 0
     output, report_text = _validate_config(args.path)
     return _emit_validation(output, report_text, machine=args.json)

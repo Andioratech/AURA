@@ -40,7 +40,9 @@ Implemented foundations include a [versioned JSON/YAML input and evidence schema
 
 [FND-07](docs/work-items/FND-07.md) adds [canonical content identity](docs/research/content-identity.md), explicit manifest/configuration link checks and bounded local file-integrity checks. The [B-02 report](docs/benchmarks/B02-content-identity.md) verifies reordering equivalence and detection of changed content. Run storage, source/environment evidence binding and replay remain future work; matching hashes do not validate physics.
 
-[FND-08](docs/work-items/FND-08.md) delivers the [locked Python environment](requirements/README.md), fresh-install checks and installed-profile verification. The [P2 exit review](docs/reviews/P2-foundation-exit.md) records **PASS for software foundations**, with 784 passing checks and separate unresolved scientific statuses. The next task is the immutable run lifecycle (RUN-01), followed by analytical wave cases; no physical simulation result is claimed.
+[FND-08](docs/work-items/FND-08.md) delivers the [locked Python environment](requirements/README.md), fresh-install checks and installed-profile verification. The [P2 exit review](docs/reviews/P2-foundation-exit.md) records **PASS for software foundations**, with 784 passing checks and separate unresolved scientific statuses. The next phase is analytical wave verification after the RUN-01 lifecycle review; no physical simulation result is claimed.
+
+[RUN-01](docs/work-items/RUN-01.md) adds an [immutable diagnostic recorder](docs/research/run-lifecycle.md) and `aura run` / `aura check`. It preserves clean-source/environment identity, exact input/output hashes and failed/aborted executions. The [examples](examples/runs/README.md) exercise software behavior only; they do not calculate an acoustic field or become scientific evidence.
 
 ## Repository structure
 
