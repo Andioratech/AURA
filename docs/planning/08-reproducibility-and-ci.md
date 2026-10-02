@@ -47,11 +47,14 @@ A failed large run is retained by identity and necessary diagnostics; retaining 
 
 ## CI before every commit
 
-Inspect `.github/workflows/quality.yml` at the time of work; the file itself is authoritative. At pack creation it uses Python 3.12, editable development install, Ruff, pytest and required-document existence checks. Reproduce the complete workflow on the final content after any last edit. The following shell sequence mirrors its current checks in an activated Python 3.12 virtual environment:
+Inspect `.github/workflows/quality.yml` at the time of work; the file itself is authoritative. The reviewed [ENV-1.0 profile](../../requirements/README.md) uses CPython 3.12.14, hashed dependency locks, a local editable build, installed-environment verification, Ruff, pytest and required-document checks. Reproduce the complete workflow on the final content after any last edit. In the activated development environment:
 
 ```bash
 set -e
-python -m pip install -e '.[dev]'
+python -m pip --isolated install --index-url https://pypi.org/simple --require-hashes --only-binary=:all: -r requirements/dev-linux-py312.lock
+python -m pip --isolated install --no-index --no-deps --no-build-isolation -e '.[dev]'
+python -m pip check
+python scripts/verify_environment.py
 ruff check .
 pytest
 test -f docs/D00-document-control.md

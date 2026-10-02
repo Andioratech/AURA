@@ -6,16 +6,14 @@ The available commands are `status` and `validate-config`. Scientific solvers, r
 
 ## Install and inspect
 
-From a checkout with Python 3.12 (the CI interpreter):
+Use the [reviewed environment instructions](../requirements/README.md) for CPython 3.12.14 on Linux x86_64. They provide both the exact development installation and a smaller runtime installation from a locally built project wheel. After the development installation:
 
 ```bash
-python3.12 -m venv .venv
-.venv/bin/python -m pip install .
 .venv/bin/aura status
 .venv/bin/aura validate-config --help
 ```
 
-For development, install the existing editable development extra with `.venv/bin/python -m pip install -e '.[dev]'`. FND-08 will lock the environment; these commands are installation instructions, not a reproducible environment lock. Once installed, the `aura` executable works outside the checkout when passed an accessible configuration path. `python -m aura.cli` is an equivalent entry point under the same interpreter.
+Once installed, the `aura` executable works outside the checkout when passed an accessible configuration path. `python -m aura.cli` is an equivalent entry point under the same interpreter.
 
 ## Validate the manufactured example
 

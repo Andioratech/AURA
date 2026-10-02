@@ -145,7 +145,7 @@ Use [00](../00-execution-protocol.md), the [task template](../templates/task-rec
 
 ## FND-08 — Lock the development environment and close P2
 
-**Current state:** READY; FND-07 is complete. **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
+**Current state:** ACTIVE — [environment implementation and pending review](../../work-items/FND-08.md). **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
 
 **Inputs / predecessors:** FND-07
 
