@@ -124,7 +124,14 @@ def check_run(folder, *, expected_sha256=None):
         usage["run_id"] != data["id"] or usage["lifecycle_version"] != VERSION
     ):
         fail("RUN_AUDIT", "Final execution/audit identity or verdict differs.")
-    if post["pre_verdict"] != data["mclf_pre"]["verdict"] or (
+    expected_limitations = [
+        "Lifecycle integrity postcheck only; independent numerical comparison and physical-result audits are unavailable."
+        if analytical else
+        "Lifecycle postcheck only; physical-result L0/L1-L5 checks unavailable."
+    ]
+    if post["scope"] != scope or post["limitations"] != expected_limitations or (
+        post["pre_verdict"] != data["mclf_pre"]["verdict"]
+    ) or (
         post["artifact_check"] != ("PASS" if state == "completed" else "NOT_ESTABLISHED")
     ) or post["physical_result"] != "NOT_REQUESTED" or usage["seed_used"] is not False:
         fail("RUN_AUDIT", "Diagnostic audit scope or seed-use policy differs.")

@@ -211,8 +211,12 @@ def execute(scenario_path, experiment_path, *, output=None, seed):
             "verdict": "INDETERMINATE" if state == "completed" else "INVALIDATED",
             "execution_status": state, "pre_verdict": pre.verdict,
             "artifact_check": "PASS" if state == "completed" else "NOT_ESTABLISHED",
-            "physical_result": "NOT_REQUESTED", "scope": LIMITATION,
-            "limitations": ["Lifecycle postcheck only; physical-result L0/L1-L5 checks unavailable."]}
+            "physical_result": "NOT_REQUESTED", "scope": analytic.SCOPE if analytical else LIMITATION,
+            "limitations": [
+                "Lifecycle integrity postcheck only; independent numerical comparison and physical-result audits are unavailable."
+                if analytical else
+                "Lifecycle postcheck only; physical-result L0/L1-L5 checks unavailable."
+            ]}
     post_ref = publish(destination, "audit-post.json", encode(post))
     manifest.update(execution_status=state, outputs=outputs,
                     failure_code=None if error is None else error["code"],
@@ -225,4 +229,5 @@ def execute(scenario_path, experiment_path, *, output=None, seed):
     publish(destination, "manifest.sha256", (ref["sha256"] + "\n").encode())
     return {"lifecycle_version": VERSION, "run_id": run_id, "output": str(destination),
             "execution_status": state, "verdict": post["verdict"], "error": error,
-            "manifest_sha256": ref["sha256"], "exit_code": code, "scope": LIMITATION}
+            "manifest_sha256": ref["sha256"], "exit_code": code,
+            "scope": analytic.SCOPE if analytical else LIMITATION}

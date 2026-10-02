@@ -150,6 +150,7 @@ def test_analytical_field_run_is_immutable_and_checkable(analytical_inputs, obse
     assert (result["execution_status"], result["verdict"], result["exit_code"]) == (
         "completed", "INDETERMINATE", 3,
     )
+    assert result["scope"].startswith("Analytical incident-field")
     checked = check_run(output, expected_sha256=result["manifest_sha256"])
     assert (checked["integrity"], checked["verdict"]) == ("VERIFIED", "INDETERMINATE")
     records = {
@@ -166,6 +167,8 @@ def test_analytical_field_run_is_immutable_and_checkable(analytical_inputs, obse
     assert index["run_policy"] == "ANALYTIC-RUN-1.0"
     assert index["pressure_gradient"]["unit"] == "Pa/m"
     assert index["run_id"] == result["run_id"]
+    audit = json.loads((output / "audit-post.json").read_bytes())
+    assert audit["scope"].startswith("Analytical incident-field")
 
 
 def test_analytical_check_rejects_component_tampering(analytical_inputs, observed):
@@ -174,6 +177,24 @@ def test_analytical_check_rejects_component_tampering(analytical_inputs, observe
     component = output / "field-pressure-gradient.json"
     component.write_bytes(component.read_bytes() + b" ")
     with pytest.raises((InvalidInputError, OSError), match="HASH_MISMATCH"):
+        check_run(output)
+
+
+def test_analytical_check_rejects_diagnostic_only_post_scope(analytical_inputs, observed):
+    scenario, experiment, output = analytical_inputs
+    execute(scenario, experiment, output=output, seed=None)
+    post_path = output / "audit-post.json"
+    post = json.loads(post_path.read_bytes())
+    post["scope"] = ENGINE.LIMITATION
+    post_bytes = encode(post)
+    post_path.write_bytes(post_bytes)
+    manifest_path = output / "manifest.json"
+    manifest = json.loads(manifest_path.read_bytes())
+    manifest["mclf_post"]["report"]["sha256"] = digest(post_bytes)
+    manifest_bytes = encode(manifest)
+    manifest_path.write_bytes(manifest_bytes)
+    (output / "manifest.sha256").write_text(digest(manifest_bytes) + "\n")
+    with pytest.raises(IntegrityError, match="RUN_AUDIT"):
         check_run(output)
 
 

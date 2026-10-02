@@ -69,7 +69,7 @@ Once reserved, a failure during initialization/final storage can leave an incomp
 
 ## Lifecycle post-audit and check semantics
 
-`audit-post.json` uses **RUN-POST-1.0**, a separate stored audit envelope. Its predicates are:
+`audit-post.json` uses **RUN-POST-1.0**, a separate stored audit envelope. Its driver-specific `scope` and `limitations` are checked against the admitted policy; an analytical record mislabeled as a software diagnostic fails `check`. Its predicates are:
 
 | Predicate | Outcome |
 |---|---|
