@@ -84,7 +84,7 @@ Do not combine claim-critical gates to save time. Foundation work may proceed wh
 
 **Stop conditions:** missing provenance, conflicting claims with no decision, uncertain ownership/license, or unstable repository identity. Do not start solver implementation while these remain unresolved.
 
-**Decision and evidence:** P0 PASS was recorded on 2026-10-01 after owner approval, source checksum verification, repository review, local quality checks, and successful remote CI. See [DEC-001](decisions/DEC-001-p0-baseline-approval.md). On 2026-10-02, DEC-003 approved foundation work to continue while P1 source uncertainty remains unresolved. This does not validate a solver or benchmark or authorize stronger claims. G01-G05 remain DRAFT.
+**Decision and evidence:** P0 PASS was recorded on 2026-10-01 after owner approval, source checksum verification, repository review, local quality checks, and successful remote CI. See [DEC-001](../decisions/DEC-001-p0-baseline-approval.md). On 2026-10-02, DEC-003 approved foundation work to continue while P1 source uncertainty remains unresolved. This does not validate a solver or benchmark or authorize stronger claims. G01-G05 remain DRAFT.
 
 ### P1 — Bounded question and benchmark selection
 
@@ -354,7 +354,7 @@ Changes to phase order, gates, primary observables, acceptance thresholds, model
 ## 11. Immediate next actions
 
 1. DEC-002 records the owner's approval of the Andrade et al. 50 mm sphere force measurement as AURA's first measurable force-model check. DEC-003 records the owner's direction to keep progressing while source uncertainty remains open.
-2. P1 remains open for source uncertainty and benchmark review. Its current figure comparison is descriptive and INDETERMINATE; it no longer blocks foundation work. The executable task board and subplans are in [docs/planning/README.md](planning/README.md).
+2. P1 remains open for source uncertainty and benchmark review. Its current figure comparison is descriptive and INDETERMINATE; it no longer blocks foundation work. The executable task board and subplans are in [docs/planning/README.md](../planning/README.md).
 3. Start P2.1–P2.8 through FND-01 in the detailed plan: unit conventions, small versioned schemas, pure dimensional/acoustic calculations, and the first MCLF L0 rule table. Do not add acoustic PDE solvers, force calculations or target-control logic in P2.
 4. After P2 review, proceed to P3 analytical wave cases. Treat them as equation/code verification, not experimental validation of AURA.
 5. Use the detailed decision tree and failure playbooks to branch when evidence is missing, a model leaves its domain, a run fails, or a limitation appears. Preserve the original result and create a new experiment when assumptions change.

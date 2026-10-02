@@ -82,7 +82,7 @@ Do not combine phases to save time. A phase may split into subphases only by a r
 
 **Stop conditions:** missing provenance, conflicting claims with no decision, uncertain ownership/license, or unstable repository identity. Do not start solver implementation while these remain unresolved.
 
-**Decision and evidence:** P0 PASS was recorded on 2026-10-01 after owner approval, source checksum verification, repository review, local quality checks, and successful remote CI. See [DEC-001](decisions/DEC-001-p0-baseline-approval.md). The accepted baseline is D00-D09 and this plan at commit `8cbd2e2e50a17e96299fd00dbba667b5c3b24ed4`; G01-G05 remain DRAFT. Baseline approval authorizes phase-gated research only; it does not mean a solver or benchmark has been validated.
+**Decision and evidence:** P0 PASS was recorded on 2026-10-01 after owner approval, source checksum verification, repository review, local quality checks, and successful remote CI. See [DEC-001](../decisions/DEC-001-p0-baseline-approval.md). The accepted baseline is D00-D09 and this plan at commit `8cbd2e2e50a17e96299fd00dbba667b5c3b24ed4`; G01-G05 remain DRAFT. Baseline approval authorizes phase-gated research only; it does not mean a solver or benchmark has been validated.
 
 ### P1 — Bounded question and benchmark selection
 

@@ -5,12 +5,12 @@
 ## First work cycle
 
 1. FND-01 is complete: [CONV-1.0 and review](../work-items/FND-01.md) freeze the representation contract and record existing helper gaps.
-2. Continue FND-02…FND-08 in dependency order; close P2 only with its actual evidence.
+2. FND-02 is complete: [schema implementation and review](../work-items/FND-02.md). Continue FND-03…FND-08 in dependency order; close P2 only with its actual evidence.
 3. LIT-01…LIT-05 may proceed as the separate evidence track; missing measurements do not stop P2/P3.
 4. Build RUN-01, then ANA-01…ANA-07. Complete RUN-02 before NUM-07 closes P4.
 5. Follow the remaining phase gates and decision tree. Do not start controller implementation before the required force/dynamics gates.
 
-FND-02 is the next READY implementation task. LIT-01 and SC-01 remain READY for research. Existing helpers/tests are PARTIAL evidence for P2; only explicitly reviewed task records are DONE. BLOCKED below means a normal dependency has not yet been delivered, not that the whole project must stop.
+FND-03 is the next READY implementation task. LIT-01 and SC-01 remain READY for research. Existing helpers/tests are PARTIAL evidence for P2; only explicitly reviewed task records are DONE. BLOCKED below means a normal dependency has not yet been delivered, not that the whole project must stop.
 
 ## Dependency and status table
 
@@ -22,8 +22,8 @@ FND-02 is the next READY implementation task. LIT-01 and SC-01 remain READY for 
 | LIT-04 | Identify fluid, wall, thermal and stochastic competing effects | LIT-03 | BLOCKED | [LIT](phases/P01-evidence.md) |
 | LIT-05 | Prepare necessary-limit and prior-work investigations | LIT-04 | BLOCKED | [LIT](phases/P01-evidence.md) |
 | FND-01 | Freeze coordinate, SI and amplitude conventions | Baseline available | DONE — [record](../work-items/FND-01.md) | [FND](phases/P02-foundations.md) |
-| FND-02 | Implement versioned scenario and evidence schemas | FND-01 | READY | [FND](phases/P02-foundations.md) |
-| FND-03 | Extend safe SI calculations and conversion boundaries | FND-02 | BLOCKED | [FND](phases/P02-foundations.md) |
+| FND-02 | Implement versioned scenario and evidence schemas | FND-01 | DONE — [record](../work-items/FND-02.md) | [FND](phases/P02-foundations.md) |
+| FND-03 | Extend safe SI calculations and conversion boundaries | FND-02 | READY | [FND](phases/P02-foundations.md) |
 | FND-04 | Implement stable MCLF L0 rules and typed errors | FND-03 | BLOCKED | [FND](phases/P02-foundations.md) |
 | FND-05 | Build independent known-answer and invalid-input verification | FND-04 | BLOCKED | [FND](phases/P02-foundations.md) |
 | FND-06 | Expose configuration validation through the CLI | FND-05 | BLOCKED | [FND](phases/P02-foundations.md) |

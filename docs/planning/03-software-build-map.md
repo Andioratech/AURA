@@ -2,9 +2,9 @@
 
 ## Implementation rule
 
-Paths below are specifications for future code, not files that already exist. Preserve the working CLI and SI helpers. Build modules in the task order; optional branches are implemented only when the regime/evidence requires them. No notebook is the sole implementation of a scientific result.
+Paths below describe the construction target; consult the work board and task records for actual availability. FND-02 implements the initial schema boundary and input error type; scientific solvers remain unimplemented. Preserve the working CLI and SI helpers. Build modules in the task order; optional branches are implemented only when the regime/evidence requires them. No notebook is the sole implementation of a scientific result.
 
-Core remains CPU-first. Review dependency licenses and current compatibility in FND-08; lock the environment. NumPy/SciPy and schema/array-storage libraries are candidates, not already approved dependencies. A new backend needs a documented need and decision. Keep optional expensive solvers behind extras and narrow adapters.
+Core remains CPU-first. FND-02 records the [initial schema dependency review](../research/schema-contract.md); FND-08 completes environment locking and compatibility review. NumPy/SciPy and array-storage libraries remain candidates. A new backend needs a documented need and decision. Keep optional expensive solvers behind extras and narrow adapters.
 
 ## Planned package inventory
 
@@ -54,7 +54,7 @@ Core remains CPU-first. Review dependency licenses and current compatibility in 
 
 ## Interface contracts to freeze before implementation
 
-1. `load_scenario(path) -> ValidatedScenario`: returns canonical SI plus provenance; never allocates solver memory.
+1. Implemented FND-02 boundary: `schema.load_document(path) -> ValidatedRecord`, returning `Scenario` for a scenario envelope; `schema.validate_document(data)` handles a dictionary. Returns explicit canonical SI and provenance without solver allocation. The earlier proposed `load_scenario` name is superseded by this documented generic boundary.
 2. `evaluate_preflight(scenario, resources) -> PreflightReport`: dimensions, estimates, budgets, decision and reason codes.
 3. `solve_field(scenario, solver_context) -> FieldResult`: typed pressure/velocity samples, gradients if supported, coordinates, convention, solver/boundary diagnostics and output references.
 4. `compute_force(field, body, context) -> ForceResult`: required field components and regime metadata; no silent interpolation/extrapolation outside samples.
@@ -97,6 +97,6 @@ CLI plus documented configurations, pressure/velocity field plots, per-force and
 
 ## Planned support for greater masses and larger objects
 
-The initial particle implementation is one model behind the common `Body`, field, force and dynamics interfaces. FND-02 must preserve explicit geometry/material/mass/inertia metadata and capability checks; it must not make every possible body an implicit point particle. Unsupported body/model combinations fail explicitly.
+The initial particle implementation is one model behind the common `Body`, field, force and dynamics interfaces. FND-02 preserves explicit geometry/material/mass/inertia metadata and rejects unsupported schema geometries; it does not make every body an implicit point particle. It accepts declared model metadata without granting execution capability. FND-04 and subsequent model-dispatch tasks must reject unsupported body/model combinations before computation; no dispatch exists at FND-02.
 
 SC-02–SC-03 in [11](11-scale-progression.md) select and verify the required later implementation: a geometry adapter, an appropriate scattering/body-field backend, force/torque evaluation and any loading diagnostics required by the candidate claim. Proposed locations are `geometry/`, `fields/scattering.py` and `forces/body.py`; these are planned, unimplemented components. Select the actual method and numerical library only after source review and resource preflight. Reuse the existing run/audit/reporting infrastructure while repeating the applicable model and evidence gates.
