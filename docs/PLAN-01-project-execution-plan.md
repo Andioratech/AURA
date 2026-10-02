@@ -58,7 +58,7 @@ Do not combine phases to save time. A phase may split into subphases only by a r
 | Phase | Status | Blocking condition / next action |
 |---|---|---|
 | P0 | PASS | Owner acceptance recorded in DEC-001; repository, source provenance, links, local quality checks, and remote CI passed |
-| P1 | REVIEW | P1.1 dossier and P1.2 scoring are complete; owner must settle access/handling of the primary candidate's uncertainty data before P1.3–P1.7 can be frozen |
+| P1 | REVIEW | Candidate A is proposed as primary using the published Table 5 ratio and a separately digitized Figure 8 uncertainty bound; P1.3–P1.7 design is documented and awaits owner approval before it is frozen |
 | P2-P10 | BLOCKED | Advance only after the preceding phase receives a recorded PASS decision |
 
 ## 5. Phase details
@@ -352,6 +352,6 @@ Changes to phase order, gates, primary observables, acceptance thresholds, model
 ## 11. Immediate next actions
 
 1. P1.1 candidate dossier and P1.2 equal-weight screen are recorded in `docs/benchmarks/P1.1-benchmark-candidates.md`.
-2. Confirm the permitted source-data path for the provisional primary (APS supplement or figure digitization with added uncertainty).
-3. Complete P1.3–P1.7, then obtain owner approval of the selected benchmark, frozen domain, and uncertainty-derived decision rule at the P1 exit gate.
+2. P1.3–P1.7 proposed design is documented in the dossier: Candidate A primary, B backup, two particle-size endpoints, the Table 5 ratio, a predeclared Figure 8 reading bound, stop rule, and workstation-scale resource estimate.
+3. Obtain owner approval of the proposed small-particle comparison and uncertainty handling at the P1 exit gate; freeze the digitization record and decision rule before implementing the benchmark.
 4. Do not start implementation before P1 PASS or implement acoustic propagation, radiation force, control, AI optimization, or high-fidelity solvers before the applicable gate.
