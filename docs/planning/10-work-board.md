@@ -10,7 +10,7 @@
 4. The requested system/core explanation was delivered at P2 exit. RUN-01 is complete for software diagnostics; continue ANA-01…ANA-07 with their reviewed physical-output and execution contracts. Complete RUN-02 before NUM-07 closes P4. This is an explanation checkpoint, not an additional approval gate.
 5. Follow the remaining phase gates and decision tree. Do not start controller implementation before the required force/dynamics gates.
 
-ANA-01 is the next READY task. [RUN-01 is DONE](../reviews/RUN-01-lifecycle.md); the owner received the requested explanation at P2 exit. P2 is PASS within its reviewed foundation scope. LIT-01 and SC-01 remain READY for research. Only explicitly reviewed task records are DONE; production integration and scientific model validation remain pending. BLOCKED below means a normal dependency has not yet been delivered, not that the whole project must stop.
+ANA-01 is ACTIVE — [task record](../work-items/ANA-01.md). [RUN-01 is DONE](../reviews/RUN-01-lifecycle.md); the owner received the requested explanation at P2 exit. P2 is PASS within its reviewed foundation scope. LIT-01 and SC-01 remain READY for research. Only explicitly reviewed task records are DONE; production integration and scientific model validation remain pending. BLOCKED below means a normal dependency has not yet been delivered, not that the whole project must stop.
 
 ## Dependency and status table
 
@@ -29,7 +29,7 @@ ANA-01 is the next READY task. [RUN-01 is DONE](../reviews/RUN-01-lifecycle.md);
 | FND-06 | Expose configuration validation through the CLI | FND-05 | DONE — [record](../work-items/FND-06.md) | [FND](phases/P02-foundations.md) |
 | FND-07 | Freeze canonical serialization and immutable hash identity | FND-06 | DONE — [record](../work-items/FND-07.md) | [FND](phases/P02-foundations.md) |
 | FND-08 | Lock the development environment and close P2 | FND-07 | DONE — [record](../work-items/FND-08.md) | [FND](phases/P02-foundations.md) |
-| ANA-01 | Specify field outputs and the analytic case matrix | FND-08, RUN-01 | READY | [ANA](phases/P03-analytical-fields.md) |
+| ANA-01 | Specify field outputs and the analytic case matrix | FND-08, RUN-01 | ACTIVE — [record](../work-items/ANA-01.md) | [ANA](phases/P03-analytical-fields.md) |
 | ANA-02 | Implement a progressive plane wave and its velocity | ANA-01 | BLOCKED | [ANA](phases/P03-analytical-fields.md) |
 | ANA-03 | Construct a standing wave with correct flux accounting | ANA-02 | BLOCKED | [ANA](phases/P03-analytical-fields.md) |
 | ANA-04 | Verify two-source interference and allowed symmetries | ANA-03 | BLOCKED | [ANA](phases/P03-analytical-fields.md) |

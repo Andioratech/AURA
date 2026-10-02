@@ -42,7 +42,9 @@ Implemented foundations include a [versioned JSON/YAML input and evidence schema
 
 [FND-08](docs/work-items/FND-08.md) delivers the [locked Python environment](requirements/README.md), fresh-install checks and installed-profile verification. The [P2 exit review](docs/reviews/P2-foundation-exit.md) records **PASS for software foundations**, with 784 passing checks and separate unresolved scientific statuses. The next phase is analytical wave verification; no physical simulation result is claimed.
 
-[RUN-01](docs/work-items/RUN-01.md) adds an [immutable diagnostic recorder](docs/research/run-lifecycle.md) and `aura run` / `aura check`. It preserves clean-source/environment identity, exact input/output hashes and failed/aborted executions. The [examples](examples/runs/README.md) exercise software behavior only; they do not calculate an acoustic field or become scientific evidence. The [RUN-01 review](docs/reviews/RUN-01-lifecycle.md) records 911 passing checks and actual completed/failed diagnostic bundles; ANA-01 is READY.
+[RUN-01](docs/work-items/RUN-01.md) adds an [immutable diagnostic recorder](docs/research/run-lifecycle.md) and `aura run` / `aura check`. It preserves clean-source/environment identity, exact input/output hashes and failed/aborted executions. The [examples](examples/runs/README.md) exercise software behavior only; they do not calculate an acoustic field or become scientific evidence. The [RUN-01 review](docs/reviews/RUN-01-lifecycle.md) records 911 passing checks and actual completed/failed diagnostic bundles.
+
+[ANA-01](docs/work-items/ANA-01.md) specifies [analytical field outputs](docs/research/analytical-field-contract.md) and [four independent reference protocols](docs/benchmarks/B03-B06-analytical-protocols.md). The new immutable container carries pressure, full fluid velocity and pressure gradients with explicit units and conventions. Acoustic solvers, physical run admission and execution of those reference cases remain pending.
 
 ## Repository structure
 

@@ -1,6 +1,6 @@
 # Equation and Convention Register
 
-**Register version:** 1.1 · **Date:** 2026-10-02
+**Register version:** 1.2 · **Date:** 2026-10-02
 
 This register records current algebra and representation choices. Source review, implementation verification and experimental validation are distinct statuses. No force model or simulator is validated by this table.
 
@@ -21,3 +21,18 @@ SRC-E01: M. Settnes and H. Bruus, *Physical Review E* 85, 016327 (2012), [DOI](h
 ## Implementation status and limitations
 
 FND-03 hardens EQ-001–EQ-004 and implements the explicit EQ-005/CONV-002 adapters without changing their equations or assumptions. The [numeric-domain contract](../research/numerical-domain-and-conversions.md) records the supported input/output range and conversion limitations. New externally serialized inputs must follow CONV-1.0; algebraic agreement alone cannot establish model applicability or experimental agreement. The [fixture specification](../research/foundation-reference-values.md) contains manufactured values, tolerances and rejection criteria; [FND-03](../work-items/FND-03.md) records their execution. This minor register revision updates implementation status, not scientific evidence.
+
+## Analytical additions specified by ANA-01
+
+The [dated source review](../research/analytical-source-review.md) identifies SRC-E02 (MIT Lecture 2, 14 September 2004) and SRC-E03 (Lecture 3, 16 September 2004), including the conversion from their positive time sign. [FIELD-1.0](../research/analytical-field-contract.md) defines every symbol, normalization, unit and exclusion; [ANA-REF-1.0](../benchmarks/B03-B06-analytical-protocols.md) supplies independent sample values, component scales, numerical budgets and stop rules. These additions do not change a previous run or baseline equation.
+
+| ID | Equation / units | Source, restriction and derivation | Planned implementation / independent cases |
+|---|---|---|---|
+| EQ-006 | `grad(p)=i omega rho v`, Pa/m; `div(v)=i omega p/(rho c^2)`, 1/s | SRC-E01 Eq. (6), drop viscosity in homogeneous stationary ideal-fluid model, insert CONV-001 | ANA-02 `fields/analytic.py`; differentiated B03-01…05 and direction variants |
+| EQ-007 | `p=A exp(i(k n dot (x-x_ref)+phi))`, Pa; `v=n p/(rho c)`, m/s; `grad(p)=i k n p`, Pa/m | SRC-E02 Eqs. (2.15)–(2.18), conjugate time convention; project rotation/phase-reference definition | ANA-02; B-03 exact quarter-turn values and rational non-axis direction |
+| EQ-008 | Componentwise sum of p, v and grad(p); equal opposite pair `p=2A cos(kx)`, `v_x=2i A sin(kx)/(rho c)` | Linear superposition; SRC-E02 Eqs. (2.24)–(2.25) with converted convention; project vector generalization | ANA-03/04; B-04 nodes/unbalanced pair and B-05 noncollinear cancellation |
+| EQ-009 | `I=Re(p conj(v))/2`, W/m² | SRC-E03 Eq. (3.4), or direct average of peak real harmonics; ideal acoustic energy flux, not body force | ANA-02…06; B-03 directed flux, B-04 zero/net flux, B-05 vector flux |
+| EQ-010 | `p=P_ref(r_ref/r) exp(i(k(r-r_ref)+phi))`; `grad(p)=(ik-1/r)p n_r`; `v=(p/(rho c))(1+i/(kr))n_r` | SRC-E03 Eqs. (3.11)–(3.14), converted convention; project normalization/differentiation; ideal outgoing spherical wave, explicit r_min>0 | ANA-05; B06-01…03 radial tables and exclusion checks |
+| EQ-011 | `4 pi r^2 I_r=4 pi r_ref^2 P_ref^2/(2 rho c)`, W | Project multiplication of EQ-009/010, real reactive term cancels; complete outward sphere within ideal lossless solution | ANA-06; B-06 independent surface-power reference; no universal momentum/force bound |
+
+**Current status:** equations and protocols specified; physical implementation and B-03…B-06 execution pending. `fields/types.py` only checks and serializes representation. Neither its tests nor this register supply a verified acoustic solver, validated material model or experimental result.
