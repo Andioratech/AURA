@@ -1,5 +1,9 @@
 # AURA Scientific Project
 
+<p align="center">
+  <img src="assets/andiora-logo-no-slogan.svg" alt="Andiora logo" width="420">
+</p>
+
 **Adaptive Ultrasonic Regulated Acceleration (AURA)** is a computational research project studying whether controlled acoustic radiation forces can impose a prescribed acceleration on free bodies in a limited, reproducible domain. AURA investigates *acoustic pseudogravity*: mechanically induced acceleration that can reproduce selected kinematic effects. It does not create gravitational fields or spacetime curvature.
 
 The project is designed to produce either a supported operating region or a quantified physical limit. A positive result is not assumed.
