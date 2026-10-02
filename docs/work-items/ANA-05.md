@@ -1,6 +1,6 @@
 # ANA-05 — Ideal Spherical Spreading
 
-**State:** ACTIVE · **Protocol frozen:** 2026-10-02 · **Owner role:** research implementer
+**State:** DONE · **Protocol frozen:** 2026-10-02 · **Owner role:** research implementer
 
 ## Authority and scope
 
@@ -27,3 +27,9 @@ The first B-03…B-06 development execution recorded 5 failures / 311 passes in 
 Before rerunning, amendment A1 moves only the positive oblique comparison and memory sample to twice that radius: (0.00045,0.0006,0). DIRECTIONS still has four observations; the oblique expected field is now compared to AXIAL row 2. The original oblique boundary input becomes an explicit rejection regression. The three required B-06 radial table points and -x/+y checks remain unchanged. Five configurations / 16 observations, equations, tolerances, resource limits and strict exclusion are unchanged. This documents the changed fixture and its geometric reason; the failed attempt remains evidence.
 
 The amended B-03…B-06 development rerun passed 317 tests in 1.49 s; log/JUnit `aura-ana05-development-02.log/xml` are retained. An additional reference-sphere reparameterization and inclusive-box-face regression was then added before full Quality. Tolerance and exclusion behavior remain unchanged.
+
+## Published-source outcome
+
+Implementation `951af42b3c06b577590f493d55185079db468b1e` passed full local Quality (1,351 tests in 16.56 s) and [exact remote Quality](https://github.com/Andioratech/AURA/actions/runs/37051894964) (1,351 in 21.05 s). Clean-source verification passed 63 checks in 0.24 s. Immutable report `VERIFY-ANA05-9bfc7d4be81e468e9c4b7ac407ae61d1` retains matching before/after source/environment observations, raw samples, all component errors, resource measurements, checksums and the failed/amended development history.
+
+[The numerical report](../benchmarks/B06-spherical-verification.md) and [artifact review](../reviews/ANA-05-spherical.md) close ANA-05 and make ANA-06 READY. P3, physical recorder admission and experimental validation remain open. Closure has a separate full Quality/owner-commit/remote-CI delivery.
