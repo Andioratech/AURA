@@ -92,7 +92,7 @@ Use [00](../00-execution-protocol.md), the [task template](../templates/task-rec
 
 ## NUM-03 — Implement the selected field backend
 
-**Current state:** ACTIVE — isolated spherical Bessel/Legendre, Gauss-Legendre, stationary-sphere coefficient, and piston source-factor routines have focused tests recorded in [NUM-03](../../work-items/NUM-03.md) and its [review](../../reviews/NUM-03-numerical-primitives.md). Higher-order quadrature sensitivity and the coupled field backend remain open. A time-limited calibration pilot, if needed, is a separate non-production diagnostic and cannot be reported as production-budgeted. **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
+**Current state:** ACTIVE — isolated numerical kernels and a first scaled coupled Hasegawa piston/stationary-sphere evaluator have focused checks recorded in [NUM-03](../../work-items/NUM-03.md), the [primitive review](../../reviews/NUM-03-numerical-primitives.md) and [coupled-kernel review](../../reviews/NUM-03-coupled-kernel-review.md). The first kernel check is not a pilot or phase PASS. Coupled P3/exact-sphere/Rayleigh comparisons, run-level preflight, chunking, live-array estimation, full-domain convergence and a diagnostic pilot remain open. Any initial calibration pilot is separate and non-production. **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
 
 **Inputs / predecessors:** NUM-02
 
