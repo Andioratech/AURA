@@ -54,4 +54,4 @@ print(field.velocity_m_s)
 print(mean_intensity_w_m2(field))
 ```
 
-The second point has nearly zero numerical pressure but retains opposing x/y fluid-velocity components. This example is an in-memory kernel call. Physical recorder admission, FIELD-1.0 gradient/provenance linking, balances and the complete P3 campaign remain pending.
+The second point has nearly zero numerical pressure but retains opposing x/y fluid-velocity components. This example is an in-memory kernel call. Its later ANA-07 recorder admission, FIELD-1.0 gradient/provenance linking, bounded analytical balances, and P3 software-gate review are complete; see the [ANA-07 campaign](../benchmarks/ANA-07-recorded-field-matrix.md) and [owner-recorded P3 decision](../reviews/P3-ANA-07-gate-review.md). Physical recorder evidence remains ideal-model software verification and does not establish physical validation.
