@@ -34,7 +34,7 @@ The focused tests compare Bessel values against separate high-precision Decimal 
 
 ## Acceptance and disposition
 
-**Acceptance not yet evaluated.** Focused comparisons pass for the generic plane-wave/sphere kernel and for the coupled piston/sphere field at nine points spanning three gaps at one order. The 0.1 mm independent coupled comparison remains open because its first Rayleigh surface projection is nonmonotone under 64/128/256/512-node refinement. Broad P3-equivalent public-path checks, run-level preflight, chunked provenance, complete-domain convergence and pilot also remain open. No production or accepted diagnostic air solver run has been made.
+**Acceptance not yet evaluated.** Focused comparisons pass for the generic plane-wave/sphere kernel and for the coupled piston/sphere field at nine points spanning three gaps at one order. The 0.1 mm independent coupled comparison remains open: surface refinement is nonmonotone, radial disk quadrature still changes through 128 nodes, and a stable azimuth discrepancy alone does not qualify the reference. Broad P3-equivalent public-path checks, run-level preflight, chunked provenance, complete-domain convergence and pilot also remain open. No production or accepted diagnostic air solver run has been made.
 
 ## Failure and change control
 
