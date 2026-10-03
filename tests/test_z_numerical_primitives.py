@@ -119,6 +119,14 @@ def test_miller_j_values_against_independent_decimal_series(order, x, kernels):
     assert actual == pytest.approx(expected, rel=2e-13, abs=2e-15)
 
 
+def test_miller_normalization_remains_finite_for_high_order_near_air_ka(kernels):
+    spherical_bessel_jy, _, _, _, _ = kernels
+    order, argument = 96, 11.5
+    actual = spherical_bessel_jy(order, argument)[0]
+    expected = float(_decimal_spherical_j(order, argument))
+    assert actual == pytest.approx(expected, rel=3e-13, abs=0.0)
+
+
 @pytest.mark.parametrize("order", range(12))
 @pytest.mark.parametrize("cosine", (-1.0, -0.6, 0.0, 0.4, 1.0))
 def test_legendre_derivative_matches_finite_difference_and_parity(order, cosine, kernels):
@@ -249,6 +257,43 @@ def test_low_order_source_factors_match_hasegawa_closed_forms(order, kernels):
         workspace_bytes=2_000_000,
     )[order]
     assert actual == pytest.approx(expected, rel=3e-13, abs=2e-14)
+
+
+@pytest.mark.parametrize("gap", (0.0001, 0.03))
+@pytest.mark.parametrize("side", ("front", "rear"))
+def test_hasegawa_piston_source_axis_matches_rayleigh_disk_integral(gap, side, kernels):
+    spherical_bessel_jy, spherical_legendre, _, _, source_diffraction_coefficients = kernels
+    density, speed, frequency = 1.18, 346.0, 25230.0
+    wavenumber = 2 * math.pi * frequency / speed
+    piston_radius, sphere_radius, piston_velocity = 0.01, 0.025, 1.0
+    center_distance = sphere_radius + gap
+    z = gap if side == "front" else gap + 2 * sphere_radius
+    radius_from_sphere = abs(z - center_distance)
+    cosine = 1.0 if z >= center_distance else -1.0
+    max_order, quadrature_order = 240, 64
+    factors = source_diffraction_coefficients(
+        max_order,
+        wave_number_rad_m=wavenumber,
+        sphere_center_distance_m=center_distance,
+        piston_radius_m=piston_radius,
+        quadrature_order=quadrature_order,
+        workspace_bytes=80_000_000,
+    )
+    series = 0j
+    for order, factor in enumerate(factors):
+        bessel = spherical_bessel_jy(order, wavenumber * radius_from_sphere)[0]
+        legendre = spherical_legendre(order, cosine)[0]
+        series += (2 * order + 1) * (-1) ** order * factor * bessel * legendre
+    potential = 1j * piston_velocity / wavenumber * series
+
+    # Direct axial evaluation of the baffled-disk Rayleigh surface integral.
+    rayleigh = piston_velocity / (1j * wavenumber) * (
+        cmath.exp(1j * wavenumber * math.hypot(z, piston_radius))
+        - cmath.exp(1j * wavenumber * z)
+    )
+    pressure_from_potential = -1j * density * 2 * math.pi * frequency * potential
+    pressure_from_rayleigh = -1j * density * 2 * math.pi * frequency * rayleigh
+    assert pressure_from_potential == pytest.approx(pressure_from_rayleigh, rel=2e-11, abs=2e-14)
 
 
 def test_source_coefficients_reject_workspace_before_quadrature(kernels, monkeypatch):

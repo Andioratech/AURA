@@ -60,10 +60,15 @@ def _spherical_sequences(
 
     j0 = math.sin(x) / x
     j1 = math.sin(x) / (x * x) - math.cos(x) / x
-    denom = values[0] * values[0] + values[1] * values[1]
-    if denom == 0 or not math.isfinite(denom):
+    norm = max(abs(values[0]), abs(values[1]))
+    if norm == 0 or not math.isfinite(norm):
         raise NumericalDomainError("BESSEL_NORMALIZATION", "/x", "Miller normalization failed.")
-    scale = (values[0] * j0 + values[1] * j1) / denom
+    normalized_zero, normalized_one = values[0] / norm, values[1] / norm
+    denom = normalized_zero * normalized_zero + normalized_one * normalized_one
+    scale = (
+        (normalized_zero * j0 + normalized_one * j1) / denom
+    ) / norm
+    _finite(scale, "/j_normalization")
     y0 = -math.cos(x) / x
     y1 = -math.cos(x) / (x * x) - math.sin(x) / x
     y_values = [y0, y1]
