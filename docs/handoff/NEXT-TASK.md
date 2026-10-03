@@ -1,6 +1,6 @@
 # Next Main Task — NUM-03 Air Numerical Backend
 
-**Checkpoint:** Owner-recorded P3 PASS for bounded analytical-software verification · **Prepared:** 2026-10-03 · **State:** NUM-W01, NUM-01, NUM-02 DONE; NUM-03 ACTIVE with coupled kernel, plane-wave overlap and a three-point independent Rayleigh projection check · **Current source:** local candidate based on `3b97eab`; focused coupled tests and Ruff pass; full local Quality and remote CI pending
+**Checkpoint:** Owner-recorded P3 PASS for bounded analytical-software verification · **Prepared:** 2026-10-03 · **State:** NUM-W01, NUM-01, NUM-02 DONE; NUM-03 ACTIVE with coupled kernel, plane-wave overlap and a three-point independent Rayleigh projection check · **Current source:** `9c12bd7`; full local Quality and remote run [37145412554](https://github.com/Andioratech/AURA/actions/runs/37145412554) passed with 1,659 tests
 
 ## Immediate NUM-03 step — broaden coupled verification
 
