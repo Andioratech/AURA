@@ -36,7 +36,11 @@ Metadata and the opening scope were checked. The analysis includes viscous and t
 
 R. Barnkob, P. Augustsson, T. Laurell and H. Bruus, “Acoustic radiation- and streaming-induced microparticle velocities determined by microparticle image velocimetry in an ultrasound symmetry plane,” *Physical Review E* 86, 056307 (2012). [DOI](https://doi.org/10.1103/PhysRevE.86.056307); [author manuscript](https://arxiv.org/abs/1208.6534); [full text](https://arxiv.org/pdf/1208.6534).
 
-Metadata and Sec. II were inspected. Eqs. (1)–(4) connect the specified transverse field, radiation force and terminal motion; Sec. II.B treats boundary-driven streaming. This is a candidate for distinguishing fluid transport from radiation-driven particle response. It is not an acceleration or microgravity validation. LIT-02 must check dataset availability, calibration independence, uncertainty and exact matching before selection.
+Metadata and Sec. II were inspected. Eqs. (1)–(4) connect the specified transverse field, radiation force and terminal motion; Sec. II.B treats boundary-driven streaming. This is a candidate for distinguishing fluid transport from radiation-driven particle response. It is not an acceleration or microgravity validation. LIT-02 compared its dataset availability, calibration dependence, uncertainty and matching against ALT-W01; see the [selection record](../benchmarks/water-reference-selection.md). Formal measurement acceptance remains INDETERMINATE.
+
+### SRC-A02 — Acoustic force and levitation precedents
+
+The bounded LIT-05 comparison is in the [prior-work register](../registers/prior-work.md). It covers NASA's measured one-axis forces across several body shapes (Oran et al., 1979), microgravity sample positioning (Trinh, 1989), opposed-array 3D EPS manipulation (Ochiai et al., 2014), reduced-gravity droplet transport/coalescence (Hasegawa et al., 2019), and microgravity trapping of filamentous cyanobacteria (Dupont et al., 2026). These records rule out broad novelty claims about acoustic levitation, phased-array 3D manipulation or acoustic trapping in reduced gravity. They do not settle whether a later, explicitly bounded acceleration-tracking question is novel. The search was not exhaustive.
 
 ### SRC-A01 — Existing air reference
 

@@ -12,7 +12,7 @@ Use [00](../00-execution-protocol.md), the [task template](../templates/task-rec
 
 ## LIT-01 — Inventory the current evidence and unresolved decisions
 
-**Initial state:** READY. **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
+**Current state:** DONE — [task record](../../work-items/LIT-01.md), [evidence inventory](../../research/evidence-inventory.md) and [unknowns register](../../registers/unknowns.md). The inventory distinguishes software verification from physical validation, retains the air benchmark's uncertainty limit, and leaves water-model inputs unresolved. It does not close P1 or decide P3. **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
 
 **Inputs / predecessors:** Current baseline, code inventory and owner direction; no new physical run required.
 
@@ -30,7 +30,7 @@ Use [00](../00-execution-protocol.md), the [task template](../templates/task-rec
 
 ## LIT-02 — Select a measurable water reference or document the bounded fallback
 
-**Initial state:** BLOCKED by predecessors / applicable gates. **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
+**Current state:** DONE as a bounded search and design task; formal measurement benchmark remains INDETERMINATE — [task record](../../work-items/LIT-02.md) and [selection record](../../benchmarks/water-reference-selection.md). SRC-W03 is the preferred exploratory reference; raw supplement access and measurement uncertainty remain unresolved. **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
 
 **Inputs / predecessors:** LIT-01
 
@@ -49,7 +49,7 @@ Use [00](../00-execution-protocol.md), the [task template](../templates/task-rec
 
 ## LIT-03 — Review the actual force equations and their domain
 
-**Initial state:** BLOCKED by predecessors / applicable gates. **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
+**Current state:** DONE as a literature model/applicability review — [task record](../../work-items/LIT-03.md), [model-selection review](../../research/particle-model-selection.md), and EQ-013–015 in the [equation register](../../registers/equations.md). Candidate equations and independent checks are recorded; no force implementation contract is frozen. **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
 
 **Inputs / predecessors:** LIT-02
 
@@ -68,7 +68,7 @@ Use [00](../00-execution-protocol.md), the [task template](../templates/task-rec
 
 ## LIT-04 — Identify fluid, wall, thermal and stochastic competing effects
 
-**Initial state:** BLOCKED by predecessors / applicable gates. **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
+**Current state:** DONE as a bounded effect ledger and calibration-dependence review — [task record](../../work-items/LIT-04.md), [fluid/omitted-effects record](../../research/fluid-and-omitted-effects.md), and [unknowns register](../../registers/unknowns.md). Coupled magnitudes and matched measurement acceptance remain open. **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
 
 **Inputs / predecessors:** LIT-03
 
@@ -87,7 +87,7 @@ Use [00](../00-execution-protocol.md), the [task template](../templates/task-rec
 
 ## LIT-05 — Prepare necessary-limit and prior-work investigations
 
-**Initial state:** BLOCKED by predecessors / applicable gates. **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
+**Current state:** DONE as bounded research/design work — [task record](../../work-items/LIT-05.md), [symbolic limit design](../../research/limits-design.md), [prior-work register](../../registers/prior-work.md), and [P1 review draft](../../reviews/P1-research-gate-review-draft.md). Formal P1 measurement acceptance remains INDETERMINATE. **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
 
 **Inputs / predecessors:** LIT-04
 
@@ -101,6 +101,8 @@ Use [00](../00-execution-protocol.md), the [task template](../templates/task-rec
 **Required artifacts:** `docs/research/limits-design.md`; `docs/registers/prior-work.md`; P1 research review.
 
 **Acceptance / decision:** The dossier enables a discriminating force/motion study and a bounded feasibility question; novelty and physical success remain unclaimed.
+
+**Finding:** No target-specific limit is calculable until the body, target, duration, workspace, complete loads and admissible actuator set are fixed. Primary prior art already includes acoustic force characterization, 3D phased-array manipulation, reduced-gravity droplet handling and microgravity sample trapping. Any distinct AURA question remains a candidate, not an established novelty claim.
 
 **If unsuccessful:** D-07/D-11; continue eligible foundation work and record the missing evidence.
 
