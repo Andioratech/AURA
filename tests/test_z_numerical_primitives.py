@@ -183,6 +183,20 @@ def test_bessel_fails_typed_when_outgoing_solution_exceeds_binary64(kernels):
         spherical_bessel_jy(512, 0.01)
 
 
+def test_scaled_neumann_sequence_matches_decimal_beyond_binary64_range():
+    from aura.fields.numerical import _scaled_spherical_neumann
+
+    order, argument = 256, 11.45
+    mantissa, exponent = _scaled_spherical_neumann(order, argument)[order]
+    with localcontext() as context:
+        context.prec = 180
+        actual = Decimal(mantissa) * (Decimal(2) ** exponent)
+        expected = _decimal_spherical_y(order, argument)
+        relative_error = abs((actual - expected) / expected)
+    assert relative_error < Decimal("3e-14")
+    assert exponent + math.log2(abs(mantissa)) > 1024
+
+
 def test_bessel_bounds_miller_workspace_before_allocation(kernels):
     spherical_bessel_jy, _, _, _, _ = kernels
     with pytest.raises(InvalidInputError, match="BESSEL_WORK_RANGE"):

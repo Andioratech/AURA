@@ -108,6 +108,49 @@ def _spherical_sequences(
     )
 
 
+def _scaled_spherical_neumann(max_order: int, x: float) -> tuple[tuple[float, int], ...]:
+    """Return ``y_n(x)`` as mantissa/base-2 exponent pairs through ``max_order``.
+
+    It uses the recurrence in NIST DLMF 10.51.1, rescaled as needed to preserve
+    each value's scale separately and avoid binary64 overflow:
+    https://dlmf.nist.gov/10.51.E1
+    """
+    if type(max_order) is not int or not 0 <= max_order <= 4096:
+        raise InvalidInputError("BESSEL_ORDER_RANGE", "/max_order", "Expected an order from 0 through 4096.")
+    if type(x) not in (int, float) or type(x) is bool or not math.isfinite(x) or x <= 0:
+        raise InvalidInputError("BESSEL_ARGUMENT", "/x", "Expected a finite positive argument.")
+    x = float(x)
+    if x > 8192:
+        raise InvalidInputError(
+            "BESSEL_WORK_RANGE", "/x", "The bounded Bessel recurrence workspace would be exceeded."
+        )
+    y_previous = _finite(-math.cos(x) / x, "/y_0")
+    y_current = _finite(-math.cos(x) / (x * x) - math.sin(x) / x, "/y_1")
+    initial_scale = max(abs(y_previous), abs(y_current))
+    if initial_scale == 0:
+        raise NumericalDomainError("BESSEL_NORMALIZATION", "/x", "Neumann scaling failed.")
+    exponent = math.frexp(initial_scale)[1]
+    y_previous = math.ldexp(y_previous, -exponent)
+    y_current = math.ldexp(y_current, -exponent)
+    values = [(y_previous, exponent)]
+    if max_order == 0:
+        return tuple(values)
+    values.append((y_current, exponent))
+
+    for order in range(1, max_order):
+        factor = _finite((2 * order + 1) / x, "/y_recurrence_factor")
+        next_value = _finite(factor * y_current - y_previous, f"/y_{order + 1}")
+        pair_scale = max(abs(y_current), abs(next_value))
+        if pair_scale and (pair_scale < 2.0**-400 or pair_scale > 2.0**400):
+            shift = math.frexp(pair_scale)[1]
+            y_current = math.ldexp(y_current, -shift)
+            next_value = math.ldexp(next_value, -shift)
+            exponent += shift
+        values.append((next_value, exponent))
+        y_previous, y_current = y_current, next_value
+    return tuple(values)
+
+
 def spherical_legendre(order: int, cosine: float) -> tuple[float, float]:
     """Return ``P_n(mu)`` and ``dP_n/dmu`` using the three-term recurrence."""
     if type(order) is not int or order < 0:
