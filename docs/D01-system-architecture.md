@@ -1,6 +1,6 @@
 # AURA-D01: System Architecture
 
-**Version:** 1.3 · **Status:** BASELINE · **Date:** 2026-10-03
+**Version:** 1.4 · **Status:** BASELINE · **Date:** 2026-10-03
 
 ## Purpose and hypothesis
 
@@ -8,7 +8,7 @@ AURA investigates whether controlled ultrasonic fields can apply object-specific
 
 Acoustic pseudogravity means mechanically induced acceleration. Acoustic forces depend on field, material, geometry and boundary conditions, whereas gravitational acceleration couples universally to mass. AURA does not claim to generate gravity.
 
-Air is the owner-selected medium for the intended validation route and the first numerical solver path under [DEC-005](decisions/DEC-005-air-validation-route.md). The initial field/force reference is the bounded DEC-002 single-transducer, 50 mm sphere case; it is not yet an acceleration trial. The small-particle water evidence track remains distinct, while greater masses, larger objects and other geometries remain explicit research objectives under [DEC-004](decisions/DEC-004-staged-mass-and-size-expansion.md). Each case needs an applicable model and independent evidence; no case decides the others.
+Water is the first numerical-workflow qualification domain, followed by the air numerical-field gate selected for the intended validation route under [DEC-005](decisions/DEC-005-air-validation-route.md) and ordered by [DEC-006](decisions/DEC-006-water-qualification-before-air-route.md). The air field/force reference is the bounded DEC-002 single-transducer, 50 mm sphere case; it is not an acceleration trial. Only after the air field gate passes does the initial downstream force, dynamics and control path proceed in air. Water qualification does not validate the air case or its physical force model. Greater masses, larger objects and other geometries remain explicit research objectives under [DEC-004](decisions/DEC-004-staged-mass-and-size-expansion.md); each needs an applicable model and independent evidence.
 
 ## System loop
 
@@ -53,7 +53,7 @@ Scenario, field, force, dynamics, control, MCLF and evidence modules communicate
 
 ## Initial research campaign
 
-P2/P3 foundations are complete. The first numerical route now follows the air benchmark under DEC-005: P4 verifies an idealized source/sphere field against P3 and independent references; P5 may compare a sphere force model with DEC-002 data only under its stated domain and with the P1.3 uncertainty limitation. The water-particle measurement remains an exploratory, separate evidence track and is not silently converted into an air model or validation. Do not combine controller or AI development with force-model work. Array control, prescribed acceleration and any microgravity case remain behind their applicable force-model, dynamics and evidence gates. See [DEC-003](decisions/DEC-003-nonblocking-foundation-work.md), [DEC-005](decisions/DEC-005-air-validation-route.md) and [PLAN-01 v1.4](PLAN-01-project-execution-plan.md).
+P2/P3 foundations are complete. P4 first audits the water numerical-workflow evidence and closes any bounded qualification gap, then verifies the selected air source/sphere field against P3 and independent references. An air P4 PASS routes initial P5 onward through air-domain models; force, dynamics, prescribed acceleration, robustness and any microgravity case keep their own gates. The SRC-W03 water-particle measurement remains exploratory and is not silently converted into field-solver verification, an air model or physical validation. Do not combine controller or AI development with force-model work. See [DEC-003](decisions/DEC-003-nonblocking-foundation-work.md), [DEC-005](decisions/DEC-005-air-validation-route.md), [DEC-006](decisions/DEC-006-water-qualification-before-air-route.md) and [PLAN-01 v1.5](PLAN-01-project-execution-plan.md).
 
 ## Scale-up boundary
 

@@ -4,7 +4,7 @@
 
 ## Objective and relationship to the first campaign
 
-AURA investigates controlled acoustic forcing and prescribed acceleration across explicitly selected body domains. Under DEC-005, air is the intended validation medium and the first numerical route follows the DEC-002 sphere benchmark. Small-particle water measurements remain a separate exploratory evidence campaign. Greater masses, larger dimensions and other shapes remain part of the research objective, with each step allowed to succeed, fail or remain unresolved.
+AURA investigates controlled acoustic forcing and prescribed acceleration across explicitly selected body domains. Under DEC-006, the existing water-like analytical workflow is qualified first, followed by air field verification against the DEC-002 sphere benchmark. If air P4 passes, initial force/dynamics/control development proceeds in air. Small-particle water measurements remain a separate exploratory evidence campaign and do not validate the air route. Greater masses, larger dimensions and other shapes remain part of the research objective, with each step allowed to succeed, fail or remain unresolved.
 
 The initial P2–P9 sequence builds reusable infrastructure and evidence for its first domain. Subsequent campaigns repeat the applicable model, numerical, force, dynamics, control and independent-evidence gates. Completion of one particle demonstrator does not close the overall scale question.
 

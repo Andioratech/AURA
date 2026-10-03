@@ -2,7 +2,7 @@
 
 ## Program objective and first operational question
 
-The program investigates whether controlled acoustic forcing can produce a prescribed acceleration for selected bodies across explicitly investigated mass, size and geometry domains, toward microgravity operation. The owner selected air as the intended validation medium and P4 numerical route under [DEC-005](../decisions/DEC-005-air-validation-route.md), using the distinct DEC-002 sphere/transducer reference as the first field/force path. Small particles in water remain a separate exploratory evidence campaign; they do not validate the air case. Greater masses and other body geometries remain explicit objectives under [DEC-004](../decisions/DEC-004-staged-mass-and-size-expansion.md); follow [11](11-scale-progression.md) for transitions.
+The program investigates whether controlled acoustic forcing can produce a prescribed acceleration for selected bodies across explicitly investigated mass, size and geometry domains, toward microgravity operation. Under [DEC-006](../decisions/DEC-006-water-qualification-before-air-route.md), first reconcile water numerical-workflow evidence, then verify the air field route selected in [DEC-005](../decisions/DEC-005-air-validation-route.md) against the DEC-002 sphere/transducer reference. If air P4 passes, the initial force/dynamics/control route remains in air. The water-particle evidence remains a distinct research campaign and does not validate the air case. Greater masses and other body geometries remain explicit objectives under [DEC-004](../decisions/DEC-004-staged-mass-and-size-expansion.md); follow [11](11-scale-progression.md) for transitions.
 
 The first operational question is:
 
@@ -17,7 +17,7 @@ The hypothesis table and domain fields below describe the initial campaign. For 
 | ID | Bounded statement to register | First discriminating result | May support |
 |---|---|---|---|
 | H-FIELD | The declared field model predicts pressure/velocity observables within its frozen numerical budget | Analytical comparison and convergence | Equation implementation only |
-| H-FORCE | The declared particle force model predicts a matched water reference within justified uncertainty | Force or independently measured motion comparison with nuisance terms | Model validity in that domain |
+| H-FORCE | The declared domain-specific force model predicts its matched reference within justified uncertainty | Force or independently measured motion comparison with nuisance terms | Model validity in that domain |
 | H-MOTION | Resolved trajectories agree with the selected force balance and available measurements | Time refinement, force accounting and held-out trajectories | Particle dynamics within stated assumptions |
 | H-ACCEL | One admissible policy meets the target acceleration metric over the specified duration | Constrained closed-loop trial and independent replay | Conditional acceleration capability |
 | H-ROBUST | H-ACCEL remains true under the registered uncertainty/disturbance set | Held-out perturbations and boundary cases | Bounded robustness, with sampling limits |
@@ -56,9 +56,9 @@ Account for radiation force, fluid drag, gravity/buoyancy under the selected fra
 
 Earth and zero-gravity cases must update the consistent fluid/body force balance. Removing gravity does not remove viscosity, walls or acoustic streaming.
 
-## Air validation route and separate water evidence
+## Water qualification and air validation route
 
-[Andrade P1.3](../benchmarks/P1.3-andrade-force-curve-specification.md) and its digitized data now anchor the air-aligned P4/P5 route under DEC-005. P4 field calculations do not reproduce a measured pressure map because none is supplied; they must be verified with independent analytic cases. P5 can compare the modeled force with the published air-sphere curve, but the unresolved experimental uncertainty keeps formal acceptance INDETERMINATE. This route does not establish a prescribed acceleration or microgravity behavior. Retain the water-particle evidence and its missing arrays/uncertainty as a separate track; neither medium transfers validation to the other.
+P4 first audits whether existing water computations support the owner's reported numerical-workflow qualification; the recorded P3/replay and figure-extraction evidence must retain their exact, limited scopes. A gap triggers only a bounded water numerical comparison against an independent reference. Then the air field route uses [Andrade P1.3](../benchmarks/P1.3-andrade-force-curve-specification.md) geometry and analytic field checks because the source supplies no measured pressure map. An air P4 PASS directs initial P5/P6/P7 development to air. P5 may compare modeled force with the published air-sphere curve, but unresolved experimental uncertainty keeps formal acceptance INDETERMINATE. Neither route establishes prescribed acceleration or microgravity behavior, and neither medium transfers validation to the other.
 
 ## Scientific completion and outcomes
 

@@ -1,6 +1,6 @@
 # PLAN-01: AURA Phase-Gated Master Work Plan
 
-**Version:** 1.5 · **Status:** BASELINE · **Owner:** AURA project owner · **Last updated:** 2026-10-03
+**Version:** 1.4 · **Status:** ARCHIVED · **Owner:** AURA project owner · **Last updated:** 2026-10-03
 
 ## 1. Purpose
 
@@ -59,9 +59,9 @@ Do not combine claim-critical gates to save time. Foundation work may proceed wh
 |---|---|---|
 | P0 | PASS | Owner acceptance recorded in DEC-001; repository, source provenance, links, local quality checks, and remote CI passed |
 | P1 | REVIEW — EVIDENCE TRACK | First benchmark and comparison rule are recorded; source measurement uncertainty remains unquantified. Keep the published-curve comparison descriptive/INDETERMINATE; continue source search when useful. This no longer blocks P2 or P3 foundation work |
-| P2 | PASS | FND-01…FND-08, ENV-1.0 and the reviewed P2 exit evidence are complete |
-| P3 | PASS — BOUNDED SOFTWARE SCOPE | Owner-recorded ANA-07 analytical-software verification PASS; no physical-water, force, motion or experimental validation is inferred |
-| P4-P10 | GATED | NUM-W01 audit is DONE with a bounded software-workflow PASS using water-like ideal inputs; water-specific field solving and measurement validation remain unestablished. Continue with the selected Hasegawa air P4 series, full preflight and independent field checks. An air P4 PASS routes initial P5 onward through air. Published air-force uncertainty remains incomplete, so formal force validation may remain INDETERMINATE |
+| P2 | ACTIVE — FOUNDATION TRACK | Define SI contracts, scenario/run schemas and MCLF L0 rules without filling missing physical inputs with defaults |
+| P3 | QUEUED | Begin after P2's own contract and known-answer review; it does not require a conclusive P1 force validation |
+| P4-P10 | GATED | Owner selected the air route under DEC-005. NUM-01 selected Hasegawa et al.'s centered piston/sphere series for P4; freeze the complete field contract and pass solver-specific stability/resource/convergence preflight before any run. P4 verifies fields only. Later force comparison remains INDETERMINATE unless source uncertainty is recovered or suitable independent measurement evidence is added |
 
 ## 5. Phase details
 
@@ -84,7 +84,7 @@ Do not combine claim-critical gates to save time. Foundation work may proceed wh
 
 **Stop conditions:** missing provenance, conflicting claims with no decision, uncertain ownership/license, or unstable repository identity. Do not start solver implementation while these remain unresolved.
 
-**Decision and evidence:** P0 PASS was recorded on 2026-10-01 after owner approval, source checksum verification, repository review, local quality checks, and successful remote CI. See [DEC-001](decisions/DEC-001-p0-baseline-approval.md). On 2026-10-02, DEC-003 approved foundation work to continue while P1 source uncertainty remains unresolved. This does not validate a solver or benchmark or authorize stronger claims. G01-G05 remain DRAFT.
+**Decision and evidence:** P0 PASS was recorded on 2026-10-01 after owner approval, source checksum verification, repository review, local quality checks, and successful remote CI. See [DEC-001](../decisions/DEC-001-p0-baseline-approval.md). On 2026-10-02, DEC-003 approved foundation work to continue while P1 source uncertainty remains unresolved. This does not validate a solver or benchmark or authorize stronger claims. G01-G05 remain DRAFT.
 
 ### P1 — Bounded question and benchmark selection
 
@@ -149,31 +149,31 @@ Do not combine claim-critical gates to save time. Foundation work may proceed wh
 
 ### P4 — First numerical field solver
 
-**Question:** Do the documented water numerical workflow and a resource-bounded air field solver reproduce independent numerical references within frozen criteria?
+**Question:** Can one numerical solver reproduce Phase 3 fields on a resource-bounded domain?
 
 **Work packages**
 
-- P4.1 Audit the reported water numerical comparisons against immutable run/reference artifacts. Separate generic software verification, water-specific numerical verification, figure extraction and physical measurement validation.
-- P4.2 If the audit finds a numerical qualification gap, freeze and run the smallest water case with an independently checkable reference before air; keep SRC-W03 measurement acceptance INDETERMINATE unless its missing raw data and uncertainty are resolved.
-- P4.3 Select the air method matched to DEC-002/DEC-005; justify the field question without treating the published force curve as a measured field map.
-- P4.4 Specify harmonic-order/discretization strategy, source and body boundaries, phasor convention, numerical precision, convergence observables, and resource estimate.
-- P4.5 Implement input validation and preflight before allocating the numerical domain.
-- P4.6 Compare the air solver with P3 and independent analytic references; run at least three applicable refinement levels and test boundary/domain sensitivity.
-- P4.7 Record runtime, peak memory, replay and the reconciled resource envelope.
+- P4.1 Select one fast numerical method matched to the Phase 1 air benchmark in DEC-002 and DEC-005; justify why it answers the air source/sphere field question without treating the published force curve as a measured field map.
+- P4.2 Specify harmonic-order/discretization strategy, source and body boundaries, phasor convention, numerical precision, convergence observables, and resource estimate.
+- P4.3 Implement input validation and preflight before allocating the numerical domain.
+- P4.4 Compare the solver pointwise and through the primary field observable with Phase 3.
+- P4.5 Run at least three harmonic-order or other applicable discretization levels for the observable; record actual convergence.
+- P4.6 Test domain expansion or boundary/PML sensitivity if boundaries can contaminate results.
+- P4.7 Record runtime and peak memory; update the approved resource envelope from observed measurements.
 
-**Deliverables:** water qualification audit and, if needed, bounded comparison; air numerical field backend; solver contract and metadata; convergence, boundary and resource reports.
+**Deliverables:** one numerical field backend; solver contract and metadata; convergence table; memory/runtime report.
 
-**Exit gate:** the water numerical-workflow scope is supported by traceable evidence; the air field observable converges within its benchmark-specific tolerance; boundary effects are bounded; MCLF reports no hard violation; resources are within a documented margin. Only an air P4 PASS routes the initial P5-onward path through air. This does not make the air force or measurement comparison PASS.
+**Exit gate:** predeclared field observable converges within its benchmark-specific tolerance; boundary effects are bounded; MCLF reports no hard violation; resource preflight predicts within a documented margin.
 
 **Out of scope:** adding a second backend just for breadth; high-fidelity FEM/BEM unless the primary benchmark demonstrates the need.
 
 ### P5 — One regime-specific force and torque model
 
-**Question:** After air P4 passes, can one air-domain force model reproduce the selected DEC-002 sphere benchmark within its stated validity domain?
+**Question:** Can one declared force model reproduce the selected benchmark within its stated validity domain?
 
 **Work packages**
 
-- P5.1 Select a force formulation for the DEC-002 50 mm EPS sphere in air from its body size, ka, material, field and source geometry; do not reuse the small-particle water force law.
+- P5.1 Select the force formulation from the frozen body size, ka, material, field and fluid assumptions.
 - P5.2 Trace every equation and coefficient to a primary source and record the regime in D09.
 - P5.3 Implement one force model; return forces/torques plus validity status and model provenance.
 - P5.4 Compare with benchmark values across the benchmark's reported parameter points.
@@ -187,11 +187,9 @@ Do not combine claim-critical gates to save time. Foundation work may proceed wh
 
 **Out of scope:** treating force as uniform body loading; extrapolating particle results to macroscopic bodies; combining incompatible force models.
 
-The published air-force curve lacks a complete uncertainty budget, so numerical agreement may remain formally INDETERMINATE as measurement validation. Water evidence is not a substitute for this air-domain gate.
-
 ### P6 — Rigid-body dynamics and numerical verification
 
-**Question:** Given air-domain forces after P5, does the rigid-body integrator solve the declared sphere dynamics accurately?
+**Question:** Given validated forces, does the rigid-body integrator solve the declared dynamics accurately?
 
 **Work packages**
 
@@ -356,7 +354,7 @@ Changes to phase order, gates, primary observables, acceptance thresholds, model
 ## 11. Immediate next actions
 
 1. DEC-002 records the owner's approval of the Andrade et al. 50 mm sphere force measurement as AURA's first measurable force-model check. DEC-003 records the owner's direction to keep progressing while source uncertainty remains open.
-2. P1 remains open for source uncertainty and benchmark review. Its current figure comparison is descriptive and INDETERMINATE; it no longer blocks foundation work. The executable task board and subplans are in [docs/planning/README.md](planning/README.md).
+2. P1 remains open for source uncertainty and benchmark review. Its current figure comparison is descriptive and INDETERMINATE; it no longer blocks foundation work. The executable task board and subplans are in [docs/planning/README.md](../planning/README.md).
 3. Start P2.1–P2.8 through FND-01 in the detailed plan: unit conventions, small versioned schemas, pure dimensional/acoustic calculations, and the first MCLF L0 rule table. Do not add acoustic PDE solvers, force calculations or target-control logic in P2.
 4. After P2 review, proceed to P3 analytical wave cases. Treat them as equation/code verification, not experimental validation of AURA.
 5. Use the detailed decision tree and failure playbooks to branch when evidence is missing, a model leaves its domain, a run fails, or a limitation appears. Preserve the original result and create a new experiment when assumptions change.
@@ -378,8 +376,8 @@ These steps are a research path, not performance promises. Advancement requires 
 
 ## 13. Scale progression as an explicit research objective
 
-[DEC-004](decisions/DEC-004-staged-mass-and-size-expansion.md) preserves research into small particles in water, greater masses, larger objects and other geometries toward microgravity. [DEC-005](decisions/DEC-005-air-validation-route.md) updates the first numerical implementation route to air so it aligns with the intended validation medium and the DEC-002 benchmark. The water evidence track remains separate and cannot validate the air route. The [SC-01–SC-05 track](planning/11-scale-progression.md) supplies scale-transition tasks.
+[DEC-004](../decisions/DEC-004-staged-mass-and-size-expansion.md) preserves research into small particles in water, greater masses, larger objects and other geometries toward microgravity. [DEC-005](../decisions/DEC-005-air-validation-route.md) updates the first numerical implementation route to air so it aligns with the intended validation medium and the DEC-002 benchmark. The water evidence track remains separate and cannot validate the air route. The [SC-01–SC-05 track](../planning/11-scale-progression.md) supplies scale-transition tasks.
 
 Begin scale-candidate research alongside P2 foundations. For each selected numerical campaign, repeat the applicable P3–P9 gates with its own domain, equations, resources and reference evidence; reuse earlier infrastructure only where its contracts remain valid. Neither a favorable nor an unfavorable small-particle result automatically decides a distinct larger-body hypothesis. Mass, dimensions and shape are recorded separately; no maximum achievable scale is assumed.
 
-Version 1.4 records the owner-approved air-first numerical route while retaining the water evidence and broader scale-research tracks; no past result, physical equation, tolerance or acceptance criterion is changed. [PLAN-01 v1.3](archive/PLAN-01-v1.3-project-execution-plan.md) is retained as a historical snapshot. The M1–M4 examples remain scoped; M1 air is the first solver/force reference, not evidence for the eventual acceleration target.
+Version 1.4 records the owner-approved air-first numerical route while retaining the water evidence and broader scale-research tracks; no past result, physical equation, tolerance or acceptance criterion is changed. [PLAN-01 v1.3](PLAN-01-v1.3-project-execution-plan.md) is retained as a historical snapshot. The M1–M4 examples remain scoped; M1 air is the first solver/force reference, not evidence for the eventual acceleration target.

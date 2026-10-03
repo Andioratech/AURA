@@ -1,10 +1,10 @@
-# P6 — Water-Coupled Particle Dynamics and Gravity Cases
+# P6 — Air-Sphere Dynamics and Gravity Cases
 
 **Maps to:** P6.1–P6.7; D03/D04/D06/D07
 
 ## Entry condition
 
-P5 gate permits the declared dynamics domain, or a specific coupled-validation subphase is recorded under PLAN-01 change control. Generic mathematical design may be prepared earlier; it does not bypass the scientific gate.
+Air P4 and the P5 gate permit the declared air-sphere dynamics domain, or a specific coupled-validation subphase is recorded under PLAN-01 change control. Generic mathematical design may be prepared earlier; it does not bypass the scientific gate.
 
 ## Working contract
 
@@ -142,7 +142,7 @@ Use [00](../00-execution-protocol.md), the [task template](../templates/task-rec
 
 **If unsuccessful:** F-03/F-04/F-09; revise observation/model interpretation.
 
-## MOT-08 — Compare water motion, report and close P6
+## MOT-08 — Compare air-sphere motion, report and close P6
 
 **Initial state:** BLOCKED by predecessors / applicable gates. **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
 
@@ -150,12 +150,12 @@ Use [00](../00-execution-protocol.md), the [task template](../templates/task-rec
 
 **Steps**
 
-1. Execute any held-out trajectory/velocity reference prepared in FOR-05 with a full calibration/uncertainty map.
+1. Execute an independent air-sphere trajectory reference only if its domain and uncertainty are adequate; otherwise retain the motion comparison as INDETERMINATE and complete only numerical dynamics verification.
 2. Report x/v/acceleration, per-load terms, events and primary metric, distinguishing force-equivalent acceleration from resolved motion.
 3. Complete the applicable P5 coupled-validation obligations before requesting P6/target-control promotion.
 4. Bundle evidence, update requirements/claims and record the P6 review with exact permitted target-domain scope.
 
-**Required artifacts:** B-09/B-11/B-12 reports; motion evidence bundle; P6 gate review.
+**Required artifacts:** B-10/B-11/B-12 reports as applicable; motion evidence bundle; P6 gate review.
 
 **Acceptance / decision:** Model verification and required measurement decisions are explicit; unresolved validation blocks the affected claim gate.
 

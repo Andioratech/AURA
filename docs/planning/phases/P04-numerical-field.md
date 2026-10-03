@@ -1,4 +1,4 @@
-# P4 — One Numerical Field Solver and Resource Controls
+# P4 — Water Qualification Followed by Air Field Verification
 
 **Maps to:** P4.1–P4.7; D04/D05/D06/D08
 
@@ -6,15 +6,59 @@
 
 P3 PASS. LIT-02 supplies a bounded reference geometry or an explicitly exploratory verification domain. Complete solver-specific preflight before every run.
 
+## Domain sequence
+
+P4 first reconciles the reported prior water numerical comparisons with immutable run and reference artifacts. This is a software/numerical-workflow qualification, not formal validation of the SRC-W03 measurements. The current repository confirms bounded P3 analytical verification, exact RUN-02 replay, and reproducible extraction of figure-derived water profiles; it does not yet document a water-specific field-solver comparison against raw measured arrays. If the existing artifacts do not meet the frozen water qualification criteria, close the gap with the smallest independently checkable water numerical case before using the shared numerical workflow in air.
+
+After the water qualification is recorded, P4 verifies the air field for the DEC-002 source/sphere case using the method selected in NUM-01. A PASS of the air field gate routes initial P5 onward through air. It does not validate the air force model or the published force measurements, whose uncertainty remains incomplete. No result transfers between media.
+
 ## Working contract
 
 Use [00](../00-execution-protocol.md), the [task template](../templates/task-record.md), [software map](../03-software-build-map.md) and [acceptance matrix](../04-benchmarks-and-acceptance.md). Paths below are planned artifacts; package paths are relative to `src/aura/` unless prefixed otherwise. Each task uses the frozen domain from its dependencies and must declare its own primary observable, tolerance derivation and compute cap before execution. A predecessor marked DONE does not substitute for a required phase PASS.
 
-## NUM-01 — Choose one backend that answers the selected question
+## NUM-W01 — Reconcile the existing water numerical qualification
 
-**Current state:** ACTIVE — [DEC-005](../../decisions/DEC-005-air-validation-route.md) records the owner's choice of air for the intended validation route and aligns P4 with the DEC-002 sphere/transducer case. NUM-01 selects Hasegawa et al.'s centered baffled-piston/rigid-sphere spherical-harmonic series, subject to NUM-02 stability/resource/convergence preflight. P4 imposes a stationary sound-hard sphere boundary at every order; derive the special `n=1` coefficient from zero normal velocity and do not reuse the source's separate translating-sphere coefficient. The water-particle evidence remains a distinct exploratory track. P4 verifies fields only: no measured field map exists, force comparison is later and remains uncertainty-limited, and acceleration/gravity equivalence remain outside this gate. Prior-art examples do not establish convergence at AURA's source/body parameters. No solver code has started; run the required simulation-core explanation checkpoint before NUM-02/03 implementation. See [NUM-01](../../research/NUM-01-method-comparison.md). **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
+**Initial state:** READY for evidence audit. **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
 
-**Inputs / predecessors:** ANA-07, LIT-02
+**Inputs / predecessors:** ANA-07, RUN-02, LIT-02
+
+**Steps**
+
+1. Inventory owner-reported water calculations and match each to immutable run IDs, exact input/reference data, source, metrics, comparison method and checksums.
+2. Separate generic analytical-software verification, data-extraction reproducibility, water-specific numerical verification and measurement/model validation.
+3. Assess whether existing water artifacts meet a predeclared numerical comparison criterion. Do not use the SRC-W03 figure-derived profiles as raw data or invent measurement uncertainty.
+4. Record PASS, FAIL or INDETERMINATE for the precise workflow capability and list any smallest missing comparison needed before the air leg.
+
+**Required artifacts:** Water numerical qualification audit; artifact-to-claim map; any missing-evidence task proposal.
+
+**Acceptance / decision:** Every accepted prior result maps to a reproducible artifact and an independent reference. A task record may be DONE while the physical water comparison remains INDETERMINATE.
+
+**If unsuccessful:** D-01/F-02/F-09; preserve the gap and define only the smallest bounded water numerical comparison needed.
+
+## NUM-W02 — Close a bounded water numerical gap if required
+
+**Initial state:** CONDITIONAL — activate only if NUM-W01 finds the numerical-workflow criterion unsupported. **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
+
+**Inputs / predecessors:** NUM-W01; simulation-core explanation checkpoint; selected independent water reference and frozen observable.
+
+**Steps**
+
+1. Select a water field case with fully specified medium, geometry, boundary conditions and an analytical or independently computed reference; do not assume SRC-W03's coupled particle-velocity plots are a field-solver oracle.
+2. Freeze the observable, numerical tolerance rationale, precision, resource caps and run protocol before execution.
+3. Use the shared validated scenario/run/comparison workflow and preserve all attempts.
+4. Compare with the independent reference and record convergence and limits; keep measurement/model validation separate.
+
+**Required artifacts:** Water qualification benchmark specification, reproducible run bundle, comparison and bounded review.
+
+**Acceptance / decision:** The numerical workflow reproduces the selected water reference within the predeclared numerical budget. This is not a pass for the SRC-W03 measurement comparison or air physics.
+
+**If unsuccessful:** F-03/F-04/F-09; preserve the failure and hold transition to the air leg until diagnosed.
+
+## NUM-01 — Choose one backend that answers the selected air question
+
+**Current state:** ACTIVE — After NUM-W01 (and NUM-W02 if needed), use the DEC-002 sphere/transducer case selected under [DEC-005](../../decisions/DEC-005-air-validation-route.md). NUM-01 selects Hasegawa et al.'s centered baffled-piston/rigid-sphere spherical-harmonic series, subject to NUM-02 stability/resource/convergence preflight. P4 imposes a stationary sound-hard sphere boundary at every order; derive the special `n=1` coefficient from zero normal velocity and do not reuse the source's separate translating-sphere coefficient. P4 verifies field calculations only: no measured air pressure/velocity map exists, the later force comparison remains uncertainty-limited, and acceleration/gravity equivalence remain outside this gate. Prior-art examples do not establish convergence at AURA's source/body parameters. No solver code has started; give the required simulation-core explanation before NUM-02/03 implementation. See [NUM-01](../../research/NUM-01-method-comparison.md). **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
+
+**Inputs / predecessors:** NUM-W01; NUM-W02 if activated; ANA-07; LIT-02
 
 **Steps**
 

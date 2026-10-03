@@ -6,7 +6,7 @@
 
 Build a reproducible simulator that can investigate controlled acoustic forcing and prescribed acceleration for selected bodies, starting with small particles in water and explicitly researching greater masses, larger objects and other geometries. Prepare validation against measurements and actively seek counterexamples and physical or mathematical limitations while progressing toward an explicitly modeled microgravity environment. A supported restricted domain, a negative finding, or a documented evidence gap are all legitimate outcomes.
 
-The owner selected air for the intended validation medium and first numerical route under [DEC-005](../decisions/DEC-005-air-validation-route.md). Small-particle water evidence remains a separate exploratory track, while [DEC-004](../decisions/DEC-004-staged-mass-and-size-expansion.md) preserves research into greater masses, larger bodies and other geometries. Each regime needs its own applicable model and evidence.
+Under [DEC-006](../decisions/DEC-006-water-qualification-before-air-route.md), first reconcile the water numerical-workflow qualification with its immutable references, then repeat the field-verification process for the selected air benchmark. If air P4 passes, initial force, dynamics and control development continues in air. Water and air remain linked stages of one program, with domain-specific physics and evidence; neither validates the other. [DEC-004](../decisions/DEC-004-staged-mass-and-size-expansion.md) continues to preserve research into greater masses, larger bodies and other geometries.
 
 This pack decomposes [PLAN-01](../PLAN-01-project-execution-plan.md); [D00](../D00-document-control.md) through D09 retain precedence. It supplies research tasks, implementation specifications, verification work, decision branches, failure recovery, and report templates. It does not claim that the planned software exists or that a numerical tolerance, particle size, actuator, or experimental design has already been approved.
 
@@ -15,7 +15,7 @@ This pack decomposes [PLAN-01](../PLAN-01-project-execution-plan.md); [D00](../D
 Joining or resuming work? Read [the continuity entry point](../handoff/README.md) for the current checkpoint, evidence and next task, then reconcile it with the work board.
 
 1. Read [execution rules](00-execution-protocol.md) and [scientific objective](01-objective-and-domain.md).
-2. Open [the work board](10-work-board.md) and select the next READY task; completed tasks link their actual evidence. LIT-01…LIT-05 and SC-01/SC-02 are complete as bounded research/design tasks; formal water measurement acceptance remains INDETERMINATE. The owner recorded bounded P3 PASS and selected the air route; NUM-01 selected a primary-source piston/sphere series subject to resource and convergence preflight.
+2. Open [the work board](10-work-board.md) and select the next READY task; completed tasks link their actual evidence. LIT-01…LIT-05 and SC-01/SC-02 are complete as bounded research/design tasks; NUM-W01 is DONE for the water-like analytical workflow, while formal water measurement acceptance remains INDETERMINATE. NUM-01 selected a primary-source air piston/sphere series subject to resource and convergence preflight.
 3. Open the linked phase card. Carry out its numbered steps and produce every named artifact.
 4. Complete the [task record](templates/task-record.md), including input versions and acceptance criteria, before implementation.
 5. If a decision is needed, follow [the decision tree](05-decision-tree.md). If an attempt fails, use [the matching recovery playbook](06-failure-playbooks.md).
@@ -50,12 +50,12 @@ The pack is intended to make the next action unambiguous. Research outcomes cann
 | M0 — Current scaffold | Existing unit helpers and CI, source documents | Foundational code exists; simulator absent |
 | M1 — Safe and reproducible inputs | P2 gate | Invalid inputs are rejected before solver allocation |
 | M2 — Verified acoustic field | P3 and P4 gates | Declared equations are solved correctly within measured numerical error |
-| M3 — Body response model | P5/P6 gates; reconcile the air P4 route with the retained water-first force/dynamics cards before crossing domains | Force/motion predictions have the explicitly recorded, domain-specific evidence status |
+| M3 — Body response model | Air P4 PASS followed by the air-domain P5/P6 gates | Force/motion predictions have the explicitly recorded, domain-specific evidence status |
 | M4 — Bounded acceleration trial | P7 gate and target contract | A specified target succeeds or fails in the declared model and time window |
 | M5 — Limits map | P8 and P9 gates | A domain and its uncertainties/contradictions have been independently examined |
 | M6 — Experiment decision | P10 gate | A specific experiment is worth revising, pursuing, or rejecting |
 
-M3 cannot be called experimentally validated while its required measurement evidence is incomplete. DEC-005 selects the air P4 route, while DEC-004 and current P5/P6 work cards retain water-first force/dynamics work. Resolve that sequence before using one domain's field result in the other. Existing water evidence and the published air-sphere force curve both retain their own limitations; neither supplies missing evidence for the other.
+M3 cannot be called experimentally validated while its required measurement evidence is incomplete. DEC-006 resolves sequencing: water numerical-workflow qualification, then air P4, then initial P5/P6 in air if P4 passes. Existing water evidence and the published air-sphere force curve retain their own limitations; neither supplies missing evidence for the other.
 
 ## Pack completion versus project completion
 

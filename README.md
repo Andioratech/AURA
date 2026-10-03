@@ -16,7 +16,7 @@ Can an actively controlled ultrasonic field, together with state estimation and 
 
 Answers must be scoped to the tested objects, materials, geometry, medium, frequency range, field regime, solver fidelity, uncertainty, and time interval. Results for small particles do not establish performance for macroscopic or human bodies.
 
-Air is the owner-selected medium for the intended validation route, and P4 is aligned with the DEC-002 sphere/transducer benchmark under [DEC-005](docs/decisions/DEC-005-air-validation-route.md). The small-particle water evidence remains a distinct exploratory track; neither domain validates the other. The research objective also includes greater masses, larger objects and other geometries through a [staged scale progression plan](docs/planning/11-scale-progression.md). Each new domain requires an appropriate physical model and independent evidence before its performance can be claimed.
+The numerical workflow is first qualified against the existing water-like analytical evidence, then tested against the air field benchmark selected in [DEC-005](docs/decisions/DEC-005-air-validation-route.md) and sequenced in [DEC-006](docs/decisions/DEC-006-water-qualification-before-air-route.md). If air P4 passes, the initial force, dynamics and control path continues in air. Water and air remain one connected program with separate physics and evidence; neither domain validates the other. The research objective also includes greater masses, larger objects and other geometries through a [staged scale progression plan](docs/planning/11-scale-progression.md). Each new domain requires an appropriate physical model and independent evidence before its performance can be claimed.
 
 ## Scientific approach
 
