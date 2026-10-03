@@ -6,7 +6,7 @@ A task state is READY/ACTIVE/REVIEW/DONE/BLOCKED. A run execution state is plann
 
 ## RUN-01 — Minimal immutable execution lifecycle
 
-**Current state:** DONE within the original lifecycle scope — [implementation](../work-items/RUN-01.md), [artifact review](../reviews/RUN-01-lifecycle.md). ANA-07 adds an `ANALYTIC-RUN-1.0` policy for bounded ideal plane-wave field records with a read-only artifact/index checker. Independent reference comparison and spherical-source recording are not yet admitted; both remain ANA-07 work.
+**Current state:** DONE within the original lifecycle scope — [implementation](../work-items/RUN-01.md), [artifact review](../reviews/RUN-01-lifecycle.md). ANA-07 adds versioned plane- and spherical-field recording policies with read-only artifact/index checks, frozen B-03…B-06 comparisons, and selected fresh reproductions. The P3 owner decision is recorded for the bounded ideal analytical-software scope; independent physical/model validation remains outside these records.
 
 **Depends on:** FND-08 and P2 gate. **Complete before:** ANA-01 evidence runs.
 
@@ -23,16 +23,18 @@ A task state is READY/ACTIVE/REVIEW/DONE/BLOCKED. A run execution state is plann
 
 ## RUN-02 — Replay, comparison and evidence reporting
 
+**Current state:** DONE for the bounded analytical replay contract — [task record](../work-items/RUN-02.md), [artifact review](../reviews/RUN-02-replay-report.md). Exact parent/replay identities, limitations and retained failed attempts are recorded there. No scientific or physical validation is inferred.
+
 **Depends on:** RUN-01 and ANA-07. **Complete before:** NUM-07/P4 exit.
 
-1. Implement replay into a new run directory, environment verification and input/source/data checks.
-2. Separate bitwise reproducibility from metric reproducibility; freeze backend-dependent tolerances from evidence.
-3. Generate a human-readable report with run/domain/metric/check identities and a machine-readable artifact index.
-4. Refuse promotion of INVALIDATED runs. Retain ALERT/INDETERMINATE notes and missing evidence.
-5. Add CLI integration checks for changed config/data hashes, unavailable reference, dirty-source snapshot policy and nonzero failure exits.
-6. Replay a selected analytical example from its recorded environment in a fresh environment.
+1. Replay a completed integrity-verified analytical run from its recorded clean source commit into a new run directory. Rebuild ENV-1.0 in a fresh venv from the hashed lock and verify input/source/data identity. Dirty caller changes are ignored; unavailable commit or profile fails closed.
+2. Report bitwise field-array identity separately from exact ANA-07 metric reproducibility. No cross-run tolerance is admitted; the independent ANA-REF tolerance remains separate and source-bound.
+3. Generate a human-readable report and machine-readable artifact index bound to both manifest digests.
+4. Refuse failed/aborted or INVALIDATED runs. Preserve INDETERMINATE scientific status, runtime differences permitted by ENV-1.0, and unavailable-reference notes.
+5. Verify CLI rejection of changed input/data hashes, unsupported or unavailable references, caller working-tree changes, reused report/output paths and nonzero failure exits.
+6. Replay a selected analytical example from its recorded environment in a fresh venv; keep result bundles outside Git.
 
-**Artifacts:** reproduce/report modules, CLI docs and checks, replay report, compact example bundle. **Accept:** a fresh replay matches its predefined check; tampering is rejected. **Failure:** F-09/F-10; report unreproducible records without inventing metadata.
+**Artifacts:** reproduce/report module, CLI docs and integration checks, replay report, artifact index and preserved attempt records. **Accept:** a fresh replay matches its frozen exact checks; tampering is rejected. **Failure:** F-09/F-10; report unreproducible records without inventing metadata.
 
 ## Manifest and storage checklist
 

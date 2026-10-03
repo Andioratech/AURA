@@ -10,9 +10,9 @@ This is a navigation and continuity layer. [D00](../D00-document-control.md) con
 |---|---|---|
 | 1 | [Current checkpoint](CURRENT-STATE.md) | What exists, what was verified, what remains unvalidated and the source revision |
 | 2 | [D00](../D00-document-control.md), [decisions](CURRENT-STATE.md#decisions-that-must-survive-a-handoff) and [scale progression](../planning/11-scale-progression.md) | Approved scope and scientific limits |
-| 3 | [Work board](../planning/10-work-board.md), [execution rules](../planning/00-execution-protocol.md), [phase card](../planning/phases/P03-analytical-fields.md) | Current task, predecessors and acceptance gate |
-| 4 | [Latest artifact review](../reviews/ANA-06-energy-balance.md), [numerical report](../benchmarks/ANA-06-energy-balance-verification.md), [task record](../work-items/ANA-06.md) | Actual results, failed attempts and retained evidence |
-| 5 | [Next task briefing](NEXT-TASK.md) and its linked contracts | ANA-07 scope, recorder architecture, evidence and P3 gate |
+| 3 | [Work board](../planning/10-work-board.md), [execution rules](../planning/00-execution-protocol.md), [phase card](../planning/phases/P01-evidence.md) | Current task, predecessors and acceptance gate |
+| 4 | [Latest artifact review](../reviews/RUN-02-replay-report.md), [task record](../work-items/RUN-02.md), [replay contract](../research/run-lifecycle.md) | Replay evidence, failed attempts and retained limitations |
+| 5 | [Next task briefing](NEXT-TASK.md) and its linked contracts | The earliest READY work item after reconciling the board, gates and evidence |
 | 6 | [Environment](../../requirements/README.md), [reproduction and CI](../planning/08-reproducibility-and-ci.md), [G01](../../guides/G01-contributor-workflow.md) | How to install, verify, commit and publish safely |
 
 On the owner's machine, also read the **local, ignored** `AGENTS.md` and `AI-HANDOFF.md` if provided. They contain owner instructions and machine-specific checkout/evidence/dashboard locations. A clone of GitHub will not contain those files, the local dashboard or ignored raw reports. Ask for the local transfer pack only when those missing materials are required for the intended action; independent authorized work can continue under DEC-003.

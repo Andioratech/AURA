@@ -3,6 +3,7 @@
 import copy
 import importlib
 import json
+import os
 from pathlib import Path
 
 import pytest
@@ -109,6 +110,12 @@ def observed(monkeypatch):
                        item["name"]: item["version"] for item in inventory["artifacts"]}},
                    "input_sha256": {name: digest(data) for name, data in locks.items()}}
     monkeypatch.setattr(provenance, "capture", lambda: (copy.deepcopy(source), copy.deepcopy(environment), locks))
+    # Run tests use a fixed synthetic host budget instead of the CI/VM's transient available RAM.
+    original_sysconf = os.sysconf
+    monkeypatch.setattr(
+        ENGINE.os, "sysconf",
+        lambda name: 16 * 1024**3 // 4096 if name == "SC_AVPHYS_PAGES" else original_sysconf(name),
+    )
     return source, environment, locks
 
 
@@ -492,6 +499,23 @@ def test_cli_failure_and_existing_output(inputs, observed, capsys):
     assert json.loads(capsys.readouterr().out)["execution_status"] == "failed"
     assert main(args) == 1
     assert json.loads(capsys.readouterr().out)["error"]["code"] == "RUN_EXISTS"
+
+
+def test_reproduce_cli_rejects_changed_parent_data_without_allocating(inputs, observed, capsys):
+    from aura.cli import main
+
+    result = launch(inputs)
+    scenario = inputs[2] / "scenario.json"
+    scenario.write_bytes(scenario.read_bytes() + b" ")
+
+    code = main(["reproduce", str(inputs[2]), "--json"])
+
+    report = json.loads(capsys.readouterr().out)
+    assert code == 1
+    assert report["error"]["code"] == "HASH_MISMATCH"
+    assert report["exit_code"] == 1
+    assert not inputs[2].with_name("run-report").exists()
+    assert result["execution_status"] == "completed"
 
 
 def test_cli_requires_explicit_seed_policy(inputs):

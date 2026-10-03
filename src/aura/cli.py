@@ -95,7 +95,7 @@ def _lifecycle(args):
     import threading
 
     from aura.errors import InvalidInputError
-    from aura.runs import check_run, execute
+    from aura.runs import check_run, execute, reproduce
 
     class Terminated(KeyboardInterrupt):
         signal_number = signal.SIGTERM
@@ -113,8 +113,10 @@ def _lifecycle(args):
             finally:
                 if previous is not None:
                     signal.signal(signal.SIGTERM, previous)
-        else:
+        elif args.command == "check":
             output = check_run(args.path, expected_sha256=args.sha256)
+        else:
+            output = reproduce(args.path, output=args.output, report_dir=args.report_dir)
     except KeyboardInterrupt as exc:
         output = {"command": args.command, "error": {"code": "RUN_INTERRUPTED",
                   "message": "Interrupted before terminal publication; preserve any partial directory."},
@@ -125,9 +127,10 @@ def _lifecycle(args):
         output = {"command": args.command, "error": {"code": "RUN_IO", "message": str(exc)},
                   "exit_code": 4}
     except (ValueError, KeyError, TypeError) as exc:
-        if args.command != "check":
+        if args.command not in ("check", "reproduce"):
             raise
-        output = {"command": "check", "error": {"code": "RUN_RECORD", "message": str(exc)},
+        code = "RUN_RECORD" if args.command == "check" else "RUN_REPLAY_RECORD"
+        output = {"command": args.command, "error": {"code": code, "message": str(exc)},
                   "exit_code": 1}
     if args.json:
         print(json.dumps(output, indent=2, ensure_ascii=True, allow_nan=False))
@@ -160,8 +163,16 @@ def main(argv: list[str] | None = None) -> int:
     check.add_argument("path", help="recorded run directory")
     check.add_argument("--sha256", help="separately retained final manifest digest")
     check.add_argument("--json", action="store_true", help="emit a structured check result")
+    replay = commands.add_parser(
+        "reproduce", help="replay a verified analytical run in its recorded environment",
+        allow_abbrev=False,
+    )
+    replay.add_argument("path", help="completed, verified run directory")
+    replay.add_argument("--output", help="new run directory; default results/replays/<run-id>/<uuid>")
+    replay.add_argument("--report-dir", help="new report directory; default adjacent to replay output")
+    replay.add_argument("--json", action="store_true", help="emit a structured replay report")
     args = parser.parse_args(argv)
-    if args.command in ("run", "check"):
+    if args.command in ("run", "check", "reproduce"):
         return _lifecycle(args)
     if args.command == "status":
         print(

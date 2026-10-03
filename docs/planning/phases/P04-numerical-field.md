@@ -12,7 +12,7 @@ Use [00](../00-execution-protocol.md), the [task template](../templates/task-rec
 
 ## NUM-01 — Choose one backend that answers the selected question
 
-**Initial state:** BLOCKED by predecessors / applicable gates. **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
+**Current state:** ACTIVE — comparison and bounded recommendation are recorded in [NUM-01 method comparison](../../research/NUM-01-method-comparison.md). P3 PASS covers the analytical-software scope; LIT-02 supplies SRC-W03 MQ1 as an exploratory reference, not an accepted measurement benchmark. The owner must choose whether the first solver targets a manufactured Neumann mode or waits for physical source/wall data. The manufactured option must identify the streamwise-uniform first transverse mode `(mₓ,nᵧ)=(0,1)` rather than ask for the first nonzero eigenvalue, and its pilot must compare pressure, velocity, gradient and mean intensity against the matched P3 counterpropagating-wave field. RUN-02 source-bound replay is DONE, but no numerical backend is frozen and NUM-02/03 have not started. **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
 
 **Inputs / predecessors:** ANA-07, LIT-02
 

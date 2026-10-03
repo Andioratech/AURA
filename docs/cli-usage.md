@@ -2,7 +2,7 @@
 
 **Interface:** CLI-1.0 · **Implemented by:** [FND-06](work-items/FND-06.md)
 
-The available commands are `status`, `validate-config`, and the bounded software-diagnostic `run`/`check` pair described in the [RUN-1.0 contract](research/run-lifecycle.md) and [examples](../examples/runs/README.md). Scientific solvers, numerical resource preflight, physical simulation runs, replay and evidence export remain planned. The configuration command reads a scenario and checks its declarations; it does not demonstrate that AURA works.
+The available commands are `status`, `validate-config`, bounded software-diagnostic `run`/`check`, and analytical-run `reproduce`. The run commands are described in the [RUN lifecycle contract](research/run-lifecycle.md) and [examples](../examples/runs/README.md). Numerical solvers, physical simulation runs, general run-to-reference comparison and study-level evidence export remain planned. The configuration command reads a scenario and checks its declarations; it does not demonstrate that AURA works.
 
 ## Install and inspect
 
@@ -46,14 +46,26 @@ Keep the report and inspect `schema_status`, `verdict` and `error`; do not treat
 
 These checks cannot recognize every mislabeled physical value. The [B-01/B-02 report](benchmarks/B01-B02-foundation-verification.md) records the radius/diameter and peak/RMS coverage limits.
 
+## Replay a recorded analytical run
+
+```bash
+.venv/bin/aura reproduce results/<experiment-id>/<run-id> --json
+```
+
+The command verifies the original bundle and its recorded source/lock identities, checks out that exact source commit in a temporary detached worktree, creates a fresh ENV-1.0 virtual environment from the hash-pinned development lock, and runs the original experiment into a new immutable directory. The caller's dirty working-tree changes are not included. Runtime differences allowed by ENV-1.0 are listed in the report; the Python 3.12.14 Linux x86_64 dependency profile and lock hashes must match.
+
+Replay currently admits completed analytical field runs only. It reports exact byte equality for coordinates, pressure, velocity and pressure-gradient arrays. ANA-07 metrics are compared for exact equality without a new tolerance. The independent ANA-REF-1.0 comparison keeps its own frozen tolerance. Missing reference cases remain INDETERMINATE. Replay reports do not change the parent or child run's scientific verdict and do not establish physical validation.
+
+By default, the replay bundle and report directory are written under ignored results storage. Use --output and --report-dir to select unused paths. The report directory contains replay-report.json, replay-report.md and artifact-index.json. Do not commit generated runs or reports.
+
 ## Exit and stream contract
 
 | Exit | Meaning | Example |
 |---|---|---|
-| 0 | Status/help completed, or all required configuration audit checks accepted | `aura status`; actual configuration ACCEPTED is unavailable in L0-1.0 |
-| 1 | Invalid input or INVALIDATED audit | Missing gravity, unsupported version or wrong document type |
+| 0 | Status/help completed, all required configuration audit checks accepted, or an exact replay and all applicable reproducibility comparisons passed | `aura status`; actual configuration ACCEPTED is unavailable in L0-1.0; a reproduced analytical run still has scientific verdict INDETERMINATE |
+| 1 | Invalid input, failed run integrity/replay, or INVALIDATED audit | Changed parent bundle, unsupported profile or non-identical field arrays |
 | 2 | Incorrect command usage | Missing path, unknown command/option |
-| 3 | ALERT or INDETERMINATE audit | Current structurally valid manufactured scenario |
+| 3 | ALERT or INDETERMINATE audit, verified run with unresolved science, or replay without an admitted reference | Current manufactured scenario or a replay whose field arrays match but whose reference comparison is unavailable |
 | 4 | Input filesystem failure; no scientific verdict | Missing file, permissions or other read failure |
 
 Human validation output uses stdout for code 0 and stderr for nonzero outcomes. It includes schema status, validation verdict, whether the audit ran, diagnostics, per-rule findings and scope. Paths/messages are escaped to avoid interpreting embedded control characters as terminal instructions. `status` and help use stdout; usage errors use stderr.
