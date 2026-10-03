@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 
+import aura.artifacts as artifact_module
 from aura.artifacts import CHUNK_BYTES, file_sha256, verify_file
 from aura.errors import IntegrityError, InvalidInputError
 
@@ -139,6 +140,26 @@ def test_changes_during_read_are_not_accepted(tmp_path, monkeypatch, mode):
         with pytest.raises(IntegrityError) as caught:
             file_sha256(path, max_bytes=3)
         assert caught.value.code == ("ARTIFACT_LIMIT" if mode == "grow" else "ARTIFACT_CHANGED")
+
+
+def test_same_size_rewrite_is_detected_when_stat_signature_is_coarse(tmp_path, monkeypatch):
+    path = tmp_path / "input"
+    path.write_bytes(b"abc")
+    original = os.read
+    touched = False
+
+    def read(fd, count):
+        nonlocal touched
+        chunk = original(fd, count)
+        if not touched:
+            touched = True
+            path.write_bytes(b"abd")
+        return chunk
+
+    monkeypatch.setattr(artifact_module, "_signature", lambda _info: (1, 2, 3, 4, 5))
+    monkeypatch.setattr(os, "read", read)
+    with pytest.raises(IntegrityError, match="ARTIFACT_CHANGED"):
+        file_sha256(path, max_bytes=3)
 
 
 def test_descriptors_closed_after_rejection(tmp_path, monkeypatch):
