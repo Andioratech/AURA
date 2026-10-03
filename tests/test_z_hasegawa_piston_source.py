@@ -46,7 +46,8 @@ def _rayleigh_disk(rho, z, *, piston_radius, wavenumber, velocity, radial_interv
 
 
 @pytest.mark.parametrize("gap", (0.0001, 0.03))
-def test_hasegawa_piston_source_off_axis_field_matches_rayleigh(gap):
+@pytest.mark.parametrize("theta_degrees", (60, 90, 120))
+def test_hasegawa_piston_source_off_axis_field_matches_rayleigh(gap, theta_degrees):
     from aura.fields.numerical import (
         source_diffraction_coefficients,
         spherical_bessel_jy,
@@ -58,7 +59,7 @@ def test_hasegawa_piston_source_off_axis_field_matches_rayleigh(gap):
     wavenumber = omega / speed
     piston_radius, sphere_radius, piston_velocity = 0.01, 0.025, 1.0
     center_distance = sphere_radius + gap
-    theta = 2 * math.pi / 3
+    theta = math.radians(theta_degrees)
     rho = sphere_radius * math.sin(theta)
     z = center_distance + sphere_radius * math.cos(theta)
     max_order, quadrature_order = 240, 64
