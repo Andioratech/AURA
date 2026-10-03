@@ -27,6 +27,7 @@ Core remains CPU-first. FND-02 records the [initial schema dependency review](..
 | `fields/types.py` | FieldResult, samples, coordinates, phasor convention, units and diagnostics | ANA-01 | Shape/axis/convention mismatch |
 | `fields/analytic.py` | Closed-form progressive/standing/interference cases in frozen regimes | ANA-02…ANA-05 | Hand derivations, symmetry and limiting cases |
 | `fields/numerical.py` | One selected fast propagation/discretization method with declared boundaries | NUM-01…NUM-06 | Three refinements; boundary/domain effects; manufactured/reference cases |
+| `fields/_plane_sphere_reference.py` (verification reference) | Truncated partial-wave representation for a plane wave incident on a stationary rigid sphere | NUM-03 | Modal order declared by caller; boundary/limit checks; compare to piston/sphere model only at common points |
 | `fields/transfer.py` | Source response basis for feasible field/force allocation; cache identity includes all physics | CTL-02 | Direct recomputation vs cached result; stale cache rejection |
 | `forces/types.py` | ForceResult: radiation/other contributions, torque, frame, regime and provenance | FOR-02 | Missing contribution labels and invalid frame |
 | `forces/particle.py` | Selected small-particle radiation model only | FOR-01…FOR-04 | Independent derivative/limit checks; forbidden large-body input |
