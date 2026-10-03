@@ -49,6 +49,7 @@ def _rayleigh_disk(rho, z, *, piston_radius, wavenumber, velocity, radial_interv
 @pytest.mark.parametrize("theta_degrees", (60, 90, 120))
 def test_hasegawa_piston_source_off_axis_field_matches_rayleigh(gap, theta_degrees):
     from aura.fields.numerical import (
+        _scaled_piston_source_field_terms,
         source_diffraction_coefficients,
         spherical_bessel_jy,
         spherical_legendre,
@@ -115,4 +116,40 @@ def test_hasegawa_piston_source_off_axis_field_matches_rayleigh(gap, theta_degre
         -1j * density * omega * rayleigh_gradient_z,
     )
     for observed, reference in zip(actual, expected, strict=True):
+        assert observed == pytest.approx(reference, rel=5e-9, abs=2e-10)
+
+    scaled_terms = _scaled_piston_source_field_terms(
+        300,
+        wave_number_rad_m=wavenumber,
+        sphere_center_distance_m=center_distance,
+        piston_radius_m=piston_radius,
+        field_radius_m=sphere_radius,
+        cosine=cosine,
+    )
+    scaled_potential = complex(
+        math.fsum(term[0].real for term in scaled_terms),
+        math.fsum(term[0].imag for term in scaled_terms),
+    )
+    scaled_radial = complex(
+        math.fsum(term[1].real for term in scaled_terms),
+        math.fsum(term[1].imag for term in scaled_terms),
+    )
+    scaled_angular = complex(
+        math.fsum(term[2].real for term in scaled_terms),
+        math.fsum(term[2].imag for term in scaled_terms),
+    )
+    scaled_gradient_rho = (
+        sine * scaled_radial + cosine / sphere_radius * scaled_angular
+    )
+    scaled_gradient_z = (
+        cosine * scaled_radial - sine / sphere_radius * scaled_angular
+    )
+    scaled_actual = (
+        -1j * density * omega * scaled_potential,
+        -scaled_gradient_rho,
+        -scaled_gradient_z,
+        -1j * density * omega * scaled_gradient_rho,
+        -1j * density * omega * scaled_gradient_z,
+    )
+    for observed, reference in zip(scaled_actual, expected, strict=True):
         assert observed == pytest.approx(reference, rel=5e-9, abs=2e-10)

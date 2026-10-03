@@ -205,16 +205,26 @@ def _unscale_complex(value: tuple[complex, int], path: str) -> complex:
 
 
 def _regular_bessel_scaled_values(max_order: int, x: float) -> tuple[tuple[complex, int], ...]:
-    """Return scaled j_n(x) from its convergent high-order power series."""
-    # This helper is deliberately bounded to the frozen sphere ka domain. At
-    # these orders the power-series correction is well conditioned and positive.
-    if x > 12.0:
+    """Return scaled j_n(x), using direct low orders and a high-order series."""
+    if type(max_order) is not int or not 0 <= max_order <= 513:
+        raise InvalidInputError("BESSEL_ORDER_RANGE", "/max_order", "Expected order from 0 through 513.")
+    if type(x) not in (int, float) or type(x) is bool or not math.isfinite(x) or x <= 0:
+        raise InvalidInputError("BESSEL_ARGUMENT", "/x", "Expected a finite positive argument.")
+    x = float(x)
+    if x > 40.0:
         raise InvalidInputError(
-            "BESSEL_ARGUMENT_RANGE", "/x", "Scaled regular series is bounded to x <= 12."
+            "BESSEL_ARGUMENT_RANGE", "/x", "Scaled regular series is bounded to x <= 40."
         )
+
+    series_start = 0 if x <= 12.0 else max(48, math.ceil(x) + 32)
+    direct_max_order = min(max_order, series_start - 1)
+    direct_j = _spherical_sequences(direct_max_order, x)[0] if direct_max_order >= 0 else ()
+    values = [_scaled_complex(complex(value, 0.0)) for value in direct_j]
     base = _scaled_complex(1 + 0j)
-    values = []
-    for order in range(max_order + 1):
+    for order in range(series_start):
+        base = _scaled_complex_real(base, x / (2 * order + 3))
+
+    for order in range(series_start, max_order + 1):
         term = total = 1.0
         for index in range(1, 100):
             term *= -(x * x) / (2 * index * (2 * order + 2 * index + 1))
@@ -373,6 +383,82 @@ def _scaled_axial_source_derivative_terms(
         axial_sign = -1 if side == "front" else 1
         rotated = complex(-axial_sign * weighted[0].imag, axial_sign * weighted[0].real)
         terms.append(_unscale_complex(_scaled_complex(rotated, weighted[1]), f"/terms/{order}"))
+    return tuple(terms)
+
+
+def _scaled_piston_source_field_terms(
+    max_order: int,
+    *,
+    wave_number_rad_m: float,
+    sphere_center_distance_m: float,
+    piston_radius_m: float,
+    field_radius_m: float,
+    cosine: float,
+) -> tuple[tuple[complex, complex, complex], ...]:
+    """Return source-only potential and spherical-gradient terms per unit piston speed.
+
+    ``field_radius_m`` is measured from the sphere center; ``cosine`` is the
+    cosine of its polar angle relative to the piston axis.
+    """
+    if type(max_order) is not int or not 0 <= max_order <= 512:
+        raise InvalidInputError("BESSEL_ORDER_RANGE", "/max_order", "Expected order from 0 through 512.")
+    for name, value in (
+        ("wave_number_rad_m", wave_number_rad_m),
+        ("sphere_center_distance_m", sphere_center_distance_m),
+        ("piston_radius_m", piston_radius_m),
+        ("field_radius_m", field_radius_m),
+    ):
+        if type(value) not in (int, float) or type(value) is bool or not math.isfinite(value) or value <= 0:
+            raise InvalidInputError("FIELD_GEOMETRY", f"/{name}", "Expected a finite positive value.")
+    if type(cosine) not in (int, float) or type(cosine) is bool or not math.isfinite(cosine) or not -1 <= cosine <= 1:
+        raise InvalidInputError("FIELD_GEOMETRY", "/cosine", "Expected a finite value in [-1, 1].")
+
+    k = float(wave_number_rad_m)
+    field_argument = _finite(k * float(field_radius_m), "/field_argument")
+    if not 1.0 <= field_argument <= 12.0:
+        raise InvalidInputError(
+            "BESSEL_ARGUMENT_RANGE", "/field_radius_m", "Scaled surface-field terms require 1 <= kr <= 12."
+        )
+    factors = _scaled_source_diffraction_coefficients(
+        max_order,
+        wave_number_rad_m=k,
+        sphere_center_distance_m=sphere_center_distance_m,
+        piston_radius_m=piston_radius_m,
+    )
+    regular = _regular_bessel_scaled_values(max_order + 1, field_argument)
+    derivative_start = min(max_order, max(48, math.ceil(field_argument) + 24))
+    _, _, derivatives, _ = _spherical_sequences(derivative_start, field_argument)
+    sine = math.sqrt(max(0.0, 1.0 - float(cosine) ** 2))
+    terms = []
+
+    for order in range(max_order + 1):
+        if order < derivative_start:
+            radial_bessel_derivative = _scaled_complex(complex(derivatives[order], 0.0))
+        else:
+            radial_bessel_derivative = _scaled_complex_add(
+                _scaled_complex_real(regular[order], order / field_argument),
+                _scaled_complex(-regular[order + 1][0], regular[order + 1][1]),
+            )
+        polynomial, polynomial_derivative = spherical_legendre(order, float(cosine))
+        coefficient = (2 * order + 1) * (-1 if order % 2 else 1)
+        source = factors[order]
+        potential = _scaled_complex_real(
+            _scaled_complex_multiply(source, regular[order]), coefficient * polynomial / k
+        )
+        radial = _scaled_complex_real(
+            _scaled_complex_multiply(source, radial_bessel_derivative), coefficient * polynomial
+        )
+        angular = _scaled_complex_real(
+            _scaled_complex_multiply(source, regular[order]),
+            -coefficient * sine * polynomial_derivative / k,
+        )
+        terms.append(
+            (
+                _unscale_complex(_scaled_complex(complex(-potential[0].imag, potential[0].real), potential[1]), f"/potential/{order}"),
+                _unscale_complex(_scaled_complex(complex(-radial[0].imag, radial[0].real), radial[1]), f"/radial/{order}"),
+                _unscale_complex(_scaled_complex(complex(-angular[0].imag, angular[0].real), angular[1]), f"/angular/{order}"),
+            )
+        )
     return tuple(terms)
 
 

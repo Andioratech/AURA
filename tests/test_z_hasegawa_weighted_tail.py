@@ -285,3 +285,15 @@ def test_scaled_axial_derivative_rejects_ka_outside_its_checked_series_domain():
             sphere_radius_m=0.03,
             side="front",
         )
+
+
+def test_scaled_regular_sequence_matches_decimal_beyond_binary64_range():
+    from aura.fields.numerical import _regular_bessel_scaled_values
+
+    argument, precision = 36.7, 180
+    values = _regular_bessel_scaled_values(300, argument)
+    for order in (0, 20, 68, 100, 253, 300):
+        mantissa, exponent = values[order]
+        actual = Decimal(mantissa.real) * Decimal(2) ** exponent
+        expected = _spherical_j(order, argument, precision)
+        assert abs(actual - expected) / abs(expected) < Decimal("2e-12")
