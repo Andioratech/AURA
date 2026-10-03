@@ -1,6 +1,6 @@
 # Next Main Task — Owner Choice for NUM-01
 
-**Checkpoint:** Owner-recorded P3 PASS for bounded analytical-software verification · **Prepared:** 2026-10-03 · **State:** NUM-01 comparison complete, including conditional air-route limits; no backend selected · **Refreshed after:** Andrade coverage audit, Rayleigh/partial-wave candidate screen and acoustic feedback-control prior-art follow-up
+**Checkpoint:** Owner-recorded P3 PASS for bounded analytical-software verification · **Prepared:** 2026-10-03 · **State:** NUM-01 comparison complete, including conditional air-route limits; no backend selected · **Refreshed after:** critique source audit, Andrade coverage audit, Rayleigh/partial-wave candidate screen and acoustic feedback-control prior-art follow-up
 
 ## Finding that requires a project choice
 
@@ -9,6 +9,8 @@ The published SRC-W03/MQ1 study is a useful exploratory reference, but it is not
 The primary paper gives width `w = 377 µm`, MQ1 frequency `f = 1.940 MHz`, and water sound speed `c₀ = 1497 m/s`, while its ideal mode assumes `λ/2 = w`. The latter inputs imply a half wavelength of 385.82 µm, 2.34% above the reported width. This mismatch is retained as an unresolved model/input difference; no parameter was adjusted to make it disappear.
 
 A focused prior-work follow-up found an existing video-feedback system that controls planar position and tracks moving references with an ultrasonic array (PW-08). Generic feedback trajectory manipulation is therefore not a novelty claim. The publication does not resolve AURA's still-unspecified acceleration target, bulk-fluid or microgravity domain; any stronger distinction requires a target-specific comparison after scope is selected. See the [prior-work register](../registers/prior-work.md) and [critique assessment](../research/critique-assessment-2026-10-03.md).
+
+The critique assessment was source-checked against the primary small-particle Gor'kov paper, Inoue et al.'s rigid-body surface-force model, and Matouš et al.'s feedback experiments. These support the regime-specific force and prior-art boundaries; they do not establish a gravity-equivalence claim, an AURA performance result, or a novelty finding. The assessment does not change the P4 owner choice or any gate.
 
 The completed [NUM-01 method comparison](../research/NUM-01-method-comparison.md) evaluates existing analytical superposition, angular-spectrum propagation, k-space time-domain methods, FEM/BEM, and a custom finite-difference eigenmode option. It recommends the latter only for an ideal manufactured mode-shape/eigenfrequency verification with Neumann conditions at transverse edges `y = ±w/2`, matching the primary paper's Figure 1 coordinate convention and analytic cosine. The periodic rectangular spectrum also means the requested mode must be identified as `(mₓ,nᵧ) = (0,1)`: the constant mode is zero and the first streamwise mode is below the target transverse mode. A generic “first nonzero eigenvalue” is not the intended comparison. This is an ideal sound-hard boundary choice, not a model of the physical silicon-glass chip. The case omits the transducer, compliant chip, attenuation, streaming, particles and body force. The record provides the equations, proposed interface/domain boundary, independent analytic comparison, preliminary CPU/memory/storage caps and alternative routes.
 
