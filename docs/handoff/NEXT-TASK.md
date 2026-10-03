@@ -1,6 +1,6 @@
 # Next Main Task — NUM-03 Air Numerical Backend
 
-**Checkpoint:** Owner-recorded P3 PASS for bounded analytical-software verification · **Prepared:** 2026-10-03 · **State:** NUM-W01, NUM-01, NUM-02 DONE; NUM-03 ACTIVE with isolated special-function primitives, coupled backend incomplete · **Refreshed after:** commit `d639773`, high-precision order-300 axial modal-tail test (1,644 local tests; remote run 37140804162 passed)
+**Checkpoint:** Owner-recorded P3 PASS for bounded analytical-software verification · **Prepared:** 2026-10-03 · **State:** NUM-W01, NUM-01, NUM-02 DONE; NUM-03 ACTIVE with isolated special-function primitives, coupled backend incomplete · **Refreshed after:** commit `981e633`, scaled piston-only field checks (1,648 local tests; remote run 37142230509 passed)
 
 ## Immediate NUM-03 step — coupled-field core checkpoint
 
