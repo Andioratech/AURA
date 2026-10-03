@@ -12,11 +12,13 @@ from pathlib import Path
 
 from aura.errors import IncompleteEvidenceError, InvalidInputError
 
-WORKLOAD_CONTRACT = "AIR-SERIES-WORKLOAD-1.0"
-CALIBRATION_CONTRACT = "AIR-SERIES-CALIBRATION-1.0"
+WORKLOAD_CONTRACT = "AIR-SERIES-WORKLOAD-1.1"
+CALIBRATION_CONTRACT = "AIR-SERIES-CALIBRATION-1.1"
 MAX_POINT_CHUNK = 256
+MAX_QUADRATURE_ORDER = 512
+MAX_BESSEL_START = 8192
 MAX_PLAN_INTEGER = (1 << 63) - 1
-ORDER_COMPLEX_VECTORS = 6
+ORDER_COMPLEX_VECTORS = 8
 ORDER_REAL_VECTORS = 2
 RAM_HEADROOM_FACTOR = 2
 SERIALIZED_BYTES_PER_POINT = 2048
@@ -74,7 +76,8 @@ def _runtime_product(orders: int, seconds_per_order: float, path: str) -> float:
 def _workload(request: dict) -> dict:
     required = {
         "contract", "solver_model_id", "solver_model_version", "gap_count",
-        "points_per_gap", "harmonic_order", "point_chunk_size",
+        "points_per_gap", "harmonic_order", "quadrature_order", "bessel_argument_max",
+        "point_chunk_size",
     }
     if type(request) is not dict or set(request) != required:
         raise InvalidInputError(
@@ -89,6 +92,20 @@ def _workload(request: dict) -> dict:
     gap_count = _positive_integer(request["gap_count"], "/gap_count")
     points_per_gap = _positive_integer(request["points_per_gap"], "/points_per_gap")
     harmonic_order = _positive_integer(request["harmonic_order"], "/harmonic_order", minimum=0)
+    quadrature_order = _positive_integer(request["quadrature_order"], "/quadrature_order")
+    if quadrature_order > MAX_QUADRATURE_ORDER:
+        raise InvalidInputError(
+            "PREFLIGHT_QUADRATURE", "/quadrature_order",
+            f"Quadrature order must not exceed {MAX_QUADRATURE_ORDER}.",
+        )
+    bessel_argument_max = _positive_finite(request["bessel_argument_max"], "/bessel_argument_max")
+    bessel_margin = max(32, int(math.sqrt(40 * (harmonic_order + 1))))
+    bessel_start = max(harmonic_order + 1 + bessel_margin, math.ceil(bessel_argument_max) + bessel_margin)
+    if bessel_start > MAX_BESSEL_START:
+        raise InvalidInputError(
+            "PREFLIGHT_BESSEL_WORK", "/bessel_argument_max",
+            f"Derived Bessel recurrence workspace exceeds {MAX_BESSEL_START}.",
+        )
     chunk_size = _positive_integer(request["point_chunk_size"], "/point_chunk_size")
     if chunk_size > min(points_per_gap, MAX_POINT_CHUNK):
         raise InvalidInputError(
@@ -101,6 +118,9 @@ def _workload(request: dict) -> dict:
         "gap_count": gap_count,
         "points_per_gap": points_per_gap,
         "harmonic_order": harmonic_order,
+        "quadrature_order": quadrature_order,
+        "bessel_argument_max": bessel_argument_max,
+        "bessel_start": bessel_start,
         "point_chunk_size": chunk_size,
     }
 
@@ -110,7 +130,8 @@ def _calibration(record: dict | None, workload: dict, digest: str | None) -> dic
         return None
     required = {
         "contract", "solver_model_id", "solver_model_version", "source_revision",
-        "environment_sha256", "coefficient_seconds_per_order", "field_seconds_per_order",
+        "environment_sha256", "quadrature_order", "bessel_argument_max",
+        "coefficient_seconds_per_order", "field_seconds_per_order",
         "safety_multiplier",
     }
     if type(record) is not dict or set(record) != required:
@@ -128,6 +149,20 @@ def _calibration(record: dict | None, workload: dict, digest: str | None) -> dic
         raise InvalidInputError(
             "PREFLIGHT_CALIBRATION_MODEL", "/calibration/solver_model_id",
             "Calibration does not match the requested solver model and version.",
+        )
+    quadrature_order = _positive_integer(record["quadrature_order"], "/calibration/quadrature_order")
+    if quadrature_order > MAX_QUADRATURE_ORDER or quadrature_order != workload["quadrature_order"]:
+        raise InvalidInputError(
+            "PREFLIGHT_CALIBRATION_DIMENSION", "/calibration/quadrature_order",
+            "Calibration quadrature order must match the workload and supported range.",
+        )
+    bessel_argument_max = _positive_finite(
+        record["bessel_argument_max"], "/calibration/bessel_argument_max"
+    )
+    if bessel_argument_max != workload["bessel_argument_max"]:
+        raise InvalidInputError(
+            "PREFLIGHT_CALIBRATION_DIMENSION", "/calibration/bessel_argument_max",
+            "Calibration maximum Bessel argument must match the workload.",
         )
     if type(record["source_revision"]) is not str or not SOURCE_REVISION.fullmatch(
         record["source_revision"]
@@ -161,6 +196,8 @@ def _calibration(record: dict | None, workload: dict, digest: str | None) -> dic
     return {
         "source_revision": record["source_revision"],
         "environment_sha256": record["environment_sha256"],
+        "quadrature_order": quadrature_order,
+        "bessel_argument_max": bessel_argument_max,
         "calibration_sha256": digest,
         "coefficient_seconds_per_order": coefficient_rate,
         "field_seconds_per_order": field_rate,
@@ -195,6 +232,24 @@ def _order_vector_bytes(order_count: int) -> int:
     complex_vector = list_header + order_count * (pointer_bytes + complex_bytes)
     real_vector = list_header + order_count * (pointer_bytes + float_bytes)
     return ORDER_COMPLEX_VECTORS * complex_vector + ORDER_REAL_VECTORS * real_vector
+
+
+def _quadrature_workspace_bytes(quadrature_order: int) -> int:
+    """Budget simultaneous Gauss node/weight lists and returned tuples."""
+    pointer_bytes = sys.getsizeof((None,)) - sys.getsizeof(())
+    list_header, tuple_header = sys.getsizeof([]), sys.getsizeof(())
+    float_bytes = sys.getsizeof(0.0)
+    list_vector = list_header + quadrature_order * (pointer_bytes + float_bytes)
+    tuple_vector = tuple_header + quadrature_order * (pointer_bytes + float_bytes)
+    return 2 * list_vector + 2 * tuple_vector
+
+
+def _bessel_scratch_bytes(start_order: int) -> int:
+    """Budget simultaneous Miller and upward-recurrence float lists."""
+    pointer_bytes = sys.getsizeof((None,)) - sys.getsizeof(())
+    list_header, float_bytes = sys.getsizeof([]), sys.getsizeof(0.0)
+    one_vector = list_header + (start_order + 2) * (pointer_bytes + float_bytes)
+    return 2 * one_vector
 
 
 def _sample_object_bytes(point_count: int) -> int:
@@ -294,12 +349,15 @@ def estimate_air_series(
         _positive_integer(available_disk_bytes, "/disk_bytes/available", minimum=0)
     )
     order_workspace = _order_vector_bytes(order_count)
+    quadrature_workspace = _quadrature_workspace_bytes(workload["quadrature_order"])
+    bessel_scratch = _bessel_scratch_bytes(workload["bessel_start"])
     chunk_objects = _sample_object_bytes(chunk_size)
     chunk_serialization = _checked_product(
         chunk_size, SERIALIZED_BYTES_PER_POINT, path="/serialization_bytes"
     )
     incremental = _checked_sum(
-        order_workspace, chunk_objects, chunk_serialization, SERIALIZATION_FIXED_BYTES,
+        order_workspace, quadrature_workspace, bessel_scratch, chunk_objects, chunk_serialization,
+        SERIALIZATION_FIXED_BYTES,
         path="/ram_bytes/incremental",
     )
     ram_headroom = _checked_product(
@@ -368,7 +426,7 @@ def estimate_air_series(
         exit_code = 0
 
     return {
-        "contract": "AIR-SERIES-PREFLIGHT-1.0",
+        "contract": "AIR-SERIES-PREFLIGHT-1.1",
         "solver_model_id": workload["solver_model_id"],
         "solver_model_version": workload["solver_model_version"],
         "status": status,
@@ -381,6 +439,9 @@ def estimate_air_series(
             "points_per_gap": points_per_gap,
             "total_points": total_points,
             "harmonic_order": workload["harmonic_order"],
+            "quadrature_order": workload["quadrature_order"],
+            "bessel_argument_max": workload["bessel_argument_max"],
+            "bessel_start": workload["bessel_start"],
             "order_count": order_count,
             "point_chunk_size": chunk_size,
             "total_chunks": total_chunks,
@@ -392,6 +453,8 @@ def estimate_air_series(
             "baseline_peak_rss_bytes": baseline,
             "incremental_ram_bytes": ram_headroom,
             "order_workspace_bytes": order_workspace,
+            "quadrature_workspace_bytes": quadrature_workspace,
+            "bessel_recurrence_scratch_bytes": bessel_scratch,
             "chunk_field_objects_bytes": chunk_objects,
             "chunk_serialization_bytes": chunk_serialization,
             "serialization_fixed_bytes": SERIALIZATION_FIXED_BYTES,
@@ -410,8 +473,10 @@ def estimate_air_series(
         "calibration": profile,
         "calibration_context_match": calibration_matches,
         "basis": (
-            "NUM-01 single-order recurrence and incident-plus-scattered order sum; O(N) retained "
-            "vectors, sequential chunks, platform-measured CPython object sizes, 2x RAM headroom. "
+            "NUM-01 single-order recurrence and incident-plus-scattered order sum; coefficient-time "
+            "calibration is bound to the declared Gauss-Legendre order. O(N) retained vectors plus "
+            "explicit node/weight workspace, sequential chunks, platform-measured CPython object "
+            "sizes, 2x RAM headroom. "
             "Runtime calibration is accepted only for an exact clean source revision and ENV-1.0 "
             "environment digest. Runtime is not a hard deadline; this report never launches a solver."
         ),

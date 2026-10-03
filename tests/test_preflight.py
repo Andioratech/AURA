@@ -16,12 +16,14 @@ SCENARIO = json.loads((ROOT / "examples/schema/manufactured-scenario.json").read
 
 def workload(**changes):
     result = {
-        "contract": "AIR-SERIES-WORKLOAD-1.0",
+        "contract": "AIR-SERIES-WORKLOAD-1.1",
         "solver_model_id": "HASEGAWA-RIGID-SPHERE",
         "solver_model_version": "0.1",
         "gap_count": 2,
         "points_per_gap": 3,
         "harmonic_order": 4,
+        "quadrature_order": 32,
+        "bessel_argument_max": 10.0,
         "point_chunk_size": 2,
     }
     result.update(changes)
@@ -30,11 +32,13 @@ def workload(**changes):
 
 def calibration(**changes):
     result = {
-        "contract": "AIR-SERIES-CALIBRATION-1.0",
+        "contract": "AIR-SERIES-CALIBRATION-1.1",
         "solver_model_id": "HASEGAWA-RIGID-SPHERE",
         "solver_model_version": "0.1",
         "source_revision": "a" * 40,
         "environment_sha256": "b" * 64,
+        "quadrature_order": 32,
+        "bessel_argument_max": 10.0,
         "coefficient_seconds_per_order": 0.01,
         "field_seconds_per_order": 0.02,
         "safety_multiplier": 2,
@@ -71,11 +75,15 @@ def test_estimate_counts_orders_chunks_ram_disk_and_calibrated_time():
 
     assert report["status"] == "BUDGETS_WITHIN_CAPS"
     assert report["execution_authorized"] is False
+    assert report["contract"] == "AIR-SERIES-PREFLIGHT-1.1"
     assert report["dimensions"] == {
         "gap_count": 2,
         "points_per_gap": 3,
         "total_points": 6,
         "harmonic_order": 4,
+        "quadrature_order": 32,
+        "bessel_argument_max": 10.0,
+        "bessel_start": 42,
         "order_count": 5,
         "point_chunk_size": 2,
         "total_chunks": 4,
@@ -86,6 +94,8 @@ def test_estimate_counts_orders_chunks_ram_disk_and_calibrated_time():
     assert report["estimates"]["disk_bytes"] == 6 * 2048 + 4 * 4096 + 4096
     assert report["estimates"]["ram_bytes"] > 2000
     assert report["calibration"]["calibration_sha256"] == "c" * 64
+    assert report["components"]["quadrature_workspace_bytes"] > 0
+    assert report["components"]["bessel_recurrence_scratch_bytes"] > 0
     require_ready(report)
 
 
@@ -134,6 +144,9 @@ def test_currently_available_resources_are_checked(available):
     "changes,code",
     [
         ({"harmonic_order": True}, "PREFLIGHT_DIMENSION"),
+        ({"quadrature_order": True}, "PREFLIGHT_DIMENSION"),
+        ({"quadrature_order": 513}, "PREFLIGHT_QUADRATURE"),
+        ({"bessel_argument_max": 1e9}, "PREFLIGHT_BESSEL_WORK"),
         ({"gap_count": 0}, "PREFLIGHT_DIMENSION"),
         ({"point_chunk_size": 257}, "PREFLIGHT_CHUNK"),
         ({"point_chunk_size": 4}, "PREFLIGHT_CHUNK"),
@@ -159,6 +172,24 @@ def test_calibration_model_and_digest_must_match():
             baseline_rss_bytes=1000,
         )
     assert digest_error.value.code == "PREFLIGHT_CALIBRATION_ID"
+
+
+def test_calibration_quadrature_order_must_match_workload():
+    with pytest.raises(InvalidInputError) as caught:
+        estimate(
+            scenario(), workload(), calibration(quadrature_order=64),
+            calibration_sha256="c" * 64, baseline_rss_bytes=1000,
+        )
+    assert caught.value.code == "PREFLIGHT_CALIBRATION_DIMENSION"
+
+
+def test_calibration_bessel_argument_must_match_workload():
+    with pytest.raises(InvalidInputError) as caught:
+        estimate(
+            scenario(), workload(), calibration(bessel_argument_max=11.0),
+            calibration_sha256="c" * 64, baseline_rss_bytes=1000,
+        )
+    assert caught.value.code == "PREFLIGHT_CALIBRATION_DIMENSION"
 
 
 def test_stale_source_or_environment_calibration_is_indeterminate():

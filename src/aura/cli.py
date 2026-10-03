@@ -252,8 +252,8 @@ def main(argv: list[str] | None = None) -> int:
         allow_abbrev=False,
     )
     preflight.add_argument("scenario", help="validated scenario containing resource caps")
-    preflight.add_argument("--workload", required=True, help="AIR-SERIES-WORKLOAD-1.0 JSON")
-    preflight.add_argument("--calibration", help="matching AIR-SERIES-CALIBRATION-1.0 JSON")
+    preflight.add_argument("--workload", required=True, help="AIR-SERIES-WORKLOAD-1.1 JSON")
+    preflight.add_argument("--calibration", help="matching AIR-SERIES-CALIBRATION-1.1 JSON")
     preflight.add_argument("--output-dir", help="existing directory planned for run artifacts")
     preflight.add_argument("--json", action="store_true", help="emit a structured estimate")
     run = commands.add_parser("run", help="record a bounded software diagnostic", allow_abbrev=False)

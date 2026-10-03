@@ -190,3 +190,25 @@ def test_source_coefficients_reject_workspace_before_quadrature(kernels, monkeyp
             quadrature_order=32,
             workspace_bytes=1,
         )
+
+
+def test_num02_workspace_covers_source_coefficient_live_arrays(kernels):
+    from aura.fields.numerical import _source_workspace_estimate
+    from aura.preflight import (
+        SERIALIZATION_FIXED_BYTES,
+        _bessel_scratch_bytes,
+        _order_vector_bytes,
+        _quadrature_workspace_bytes,
+    )
+
+    order_count, quadrature_order, argument_max = 5, 32, 10.0
+    margin = max(32, int(math.sqrt(40 * order_count)))
+    bessel_start = max(order_count + margin, math.ceil(argument_max) + margin)
+    preflight_bytes = (
+        _order_vector_bytes(order_count)
+        + _quadrature_workspace_bytes(quadrature_order)
+        + _bessel_scratch_bytes(bessel_start)
+        + SERIALIZATION_FIXED_BYTES
+    )
+    local_bytes = _source_workspace_estimate(order_count, quadrature_order, bessel_start)
+    assert preflight_bytes >= local_bytes

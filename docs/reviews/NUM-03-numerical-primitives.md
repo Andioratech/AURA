@@ -13,6 +13,7 @@ This review covers only the isolated binary64 spherical Bessel/Legendre, Gauss-L
 - Recurrence/derivative identities are checked for `j_n` and `y_n`; Legendre parity and derivative finite differences are checked independently.
 - Gauss-Legendre nodes integrate polynomial moments through degree `2N-1` for orders 1–9; the stationary sphere coefficient enforces its modal zero-normal-velocity condition for orders 0–15 at `ka=11.45`.
 - The `n=0` and `n=1` piston source factors are checked against a separate composite Simpson integration of their closed-form integrands; an undersized local workspace is rejected before quadrature starts.
+- NUM-02 preflight v1.1 binds quadrature order and maximum Bessel argument in both workload and calibration, and includes node/weight plus recurrence scratch. A cross-component regression confirms the solver-free preflight inventory covers the source helper's local peak estimate for the matched test dimensions.
 - Invalid domains raise `InvalidInputError`; an unrepresentable outgoing solution raises `NumericalDomainError` rather than returning an infinite value.
 - Ruff and `git diff --check` pass for the intermediate change.
 
