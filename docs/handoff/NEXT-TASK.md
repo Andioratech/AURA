@@ -1,6 +1,6 @@
 # Next Main Task — Owner Choice for NUM-01
 
-**Checkpoint:** Owner-recorded P3 PASS for bounded analytical-software verification · **Prepared:** 2026-10-03 · **State:** NUM-01 comparison complete, including conditional air-route limits; no backend selected · **Refreshed after:** critique source audit, Andrade coverage audit, Rayleigh/partial-wave candidate screen and acoustic feedback-control prior-art follow-up
+**Checkpoint:** Owner-recorded P3 PASS for bounded analytical-software verification · **Prepared:** 2026-10-03 · **State:** NUM-01 comparison complete, including conditional air-route limits; no backend selected · **Refreshed after:** critique source audit, Andrade coverage audit, Rayleigh/partial-wave candidate screen, acoustic feedback-control prior art and solid-sphere force/steering prior art
 
 ## Finding that requires a project choice
 
@@ -11,6 +11,8 @@ The primary paper gives width `w = 377 µm`, MQ1 frequency `f = 1.940 MHz`, and 
 A focused prior-work follow-up found an existing video-feedback system that controls planar position and tracks moving references with an ultrasonic array (PW-08). Generic feedback trajectory manipulation is therefore not a novelty claim. The publication does not resolve AURA's still-unspecified acceleration target, bulk-fluid or microgravity domain; any stronger distinction requires a target-specific comparison after scope is selected. See the [prior-work register](../registers/prior-work.md) and [critique assessment](../research/critique-assessment-2026-10-03.md).
 
 A separate terminology search found Gires et al.'s arXiv preprint “The acoustic radiation force: a gravitation-like field” (PW-09). It derives a restricted apparent-buoyancy interpretation for a compressible Rayleigh sphere in an ideal infinite fluid, not a general acoustic gravity field or a demonstrated AURA capability; the arXiv entry lists no journal reference. This further narrows terminology/prior-art claims without resolving AURA's target-specific novelty.
+
+The source-audited PW-10 follow-up found that Ghanem et al. already validated an arbitrary-beam scattering model for plate-supported millimeter-scale solid spheres and demonstrated 2D steering on that plate. The paper's roughly 22% abstract figure concerns trapping-angle discrepancy; overall inferred-force discrepancy is `32.8±58.1%`, with a lower `11.7±8.3%` value only in a lower-friction subset. This sets a sharper prior-art boundary while leaving free 3D acceleration, gravity-equivalence, and the target-specific novelty question open. See PW-10 in the [prior-work register](../registers/prior-work.md).
 
 The critique assessment was source-checked against the primary small-particle Gor'kov paper, Inoue et al.'s rigid-body surface-force model, and Matouš et al.'s feedback experiments. These support the regime-specific force and prior-art boundaries; they do not establish a gravity-equivalence claim, an AURA performance result, or a novelty finding. The requested “g-error” is already covered by D01/D03's `error_accel_rms`; only its target-specific acceptance rule and observation uncertainty remain open. Apply justified local sensitivity checks during P4/P5 as their inputs become available, then reserve integrated attack/holdout testing for P8. The assessment does not change the P4 owner choice or any gate.
 
