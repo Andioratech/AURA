@@ -26,6 +26,12 @@ The immutable derived identifier is `FIG-W03-MQ1-20261003-01`. Its CSV contains 
 
 The complete per-file digest list, source provenance, package versions, calibrated axes, acquisition rows and validation results are in the local `sha256sums.json` and `extraction-report.json`. Python 3.13.5 was used with PyMuPDF 1.26.7, pdfplumber 0.11.10, pdfminer.six 20260107, pypdfium2 5.13.0 and Pillow 12.3.0. These temporary extraction tools were installed outside AURA’s project environment and are not solver dependencies.
 
+### Tracked reproduction
+
+The executable extraction is maintained at [`tools/research/extract_fig_w03_mq1_profiles.py`](../../tools/research/extract_fig_w03_mq1_profiles.py). It checks the source PDF digest and exact Python/parser versions, records the clean repository revision and script hash, preserves a code copy in the evidence directory, verifies all expected counts and calibration bounds, and refuses to overwrite a differing output. It is an offline data-processing utility; it does not add packages to AURA’s application or development lock.
+
+To reproduce in a separate temporary Python 3.13.5 environment, install exactly PyMuPDF 1.26.7, pdfplumber 0.11.10, pdfminer.six 20260107, pypdfium2 5.13.0 and Pillow 12.3.0. Place the checksum-identified thesis PDF at `results/research/SRC-W03-MQ1-FIG3-EXTRACTION-20261003-02/source-thesis.pdf`, retain the documented attempt log and failed-attempt artifacts there, then run `python tools/research/extract_fig_w03_mq1_profiles.py` from the repository root. The output ID is `FIG-W03-MQ1-20261003-02`; its measurements should match the first extraction byte-for-byte. A differing existing output is left intact and requires a new dataset ID for investigation.
+
 ## Extraction and checks
 
 The primary extraction locates the filled point-marker paths on PDF page 204 with PyMuPDF, takes each path’s bounding-box center, and calibrates the plot axes from the vector tick locations. Tick-label values were read from the displayed figure. A second vector parser, pdfplumber/pdfminer.six, found the same 64 plotted marker objects in each panel (39 profile markers plus 25 red overplots); corresponding centers differed by at most `0.000130` PDF point across 384 parser comparisons.
