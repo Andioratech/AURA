@@ -8,15 +8,16 @@ This review covers only the isolated binary64 spherical Bessel/Legendre, Gauss-L
 
 ## Evidence
 
-- 177 focused tests pass in ENV-1.0.
+- 195 focused numerical-primitive tests pass in ENV-1.0.
 - Spherical `j_n` is compared with a separately evaluated 160-digit Decimal power series for orders 0–12 at four positive arguments, including one above the oscillatory-region start requirement.
 - Recurrence/derivative identities are checked for `j_n` and `y_n`; Legendre parity and derivative finite differences are checked independently.
-- Gauss-Legendre nodes integrate polynomial moments through degree `2N-1` for orders 1–9; the stationary sphere coefficient enforces its modal zero-normal-velocity condition for orders 0–15 at `ka=11.45`.
+- Gauss-Legendre nodes integrate polynomial moments through degree `2N-1` for orders 1–9; the stationary sphere coefficient enforces its modal zero-normal-velocity condition for orders 0–15 at `ka=11.45` and matches a separate 160-digit Decimal coefficient reference for orders 0–16 at the frozen air `ka` (including stationary `n=1`). This is coefficient-level reference evidence, not yet a sampled exact plane-wave scattering comparison.
 - The `n=0` and `n=1` piston source factors are checked against a separate composite Simpson integration of their closed-form integrands; an undersized local workspace is rejected before quadrature starts.
+- A non-gating quadrature-sensitivity diagnostic evaluated source factors through order 24 at both ends of the contract gap range, using the DEC-002 sphere radius 25 mm, piston radius 10 mm, `f=25.23 kHz`, and `c=346 m/s`. For orders 0–16, the largest successive relative changes for quadrature orders 16→32, 32→64, and 64→128 were respectively `1.21e-14`, `1.43e-14`, and `6.30e-15` at `H=0.1 mm`, and `3.29e-15`, `3.71e-15`, and `5.04e-16` at `H=30 mm`. At the near endpoint, `|f_24|=25.36` while `|f_16|=0.0110`; the corresponding stationary coefficient-weighted magnitudes were `1.72e-10` and `1.08e-5`. These are unweighted source-factor and coefficient diagnostics only; no field sum, truncation acceptance, or physical result follows.
 - NUM-02 preflight v1.1 binds quadrature order and maximum Bessel argument in both workload and calibration, and includes node/weight plus recurrence scratch. A cross-component regression confirms the solver-free preflight inventory covers the source helper's local peak estimate for the matched test dimensions.
 - Invalid domains raise `InvalidInputError`; an unrepresentable outgoing solution raises `NumericalDomainError` rather than returning an infinite value.
 - Ruff and `git diff --check` pass for the intermediate change.
 
 ## Limits and open verification
 
-These checks establish neither Hasegawa-series convergence nor accuracy at the frozen `ka`, `kR`, and gap range. They do not test source normalization, higher-order source-integral sensitivity, complex Hankel coefficient conditioning in the coupled series, field outputs, the full summed-field sphere boundary behavior, P3 overlap, piston Rayleigh field agreement, or measured air data. The coupled evaluator, actual live-array memory audit, preflight gate, and diagnostic pilot remain required before NUM-03 can close.
+These checks establish neither Hasegawa-series convergence nor accuracy at the frozen `ka`, `kR`, and gap range. The quadrature diagnostic does not establish a field truncation tolerance. Source normalization, complex Hankel coefficient conditioning in the coupled series, sampled exact plane-wave/sphere scattering, field outputs, full summed-field sphere boundary behavior, P3 overlap, piston Rayleigh field agreement, and measured air data remain open. The coupled evaluator, actual live-array memory audit, preflight gate, and diagnostic pilot remain required before NUM-03 can close.

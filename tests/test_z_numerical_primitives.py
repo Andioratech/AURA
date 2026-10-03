@@ -44,6 +44,51 @@ def _decimal_spherical_j(order, argument):
         return x**order * series / denominator
 
 
+def _decimal_sin_cos(argument):
+    with localcontext() as context:
+        context.prec = 160
+        x = Decimal(str(argument))
+        x_squared = x * x
+        sine_term, cosine_term = x, Decimal(1)
+        sine, cosine = sine_term, cosine_term
+        for index in range(1, 300):
+            sine_term *= -x_squared / (Decimal(2 * index) * (2 * index + 1))
+            cosine_term *= -x_squared / (Decimal(2 * index - 1) * (2 * index))
+            sine += sine_term
+            cosine += cosine_term
+            if max(abs(sine_term), abs(cosine_term)) < Decimal("1e-150"):
+                break
+        return +sine, +cosine
+
+
+def _decimal_spherical_y(order, argument):
+    with localcontext() as context:
+        context.prec = 160
+        x = Decimal(str(argument))
+        sine, cosine = _decimal_sin_cos(argument)
+        values = [-cosine / x, -cosine / (x * x) - sine / x]
+        for index in range(1, order + 1):
+            values.append((Decimal(2 * index + 1) / x) * values[index] - values[index - 1])
+        return +values[order]
+
+
+def _decimal_stationary_sphere_coefficient(order, argument):
+    with localcontext() as context:
+        context.prec = 160
+        x = Decimal(str(argument))
+        j_value = _decimal_spherical_j(order, argument)
+        j_next = _decimal_spherical_j(order + 1, argument)
+        y_value = _decimal_spherical_y(order, argument)
+        y_next = _decimal_spherical_y(order + 1, argument)
+        j_derivative = Decimal(order) * j_value / x - j_next
+        y_derivative = Decimal(order) * y_value / x - y_next
+        denominator = j_derivative**2 + y_derivative**2
+        return complex(
+            float(-(j_derivative**2) / denominator),
+            float((j_derivative * y_derivative) / denominator),
+        )
+
+
 @pytest.mark.parametrize("order", range(8))
 @pytest.mark.parametrize("x", (0.25, 1.0, 4.5, 12.0))
 def test_spherical_bessel_recurrence_and_derivative_identities(order, x, kernels):
@@ -132,6 +177,15 @@ def test_stationary_sphere_coefficient_enforces_zero_normal_velocity(order, kern
     residual = complex(j_derivative, 0.0) + coefficient * complex(j_derivative, y_derivative)
     scale = math.hypot(j_derivative, y_derivative)
     assert abs(residual) <= 8 * math.ulp(scale)
+
+
+@pytest.mark.parametrize("order", range(17))
+def test_stationary_sphere_coefficient_matches_decimal_reference_at_air_ka(order, kernels):
+    *_, stationary_sphere_coefficient, _ = kernels
+    ka = 2 * math.pi * 25230 * 0.025 / 346
+    expected = _decimal_stationary_sphere_coefficient(order, ka)
+    actual = stationary_sphere_coefficient(order, ka)
+    assert actual == pytest.approx(expected, rel=8e-14, abs=2e-15)
 
 
 @pytest.mark.parametrize("order", (0, 1))
