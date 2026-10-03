@@ -19,7 +19,7 @@ The immutable derived identifier is `FIG-W03-MQ1-20261003-01`. Its CSV contains 
 | Source thesis PDF | `8adfc59f1a64b5ea2748b81ecf3171e04488a92520f9a10485d4d99ecfc52a3e` |
 | `mq1-mean-velocity-profile.csv` | `37d7c05e26a1cab40e52cf1bdcd9fd8d3502b54205ab52c15216d99ef6ea91da` |
 | `extraction-report.json` | `3d6677cdee46284f9f0cc882715194582508f72f96dd6db0e0b7a8614ada0d82` |
-| `extract.py` | `b194707f866f7f3460fce49897a7b607e51a5887bd02740736de94c09341123d` |
+| `extract.py` | `894cbb37be05782109e529d5dc6385b47634c6041060ac60f30eaf350fb3e7de` |
 | Retained failed affine-transform CSV | `eb2db004d60d66068ec6f2e9f297821a9d44d221d2ff3a9de164fac6383e90db` |
 
 The complete per-file digest list, source provenance, package versions, calibrated axes, acquisition rows and validation results are in the local `sha256sums.json` and `extraction-report.json`. Python 3.13.5 was used with PyMuPDF 1.26.7, pdfplumber 0.11.10, pdfminer.six 20260107, pypdfium2 5.13.0 and Pillow 12.3.0. These temporary extraction tools were installed outside AURA’s project environment and are not solver dependencies.
@@ -30,7 +30,7 @@ The primary extraction locates the filled point-marker paths on PDF page 204 wit
 
 As an independent raster check, PDFium rendered the page at 432 dpi. Color-thresholded connected components recovered the 150 red-circle centers, 25 per panel. Their centroid differences from the vector centers were RMS `0.0594` PDF point and maximum `0.1025` PDF point. An axis-calibration sensitivity check compared linear fits to all labelled ticks with endpoint-only fits: the maximum spatial-coordinate change was `0.095 µm`; the largest velocity-coordinate change was `0.429 µm/s` (10.6 µm panel). This is extraction sensitivity only, not measurement uncertainty. The displayed marker half-widths are separately reported in the CSV as a visualization-resolution indicator, not as uncertainty intervals.
 
-The extraction asserts the source checksum and 214-page count, checks marker counts and panel assignments, requires all 234 accepted coordinates to lie within the displayed 0–446 µm spatial axis, verifies the exact 25-point red subset per panel, matches both vector parsers within the declared bound, and cross-checks the raster red markers one-to-one. The retained development log records the initial marker-count, parser-tolerance and inverted-coordinate failures; the failed CSV remains separate from accepted data.
+The extraction asserts the source checksum and 214-page count, checks marker counts and panel assignments, requires all 234 accepted coordinates to lie within the displayed 0–446 µm spatial axis, verifies the exact 25-point red subset per panel, matches both vector parsers within the declared bound, and cross-checks the raster red markers one-to-one. The retained development log records the initial marker-count, parser-tolerance and inverted-coordinate failures, plus a rejected dark-marker raster-localization method: its 7×7-pixel windows saturated at all 84 non-red markers and produced 10–42 tied center candidates each. Its arbitrary tie-breaking offsets are not extraction errors, and no coordinates from that attempt were accepted. Its code and JSON output remain checksummed with the other local artifacts.
 
 ## Limits and interpretation
 
