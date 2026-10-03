@@ -1,6 +1,6 @@
 # Next Main Task — Owner Choice for NUM-01
 
-**Checkpoint:** Owner-recorded P3 PASS for bounded analytical-software verification · **Prepared:** 2026-10-03 · **State:** NUM-01 comparison complete; no backend selected · **Refreshed after:** `3b95531`
+**Checkpoint:** Owner-recorded P3 PASS for bounded analytical-software verification · **Prepared:** 2026-10-03 · **State:** NUM-01 comparison complete; no backend selected · **Refreshed after:** `b0ddcac`
 
 ## Finding that requires a project choice
 
@@ -12,15 +12,19 @@ The completed [NUM-01 method comparison](../research/NUM-01-method-comparison.md
 
 RUN-02 is DONE: `RUN-20261002-e85e4a5922ab4bfa9571dfa90f1037c1` replayed as `RUN-20261003-6be0ee4c106a4e4d965474df709c5683`, with exact field-byte and metric agreement under a fresh ENV-1.0 environment. This satisfies the replay prerequisite for NUM-07/P4 exit; it does not select a numerical method or validate physical behavior. See the [RUN-02 artifact review](../reviews/RUN-02-replay-report.md) and [task record](../work-items/RUN-02.md).
 
+## Plan alignment requiring owner interpretation
+
+The approved documents establish two related but distinct choices. DEC-002 names the 50 mm expanded-polystyrene sphere and one transducer in air as the first measured force-model check. DEC-004 names small particles in water as the first implementation campaign while retaining the air case and later scale work. PLAN-01 §P4.1 still says the first numerical method must match the Phase 1 benchmark, while the current P04 card and NUM-01 comparison use the SRC-W03/MQ1 water geometry. The recommended manufactured water mode can verify a numerical method against P3, but it neither models nor validates the DEC-002 air arrangement. The owner must say whether this is an intentional water-first P4 verification with an explicit plan clarification, whether P4 should be realigned to a bounded air-case field question, or whether the first domain should be deferred/replaced. The detailed conflict and evidence are in the [NUM-01 comparison](../research/NUM-01-method-comparison.md).
+
 ## Owner choice before implementation
 
-Choose the initial P4 question:
+First resolve the P4 domain/benchmark relation above, then choose the initial question:
 
-1. **Recommended — manufactured ideal mode.** Approve a CPU finite-difference eigenmode solver for a 2D water-only symmetry-plane idealization, periodic along-channel and with zero-normal-gradient (Neumann) boundaries at `y = ±w/2`. Explicitly select `(mₓ,nᵧ) = (0,1)` and compare pressure, velocity, gradient and mean intensity against the P3 counterpropagating-wave formulation, as well as the closed-form cosine mode and eigenvalue. At `c₀ = 1497 m/s`, the manufactured half-wave eigenfrequency is `1.985411 MHz`, 2.34% above the source's listed MQ1 `1.940 MHz`; preserve both. The `1 Pa` pressure normalization is only for software comparison, not source calibration. This is an ideal sound-hard-boundary verification case, not a coupled model of the physical chip.
-2. **Wait for complete MQ1 inputs.** The author-thesis facsimile supplies plots and acquisition metadata, and an exploratory artifact recovers six plotted 1D profiles. NUM-03 still lacks the original numerical 2D field arrays, adequate calibration/measurement uncertainty and channel/wall properties. Figure-derived profiles cannot replace them; formal MQ1 comparison remains INDETERMINATE in the meantime.
-3. **Change to a free-space array domain.** Use measured or explicitly manufactured aperture data and analytical/angular-spectrum propagation. This changes the first numerical question and does not represent the MQ1 channel.
+1. **Water-first P4 (DEC-004).** Approve the manufactured CPU finite-difference eigenmode case as a numerical-verification slice for the water campaign and authorize a plan clarification that preserves the separate DEC-002 air force benchmark. Explicitly select `(mₓ,nᵧ) = (0,1)` in the ideal periodic/Neumann domain and compare pressure, velocity, gradient and mean intensity against P3 plus the closed-form mode/eigenvalue. This does not satisfy or validate the air benchmark. At `c₀ = 1497 m/s`, the manufactured half-wave eigenfrequency is `1.985411 MHz`, 2.34% above the listed MQ1 `1.940 MHz`; preserve both. The `1 Pa` normalization is only for software comparison.
+2. **P1-air-aligned P4 (PLAN-01 §P4.1 / DEC-002).** Keep P4 aligned with the first measured force benchmark. This requires a new bounded comparison specifying what numerical field observable and source/body boundary representation can be verified against P3 before the later P5 force-curve comparison. No air solver or boundary model is currently selected; do not infer one from the water comparison.
+3. **Defer or replace the first domain.** Wait for more complete MQ1 inputs, select a bounded free-space array question, or name another domain. The facsimile and figure-derived profiles still lack original spatial arrays, adequate measurement/calibration uncertainty and wall/source inputs. A free-space array does not represent either the MQ1 channel or the DEC-002 sphere setup unless separately justified.
 
-The owner should name the route or describe a different bounded first question. This choice determines the scientific meaning of the first simulator result; it is the NUM-01 decision gate. Until it is recorded, leave NUM-01 ACTIVE and NUM-02/NUM-03 BLOCKED. Do not install solver dependencies, freeze the backend, or begin simulation-core implementation.
+The owner should select a domain/benchmark relation and route, or describe a different bounded first question. This choice determines what the first numerical result means and whether a plan clarification is required. Until it is recorded, leave NUM-01 ACTIVE and NUM-02/NUM-03 BLOCKED. Do not install solver dependencies, freeze the backend, or begin simulation-core implementation.
 
 ## Reconciliation and reading
 
