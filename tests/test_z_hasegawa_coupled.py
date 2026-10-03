@@ -121,7 +121,8 @@ def test_stationary_sphere_modal_kernel_overlaps_plane_wave_reference_including_
         assert observed == pytest.approx(expected, rel=1e-10, abs=2e-10)
 
 
-def test_coupled_piston_sphere_matches_independent_rayleigh_surface_projection():
+@pytest.mark.parametrize("gap", (0.010, 0.020, 0.030))
+def test_coupled_piston_sphere_matches_independent_rayleigh_surface_projection(gap):
     from aura.fields.hasegawa import evaluate_hasegawa_piston_sphere_field
     from aura.fields.numerical import (
         gauss_legendre_rule,
@@ -133,7 +134,8 @@ def test_coupled_piston_sphere_matches_independent_rayleigh_surface_projection()
     density, speed, frequency = 1.18, 346.0, 25_230.0
     omega = 2 * math.pi * frequency
     k = omega / speed
-    sphere_radius, center_distance, piston_radius = 0.025, 0.035, 0.01
+    sphere_radius, piston_radius = 0.025, 0.01
+    center_distance = sphere_radius + gap
     order = 18
 
     # Integrate the piston-only Rayleigh surface kernel on the sphere surface,
