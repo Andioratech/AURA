@@ -80,6 +80,46 @@ def test_coupled_field_matches_independent_unscaled_modal_sum():
     assert actual.pressure_gradient_pa_m[0] == pytest.approx(expected_gradient, rel=1e-10, abs=2e-12)
 
 
+def test_stationary_sphere_modal_kernel_overlaps_plane_wave_reference_including_n1():
+    from aura.fields._plane_sphere_reference import evaluate_plane_wave_rigid_sphere_reference
+    from aura.fields.hasegawa import _evaluate_stationary_sphere_modes
+
+    density, speed, frequency, radius = 1.18, 346.0, 25_230.0, 0.025
+    omega = 2 * math.pi * frequency
+    k = omega / speed
+    points = (
+        (0.0, 0.0, radius),
+        (radius * math.sqrt(3) / 2, 0.0, radius / 2),
+        (0.0, 0.0, -radius),
+    )
+    # For exp(-iwt), p=-i*rho*omega*phi. A +z plane wave with
+    # pressure amplitude rho*c therefore has phi amplitude i/k.
+    phi_amplitude = 1j / k
+    order = 32
+    modal_potential = tuple(
+        ((2 * n + 1) * phi_amplitude * 1j**n, 0)
+        for n in range(order + 1)
+    )
+    prepared_points = tuple((point, point, math.hypot(*point)) for point in points)
+    modal = _evaluate_stationary_sphere_modes(
+        prepared_points,
+        modal_potential_coefficients=modal_potential,
+        density_kg_m3=density, sound_speed_m_s=speed, frequency_hz=frequency,
+        sphere_radius_m=radius, max_order=order,
+    )
+    reference = evaluate_plane_wave_rigid_sphere_reference(
+        points, density_kg_m3=density, sound_speed_m_s=speed,
+        frequency_hz=frequency, peak_pressure_pa=density * speed,
+        sphere_radius_m=radius, max_order=order, workspace_bytes=2_000_000,
+    )
+    for observed, expected in zip(modal.pressure_pa, reference.pressure_pa, strict=True):
+        assert observed == pytest.approx(expected, rel=1e-10, abs=2e-10)
+    for observed, expected in zip(modal.velocity_m_s, reference.velocity_m_s, strict=True):
+        assert observed == pytest.approx(expected, rel=1e-10, abs=2e-10)
+    for observed, expected in zip(modal.pressure_gradient_pa_m, reference.pressure_gradient_pa_m, strict=True):
+        assert observed == pytest.approx(expected, rel=1e-10, abs=2e-10)
+
+
 @pytest.mark.parametrize("sign", (-1, 1))
 def test_coupled_field_satisfies_stationary_sphere_normal_velocity_at_poles(sign):
     from aura.fields.hasegawa import evaluate_hasegawa_piston_sphere_field

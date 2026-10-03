@@ -161,69 +161,99 @@ def evaluate_hasegawa_piston_sphere_field(
         max_order, wave_number_rad_m=wave_number,
         sphere_center_distance_m=sphere_center_distance_m, piston_radius_m=piston_radius_m,
     )
-    _, _, sphere_derivatives = _scaled_derivatives(max_order, ka)
-    omega = 2 * math.pi * frequency_hz
-    prefactor = complex(0.0, 1.0) * velocity_amplitude
-    pressures, velocities, pressure_gradients = [], [], []
+    modal_potential = tuple(
+        _scaled_complex_multiply(
+            _scaled_complex_real(
+                factor, (2 * order + 1) * (-1 if order % 2 else 1) / wave_number
+            ),
+            _scaled_complex(1j * velocity_amplitude),
+        )
+        for order, factor in enumerate(source)
+    )
+    return _evaluate_stationary_sphere_modes(
+        points,
+        modal_potential_coefficients=modal_potential,
+        density_kg_m3=float(density_kg_m3), sound_speed_m_s=float(sound_speed_m_s),
+        frequency_hz=float(frequency_hz), sphere_radius_m=float(sphere_radius_m),
+        max_order=max_order,
+    )
 
+
+def _evaluate_stationary_sphere_modes(
+    points,
+    *,
+    modal_potential_coefficients,
+    density_kg_m3: float,
+    sound_speed_m_s: float,
+    frequency_hz: float,
+    sphere_radius_m: float,
+    max_order: int,
+) -> FieldSamples:
+    """Apply the stationary sphere response to incident potential modes.
+
+    ``modal_potential_coefficients[n]`` multiplies ``j_n(kr) P_n(mu)`` in
+    the incident velocity potential. This internal entry point also permits
+    an exact plane-wave modal overlap test without changing piston physics.
+    ``points`` must already be validated by the public caller.
+    """
+    wave_number = 2 * math.pi * frequency_hz / sound_speed_m_s
+    _, _, sphere_derivatives = _scaled_derivatives(max_order, wave_number * sphere_radius_m)
+    omega = 2 * math.pi * frequency_hz
+    pressures, velocities, pressure_gradients = [], [], []
     for point_index, (point, relative, radius) in enumerate(points):
-        kr = wave_number * radius
-        radial_regular, radial_neumann, radial_derivatives = _scaled_derivatives(max_order, kr)
+        radial_regular, radial_neumann, radial_derivatives = _scaled_derivatives(max_order, wave_number * radius)
         cosine = min(1.0, max(-1.0, relative[2] / radius))
         sine = math.sqrt(max(0.0, 1.0 - cosine * cosine))
         radial_terms, angular_terms, potential_terms = [], [], []
-        for order in range(max_order + 1):
+        for order, incident_mode in enumerate(modal_potential_coefficients):
             at_surface_jp, at_surface_yp = sphere_derivatives[order]
             at_surface_hp = _scaled_complex_add(at_surface_jp, _scaled_complex(1j * at_surface_yp[0], at_surface_yp[1]))
             scattering = _scaled_complex_real(_scaled_divide(at_surface_jp, at_surface_hp), -1.0)
-            scattered_value = _scaled_complex_multiply(scattering, _hankel(radial_regular[order], radial_neumann[order]))
-            total_value = _scaled_complex_add(radial_regular[order], scattered_value)
+            total_value = _scaled_complex_add(
+                radial_regular[order],
+                _scaled_complex_multiply(scattering, _hankel(radial_regular[order], radial_neumann[order])),
+            )
             radial_jp, radial_yp = radial_derivatives[order]
             radial_hp = _scaled_complex_add(radial_jp, _scaled_complex(1j * radial_yp[0], radial_yp[1]))
-            total_derivative = _scaled_complex_add(radial_jp, _scaled_complex_multiply(scattering, radial_hp))
+            total_derivative = _scaled_complex_add(
+                radial_jp, _scaled_complex_multiply(scattering, radial_hp)
+            )
             polynomial, polynomial_derivative = spherical_legendre(order, cosine)
-            weight = (2 * order + 1) * (-1 if order % 2 else 1) * source[order][0]
-            weight_scaled = (weight, source[order][1])
-            potential_mode = _scaled_complex_real(
-                _scaled_complex_multiply(weight_scaled, total_value), polynomial / wave_number
+            potential_terms.append(
+                _scaled_complex_real(_scaled_complex_multiply(incident_mode, total_value), polynomial)
             )
-            radial_mode = _scaled_complex_real(
-                _scaled_complex_multiply(weight_scaled, total_derivative), polynomial
+            radial_terms.append(
+                _scaled_complex_real(
+                    _scaled_complex_multiply(incident_mode, total_derivative),
+                    wave_number * polynomial,
+                )
             )
-            angular_mode = _scaled_complex_real(
-                _scaled_complex_multiply(weight_scaled, total_value), -sine * polynomial_derivative / wave_number
+            angular_terms.append(
+                _scaled_complex_real(
+                    _scaled_complex_multiply(incident_mode, total_value),
+                    -sine * polynomial_derivative,
+                )
             )
-            potential_terms.append(_scaled_complex_multiply(potential_mode, _scaled_complex(prefactor)))
-            radial_terms.append(_scaled_complex_multiply(radial_mode, _scaled_complex(prefactor)))
-            angular_terms.append(_scaled_complex_multiply(angular_mode, _scaled_complex(prefactor)))
 
-        potential = _sum_scaled(potential_terms, f"/potential/{point_index}")
-        radial_gradient = _sum_scaled(radial_terms, f"/radial_gradient/{point_index}")
-        angular_gradient = _sum_scaled(angular_terms, f"/angular_gradient/{point_index}")
-        phi = _unscale_complex(potential, f"/potential/{point_index}")
-        radial = _unscale_complex(radial_gradient, f"/radial_gradient/{point_index}")
-        angular = _unscale_complex(angular_gradient, f"/angular_gradient/{point_index}") / radius
+        phi = _unscale_complex(_sum_scaled(potential_terms, f"/potential/{point_index}"), f"/potential/{point_index}")
+        radial = _unscale_complex(_sum_scaled(radial_terms, f"/radial_gradient/{point_index}"), f"/radial_gradient/{point_index}")
+        angular = _unscale_complex(_sum_scaled(angular_terms, f"/angular_gradient/{point_index}"), f"/angular_gradient/{point_index}") / radius
         ex, ey, ez = (component / radius for component in relative)
         if sine > 0.0:
-            etheta = (
-                cosine * relative[0] / (radius * sine),
-                cosine * relative[1] / (radius * sine),
-                -sine,
-            )
+            etheta = (cosine * relative[0] / (radius * sine), cosine * relative[1] / (radius * sine), -sine)
         else:
             etheta = (0.0, 0.0, 0.0)
         grad_phi = tuple(radial * er + angular * et for er, et in zip((ex, ey, ez), etheta, strict=True))
-        pressure = -1j * float(density_kg_m3) * omega * phi
-        grad_pressure = tuple(-1j * float(density_kg_m3) * omega * component for component in grad_phi)
+        pressure = -1j * density_kg_m3 * omega * phi
+        grad_pressure = tuple(-1j * density_kg_m3 * omega * component for component in grad_phi)
         particle_velocity = tuple(-component for component in grad_phi)
         if not all(math.isfinite(value.real) and math.isfinite(value.imag) for value in (pressure, *grad_pressure, *particle_velocity)):
             raise NumericalDomainError("NUMERIC_RANGE", f"/samples/{point_index}", "Field output is not representable.")
         pressures.append(pressure)
         velocities.append(particle_velocity)
         pressure_gradients.append(grad_pressure)
-
     return FieldSamples(
-        frequency_hz=float(frequency_hz), coordinates_m=tuple(item[0] for item in points),
+        frequency_hz=frequency_hz, coordinates_m=tuple(item[0] for item in points),
         pressure_pa=tuple(pressures), velocity_m_s=tuple(velocities),
         pressure_gradient_pa_m=tuple(pressure_gradients),
     )
