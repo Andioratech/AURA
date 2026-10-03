@@ -1,5 +1,6 @@
 """Focused checks for the truncated Hasegawa piston/rigid-sphere field."""
 
+import cmath
 import math
 
 import pytest
@@ -118,6 +119,99 @@ def test_stationary_sphere_modal_kernel_overlaps_plane_wave_reference_including_
         assert observed == pytest.approx(expected, rel=1e-10, abs=2e-10)
     for observed, expected in zip(modal.pressure_gradient_pa_m, reference.pressure_gradient_pa_m, strict=True):
         assert observed == pytest.approx(expected, rel=1e-10, abs=2e-10)
+
+
+def test_coupled_piston_sphere_matches_independent_rayleigh_surface_projection():
+    from aura.fields.hasegawa import evaluate_hasegawa_piston_sphere_field
+    from aura.fields.numerical import (
+        gauss_legendre_rule,
+        spherical_bessel_jy,
+        spherical_legendre,
+        stationary_sphere_coefficient,
+    )
+
+    density, speed, frequency = 1.18, 346.0, 25_230.0
+    omega = 2 * math.pi * frequency
+    k = omega / speed
+    sphere_radius, center_distance, piston_radius = 0.025, 0.035, 0.01
+    order = 18
+
+    # Integrate the piston-only Rayleigh surface kernel on the sphere surface,
+    # then project it onto regular Legendre/spherical-Bessel modes. This source
+    # path does not use Hasegawa's piston diffraction-factor recurrence.
+    surface_nodes, surface_weights = gauss_legendre_rule(64)
+    radial_nodes, radial_weights = gauss_legendre_rule(64)
+    aperture_radii = tuple(
+        (piston_radius * math.sqrt((node + 1) / 2), weight / 2)
+        for node, weight in zip(radial_nodes, radial_weights, strict=True)
+    )
+    azimuth_count = 256
+    azimuths = tuple(2 * math.pi * index / azimuth_count for index in range(azimuth_count))
+    incident_on_surface = []
+    for cosine in surface_nodes:
+        radial_coordinate = sphere_radius * math.sqrt(1 - cosine * cosine)
+        axial_coordinate = center_distance + sphere_radius * cosine
+        potential = 0j
+        for aperture_radius, radial_weight in aperture_radii:
+            disk_weight = radial_weight * piston_radius**2 / 2
+            for azimuth in azimuths:
+                distance = math.sqrt(
+                    radial_coordinate**2 + aperture_radius**2
+                    - 2 * radial_coordinate * aperture_radius * math.cos(azimuth)
+                    + axial_coordinate**2
+                )
+                green = cmath.exp(1j * k * distance) / distance
+                potential += disk_weight * (2 * math.pi / azimuth_count) * green / (2 * math.pi)
+        incident_on_surface.append(potential)
+
+    incident_modes = []
+    for mode in range(order + 1):
+        regular_at_surface = spherical_bessel_jy(mode, k * sphere_radius)[0]
+        projection = sum(
+            weight * incident_on_surface[index] * spherical_legendre(mode, cosine)[0]
+            for index, (cosine, weight) in enumerate(zip(surface_nodes, surface_weights, strict=True))
+        )
+        incident_modes.append((2 * mode + 1) * projection / (2 * regular_at_surface))
+
+    for theta, azimuth, field_radius in ((0.73, 0.41, 0.030), (1.1, 1.7, 0.032), (2.0, 2.4, 0.034)):
+        cosine, sine = math.cos(theta), math.sin(theta)
+        potential = radial_gradient = angular_gradient = 0j
+        for mode, incident_mode in enumerate(incident_modes):
+            regular, irregular, regular_prime, irregular_prime = spherical_bessel_jy(
+                mode, k * field_radius
+            )
+            scattering = stationary_sphere_coefficient(mode, k * sphere_radius)
+            total = complex(regular, 0.0) + scattering * complex(regular, irregular)
+            total_prime = complex(regular_prime, 0.0) + scattering * complex(regular_prime, irregular_prime)
+            polynomial, polynomial_prime = spherical_legendre(mode, cosine)
+            potential += incident_mode * total * polynomial
+            radial_gradient += incident_mode * k * total_prime * polynomial
+            angular_gradient -= incident_mode * total * sine * polynomial_prime / field_radius
+        radial = (sine * math.cos(azimuth), sine * math.sin(azimuth), cosine)
+        polar = (cosine * math.cos(azimuth), cosine * math.sin(azimuth), -sine)
+        gradient = tuple(
+            radial_gradient * radial_axis + angular_gradient * polar_axis
+            for radial_axis, polar_axis in zip(radial, polar, strict=True)
+        )
+        expected_pressure = -1j * density * omega * potential
+        expected_velocity = tuple(-component for component in gradient)
+        expected_gradient = tuple(-1j * density * omega * component for component in gradient)
+
+        point = (
+            field_radius * sine * math.cos(azimuth),
+            field_radius * sine * math.sin(azimuth),
+            center_distance + field_radius * cosine,
+        )
+        actual = evaluate_hasegawa_piston_sphere_field(
+            [point], density_kg_m3=density, sound_speed_m_s=speed,
+            frequency_hz=frequency, piston_velocity_peak_m_s=1.0,
+            piston_radius_m=piston_radius, sphere_radius_m=sphere_radius,
+            sphere_center_distance_m=center_distance, max_order=order,
+            workspace_bytes=2_000_000,
+        )
+        assert actual.pressure_pa[0] == pytest.approx(expected_pressure, rel=1e-10, abs=2e-12)
+        assert actual.velocity_m_s[0] == pytest.approx(expected_velocity, rel=1e-10, abs=2e-12)
+        assert actual.pressure_gradient_pa_m[0] == pytest.approx(expected_gradient, rel=1e-10, abs=2e-12)
 
 
 @pytest.mark.parametrize("sign", (-1, 1))
