@@ -134,8 +134,12 @@ def test_changes_during_read_are_not_accepted(tmp_path, monkeypatch, mode):
 
     monkeypatch.setattr(os, "read", read)
     if mode == "remove":
-        with pytest.raises(FileNotFoundError):
+        # Depending on when ctime changes, removal is detected at the
+        # descriptor check or the later pathname lookup. Either rejects it.
+        with pytest.raises((FileNotFoundError, IntegrityError)) as caught:
             file_sha256(path, max_bytes=3)
+        if isinstance(caught.value, IntegrityError):
+            assert caught.value.code == "ARTIFACT_CHANGED"
     else:
         with pytest.raises(IntegrityError) as caught:
             file_sha256(path, max_bytes=3)
