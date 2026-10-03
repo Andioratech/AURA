@@ -28,19 +28,19 @@ def kernels():
     )
 
 
-def _decimal_spherical_j(order, argument):
+def _decimal_spherical_j(order, argument, *, precision=160, max_terms=300):
     with localcontext() as context:
-        context.prec = 160
+        context.prec = precision
         x = Decimal(str(argument))
         denominator = Decimal(1)
         for index in range(1, order + 1):
             denominator *= 2 * index + 1
         term = Decimal(1)
         series = term
-        for index in range(1, 300):
+        for index in range(1, max_terms):
             term *= -(x * x) / (Decimal(2 * index) * (2 * order + 2 * index + 1))
             series += term
-            if abs(term) < Decimal("1e-90"):
+            if abs(term) < Decimal(1).scaleb(-(precision - 20)):
                 break
         return x**order * series / denominator
 
@@ -117,6 +117,29 @@ def test_miller_j_values_against_independent_decimal_series(order, x, kernels):
     actual = spherical_bessel_jy(order, x)[0]
     expected = float(_decimal_spherical_j(order, x))
     assert actual == pytest.approx(expected, rel=2e-13, abs=2e-15)
+
+
+@pytest.mark.parametrize("order", (0, 1, 8, 16, 32))
+def test_large_argument_j_values_match_high_precision_decimal_series(order, kernels):
+    spherical_bessel_jy, _, _, _, _ = kernels
+    argument = 446.664123
+    actual, _, actual_derivative, _ = spherical_bessel_jy(order, argument)
+    expected = float(_decimal_spherical_j(order, argument, precision=340, max_terms=1200))
+    expected_next = float(_decimal_spherical_j(order + 1, argument, precision=340, max_terms=1200))
+    expected_derivative = order * expected / argument - expected_next
+    assert actual == pytest.approx(expected, rel=2e-12, abs=2e-15)
+    assert actual_derivative == pytest.approx(expected_derivative, rel=2e-12, abs=2e-15)
+
+
+def test_very_large_argument_low_order_j_matches_high_precision_decimal(kernels):
+    spherical_bessel_jy, _, _, _, _ = kernels
+    argument, order = 2279.0, 1
+    actual, _, actual_derivative, _ = spherical_bessel_jy(order, argument)
+    expected = float(_decimal_spherical_j(order, argument, precision=1400, max_terms=5000))
+    expected_next = float(_decimal_spherical_j(order + 1, argument, precision=1400, max_terms=5000))
+    expected_derivative = order * expected / argument - expected_next
+    assert actual == pytest.approx(expected, rel=2e-12, abs=2e-15)
+    assert actual_derivative == pytest.approx(expected_derivative, rel=2e-12, abs=2e-15)
 
 
 def test_miller_normalization_remains_finite_for_high_order_near_air_ka(kernels):

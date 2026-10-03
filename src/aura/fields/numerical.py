@@ -23,9 +23,11 @@ def _finite(value: float, path: str) -> float:
 def spherical_bessel_jy(order: int, x: float) -> tuple[float, float, float, float]:
     """Return ``j_n, y_n, j'_n, y'_n`` for real ``x > 0``.
 
-    ``j_n`` uses a downward Miller recurrence normalized by the analytic
-    ``j_0``/``j_1`` pair. ``y_n`` uses its stable upward recurrence. No external
-    numerical package or silent precision fallback is used.
+    ``j_n`` uses downward Miller recurrence normalized by the analytic
+    ``j_0``/``j_1`` pair unless all requested orders are well inside the
+    oscillatory region, where upward recurrence is stable. ``y_n`` uses upward
+    recurrence. No external numerical package or silent precision fallback is
+    used.
     """
     if type(order) is not int or order < 0:
         raise InvalidInputError("BESSEL_ORDER", "/order", "Expected a nonnegative integer order.")
@@ -34,6 +36,10 @@ def spherical_bessel_jy(order: int, x: float) -> tuple[float, float, float, floa
     x = float(x)
     if order > 4096:
         raise InvalidInputError("BESSEL_ORDER_RANGE", "/order", "Order exceeds the bounded recurrence limit.")
+    if x > 8192:
+        raise InvalidInputError(
+            "BESSEL_WORK_RANGE", "/x", "The bounded Bessel recurrence workspace would be exceeded."
+        )
 
     return tuple(component[order] for component in _spherical_sequences(order, float(x)))
 
@@ -42,33 +48,42 @@ def _spherical_sequences(
     max_order: int, x: float
 ) -> tuple[tuple[float, ...], tuple[float, ...], tuple[float, ...], tuple[float, ...]]:
     """Build the four real sequences once for a shared argument."""
-    # Miller's start must exceed both the requested order and the oscillatory region.
-    margin = max(32, int(math.sqrt(40 * (max_order + 1))))
-    start = max(max_order + 1 + margin, math.ceil(x) + margin)
-    if start > 8192:
-        raise InvalidInputError(
-            "BESSEL_WORK_RANGE", "/x", "The bounded Miller recurrence workspace would be exceeded."
-        )
-    values = [0.0] * (start + 2)
-    values[start] = 1.0
-    for n in range(start, 0, -1):
-        if max(abs(values[n]), abs(values[n + 1])) > 1e200:
-            for index in range(n, start + 2):
-                values[index] *= 1e-200
-        values[n - 1] = ((2 * n + 1) / x) * values[n] - values[n + 1]
-        _finite(values[n - 1], "/j_recurrence")
-
     j0 = math.sin(x) / x
     j1 = math.sin(x) / (x * x) - math.cos(x) / x
-    norm = max(abs(values[0]), abs(values[1]))
-    if norm == 0 or not math.isfinite(norm):
-        raise NumericalDomainError("BESSEL_NORMALIZATION", "/x", "Miller normalization failed.")
-    normalized_zero, normalized_one = values[0] / norm, values[1] / norm
-    denom = normalized_zero * normalized_zero + normalized_one * normalized_one
-    scale = (
-        (normalized_zero * j0 + normalized_one * j1) / denom
-    ) / norm
-    _finite(scale, "/j_normalization")
+    if x > max_order + 64:
+        # Upward recurrence is stable when every requested order is well inside
+        # the oscillatory region; it avoids Miller normalization loss at large x.
+        j_values = [j0, j1]
+        for n in range(1, max_order + 1):
+            next_value = ((2 * n + 1) / x) * j_values[n] - j_values[n - 1]
+            j_values.append(_finite(next_value, f"/j_{n + 1}"))
+    else:
+        # Miller's start must exceed both the requested order and the oscillatory region.
+        margin = max(32, int(math.sqrt(40 * (max_order + 1))))
+        start = max(max_order + 1 + margin, math.ceil(x) + margin)
+        if start > 8192:
+            raise InvalidInputError(
+                "BESSEL_WORK_RANGE", "/x",
+                "The bounded Miller recurrence workspace would be exceeded.",
+            )
+        values = [0.0] * (start + 2)
+        values[start] = 1.0
+        for n in range(start, 0, -1):
+            if max(abs(values[n]), abs(values[n + 1])) > 1e200:
+                for index in range(n, start + 2):
+                    values[index] *= 1e-200
+            values[n - 1] = ((2 * n + 1) / x) * values[n] - values[n + 1]
+            _finite(values[n - 1], "/j_recurrence")
+
+        norm = max(abs(values[0]), abs(values[1]))
+        if norm == 0 or not math.isfinite(norm):
+            raise NumericalDomainError("BESSEL_NORMALIZATION", "/x", "Miller normalization failed.")
+        normalized_zero, normalized_one = values[0] / norm, values[1] / norm
+        denom = normalized_zero * normalized_zero + normalized_one * normalized_one
+        scale = ((normalized_zero * j0 + normalized_one * j1) / denom) / norm
+        _finite(scale, "/j_normalization")
+        j_values = [_finite(values[n] * scale, f"/j_{n}") for n in range(max_order + 2)]
+
     y0 = -math.cos(x) / x
     y1 = -math.cos(x) / (x * x) - math.sin(x) / x
     y_values = [y0, y1]
@@ -76,7 +91,7 @@ def _spherical_sequences(
         next_value = ((2 * n + 1) / x) * y_values[n] - y_values[n - 1]
         y_values.append(_finite(next_value, "/y_n"))
 
-    j_values = tuple(_finite(values[n] * scale, f"/j_{n}") for n in range(max_order + 2))
+    j_values = tuple(j_values[: max_order + 2])
     j_derivatives = tuple(
         _finite((n / x) * j_values[n] - j_values[n + 1], f"/j_{n}_derivative")
         for n in range(max_order + 1)
