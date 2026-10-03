@@ -1,6 +1,6 @@
 # PLAN-01: AURA Phase-Gated Master Work Plan
 
-**Version:** 1.4 · **Status:** BASELINE · **Owner:** AURA project owner · **Last updated:** 2026-10-03
+**Version:** 1.3 · **Status:** BASELINE · **Owner:** AURA project owner · **Last updated:** 2026-10-02
 
 ## 1. Purpose
 
@@ -61,7 +61,7 @@ Do not combine claim-critical gates to save time. Foundation work may proceed wh
 | P1 | REVIEW — EVIDENCE TRACK | First benchmark and comparison rule are recorded; source measurement uncertainty remains unquantified. Keep the published-curve comparison descriptive/INDETERMINATE; continue source search when useful. This no longer blocks P2 or P3 foundation work |
 | P2 | ACTIVE — FOUNDATION TRACK | Define SI contracts, scenario/run schemas and MCLF L0 rules without filling missing physical inputs with defaults |
 | P3 | QUEUED | Begin after P2's own contract and known-answer review; it does not require a conclusive P1 force validation |
-| P4-P10 | GATED | Owner selected the air route under DEC-005. NUM-01 selected Hasegawa et al.'s centered piston/sphere series for P4; freeze the complete field contract and pass solver-specific stability/resource/convergence preflight before any run. P4 verifies fields only. Later force comparison remains INDETERMINATE unless source uncertainty is recovered or suitable independent measurement evidence is added |
+| P4-P10 | GATED | Advance according to scientific dependencies below. Before P4 solver runs, freeze its domain and complete solver-specific resource preflight. P5 comparisons using the current figure remain INDETERMINATE unless source uncertainty is recovered or a suitable independent measurement is added |
 
 ## 5. Phase details
 
@@ -84,7 +84,7 @@ Do not combine claim-critical gates to save time. Foundation work may proceed wh
 
 **Stop conditions:** missing provenance, conflicting claims with no decision, uncertain ownership/license, or unstable repository identity. Do not start solver implementation while these remain unresolved.
 
-**Decision and evidence:** P0 PASS was recorded on 2026-10-01 after owner approval, source checksum verification, repository review, local quality checks, and successful remote CI. See [DEC-001](decisions/DEC-001-p0-baseline-approval.md). On 2026-10-02, DEC-003 approved foundation work to continue while P1 source uncertainty remains unresolved. This does not validate a solver or benchmark or authorize stronger claims. G01-G05 remain DRAFT.
+**Decision and evidence:** P0 PASS was recorded on 2026-10-01 after owner approval, source checksum verification, repository review, local quality checks, and successful remote CI. See [DEC-001](../decisions/DEC-001-p0-baseline-approval.md). On 2026-10-02, DEC-003 approved foundation work to continue while P1 source uncertainty remains unresolved. This does not validate a solver or benchmark or authorize stronger claims. G01-G05 remain DRAFT.
 
 ### P1 — Bounded question and benchmark selection
 
@@ -153,11 +153,11 @@ Do not combine claim-critical gates to save time. Foundation work may proceed wh
 
 **Work packages**
 
-- P4.1 Select one fast numerical method matched to the Phase 1 air benchmark in DEC-002 and DEC-005; justify why it answers the air source/sphere field question without treating the published force curve as a measured field map.
-- P4.2 Specify harmonic-order/discretization strategy, source and body boundaries, phasor convention, numerical precision, convergence observables, and resource estimate.
+- P4.1 Select one fast numerical method matched to the Phase 1 benchmark; justify why it answers the question.
+- P4.2 Specify mesh/grid, boundary conditions, solver precision, tolerances, and resource estimate.
 - P4.3 Implement input validation and preflight before allocating the numerical domain.
 - P4.4 Compare the solver pointwise and through the primary field observable with Phase 3.
-- P4.5 Run at least three harmonic-order or other applicable discretization levels for the observable; record actual convergence.
+- P4.5 Run at least three grid or discretization levels for the observable; record actual convergence.
 - P4.6 Test domain expansion or boundary/PML sensitivity if boundaries can contaminate results.
 - P4.7 Record runtime and peak memory; update the approved resource envelope from observed measurements.
 
@@ -354,7 +354,7 @@ Changes to phase order, gates, primary observables, acceptance thresholds, model
 ## 11. Immediate next actions
 
 1. DEC-002 records the owner's approval of the Andrade et al. 50 mm sphere force measurement as AURA's first measurable force-model check. DEC-003 records the owner's direction to keep progressing while source uncertainty remains open.
-2. P1 remains open for source uncertainty and benchmark review. Its current figure comparison is descriptive and INDETERMINATE; it no longer blocks foundation work. The executable task board and subplans are in [docs/planning/README.md](planning/README.md).
+2. P1 remains open for source uncertainty and benchmark review. Its current figure comparison is descriptive and INDETERMINATE; it no longer blocks foundation work. The executable task board and subplans are in [docs/planning/README.md](../planning/README.md).
 3. Start P2.1–P2.8 through FND-01 in the detailed plan: unit conventions, small versioned schemas, pure dimensional/acoustic calculations, and the first MCLF L0 rule table. Do not add acoustic PDE solvers, force calculations or target-control logic in P2.
 4. After P2 review, proceed to P3 analytical wave cases. Treat them as equation/code verification, not experimental validation of AURA.
 5. Use the detailed decision tree and failure playbooks to branch when evidence is missing, a model leaves its domain, a run fails, or a limitation appears. Preserve the original result and create a new experiment when assumptions change.
@@ -376,8 +376,8 @@ These steps are a research path, not performance promises. Advancement requires 
 
 ## 13. Scale progression as an explicit research objective
 
-[DEC-004](decisions/DEC-004-staged-mass-and-size-expansion.md) preserves research into small particles in water, greater masses, larger objects and other geometries toward microgravity. [DEC-005](decisions/DEC-005-air-validation-route.md) updates the first numerical implementation route to air so it aligns with the intended validation medium and the DEC-002 benchmark. The water evidence track remains separate and cannot validate the air route. The [SC-01–SC-05 track](planning/11-scale-progression.md) supplies scale-transition tasks.
+[DEC-004](../decisions/DEC-004-staged-mass-and-size-expansion.md) records the owner's clarification that small particles in water are the initial implementation case, while the project also investigates greater masses, larger objects and other geometries toward microgravity. The [SC-01–SC-05 track](../planning/11-scale-progression.md) supplies concrete research, model-transition and evidence tasks.
 
 Begin scale-candidate research alongside P2 foundations. For each selected numerical campaign, repeat the applicable P3–P9 gates with its own domain, equations, resources and reference evidence; reuse earlier infrastructure only where its contracts remain valid. Neither a favorable nor an unfavorable small-particle result automatically decides a distinct larger-body hypothesis. Mass, dimensions and shape are recorded separately; no maximum achievable scale is assumed.
 
-Version 1.4 records the owner-approved air-first numerical route while retaining the water evidence and broader scale-research tracks; no past result, physical equation, tolerance or acceptance criterion is changed. [PLAN-01 v1.3](archive/PLAN-01-v1.3-project-execution-plan.md) is retained as a historical snapshot. The M1–M4 examples remain scoped; M1 air is the first solver/force reference, not evidence for the eventual acceleration target.
+Version 1.3 clarifies program scope and links this track without changing existing equations, tolerances or evidence gates. The previous [PLAN-01 v1.2](PLAN-01-v1.2-project-execution-plan.md) is retained as a historical snapshot. The M1–M4 reference leads above remain scoped examples, not a requirement to switch the water campaign into air.

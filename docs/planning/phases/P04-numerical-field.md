@@ -12,15 +12,15 @@ Use [00](../00-execution-protocol.md), the [task template](../templates/task-rec
 
 ## NUM-01 — Choose one backend that answers the selected question
 
-**Current state:** ACTIVE — comparison and conditional recommendation are recorded in [NUM-01 method comparison](../../research/NUM-01-method-comparison.md). An owner interpretation is also needed: PLAN-01 §P4.1 says the method must match the P1 benchmark (DEC-002's 50 mm sphere/transducer case in air), while DEC-004 establishes small particles in water as the first implementation campaign and this card uses SRC-W03/MQ1 water geometry. The manufactured Neumann mode would verify an ideal water formulation only; it does not address or validate the air force benchmark. The owner must decide whether P4 proceeds as a water-first verification slice with a plan clarification, is realigned to a newly specified P1-air field question, or is deferred/replaced. If the water mode is selected, target the streamwise-uniform first transverse mode `(mₓ,nᵧ)=(0,1)` rather than the first nonzero eigenvalue, and compare pressure, velocity, gradient and mean intensity against the matched P3 counterpropagating-wave field. RUN-02 source-bound replay is DONE, but no numerical backend is frozen and NUM-02/03 have not started. **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
+**Current state:** ACTIVE — [DEC-005](../../decisions/DEC-005-air-validation-route.md) records the owner's choice of air for the intended validation route and aligns P4 with the DEC-002 sphere/transducer case. NUM-01 selects Hasegawa et al.'s centered baffled-piston/rigid-sphere spherical-harmonic series, subject to NUM-02 stability/resource/convergence preflight. P4 imposes a stationary sound-hard sphere boundary at every order; derive the special `n=1` coefficient from zero normal velocity and do not reuse the source's separate translating-sphere coefficient. The water-particle evidence remains a distinct exploratory track. P4 verifies fields only: no measured field map exists, force comparison is later and remains uncertainty-limited, and acceleration/gravity equivalence remain outside this gate. Prior-art examples do not establish convergence at AURA's source/body parameters. No solver code has started; run the required simulation-core explanation checkpoint before NUM-02/03 implementation. See [NUM-01](../../research/NUM-01-method-comparison.md). **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
 
 **Inputs / predecessors:** ANA-07, LIT-02
 
 **Steps**
 
-1. Compare analytical transfer/superposition discretization and alternative fast numerical methods against the required boundary/scattering representation.
-2. Choose one method; state equations, source normalization, geometry, approximation, precision and missing physics.
-3. If the water reference needs walls beyond the fast model, plan a qualified overlap case and D-04 branch; do not claim unmodeled wall validity.
+1. Reproduce the selected primary-source series equations and explicitly map its phasor convention to FIELD-1.0; keep the stationary-sphere and translating-sphere coefficient branches separate.
+2. Define source normalization, geometry, air property source, centered sphere boundary, output observables, supported gap range, arithmetic and all missing physics.
+3. Predeclare independent piston-only Rayleigh, P3 plane-wave, exact plane-wave/sphere and harmonic-order checks. Do not claim measured-field validation when the benchmark supplies no field maps.
 
 **Required artifacts:** Backend decision; `fields/numerical.py` interface specification; frozen solver-domain record.
 

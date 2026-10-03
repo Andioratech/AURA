@@ -8,7 +8,7 @@ The small-sphere particle-force formulations reviewed in LIT-03 are not transfer
 
 The published boundary-element method (BEM) of Inoue et al. is a **candidate formulation for a separately reviewed future model contract**, not an AURA model selection or validation. Its primary source derives the scattered pressure with a Kirchhoff–Helmholtz boundary integral, discretizes the body and array, then integrates time-averaged radiation loading over the body surface to obtain force and moment (Eqs. 1–13). The authors report sound-hard boundary, neglect of air viscosity, neglect of re-reflection at the transducers, constant transducer amplitudes during phase optimization, and finite stable-region behavior. The study observed force-model discrepancy for its sphere and did not directly measure octahedron torque. The boundary impedance assumption alone is sufficient to prevent treating it as a validated EPS model.
 
-This decision applies only to studying a rigid, acoustically scattering body with dimensions comparable to or larger than wavelength. It selects neither air nor water, a material, hardware, an AURA operating point, a target acceleration, nor a simulation implementation. The water-particle campaign remains separate.
+This review applies only to studying a rigid, acoustically scattering body with dimensions comparable to or larger than wavelength. Under later [DEC-005](../decisions/DEC-005-air-validation-route.md), AURA selected air for its intended validation route; that does not change this review's candidate-only status, select a material or operating point, or authorize a simulation implementation. The water-particle evidence campaign remains separate.
 
 ## Why the particle model does not transfer
 

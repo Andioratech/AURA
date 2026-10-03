@@ -1,6 +1,6 @@
 # AURA-D00: Document Control and Scientific Baseline
 
-**Version:** 1.3 · **Status:** BASELINE · **Date:** 2026-10-02 · **Owner:** Andiora Research
+**Version:** 1.4 · **Status:** BASELINE · **Date:** 2026-10-03 · **Owner:** Andiora Research
 
 ## Purpose
 
@@ -58,7 +58,7 @@ Use MAJOR.MINOR versions. Increase MAJOR when requirements, accepted equations, 
 
 ## Baseline approval
 
-On 2026-10-01, the project owner approved D00-D09 and PLAN-01 as the controlled development baseline. The decision is recorded in [DEC-001](decisions/DEC-001-p0-baseline-approval.md) against commit `8cbd2e2e50a17e96299fd00dbba667b5c3b24ed4`. On 2026-10-02, the owner approved the first measurable force-model benchmark and a staged search for later benchmarks; [DEC-002](decisions/DEC-002-initial-measurable-force-benchmark.md) records the scope. The owner later directed that missing evidence must not stop independent foundation work; [DEC-003](decisions/DEC-003-nonblocking-foundation-work.md) records the evidence limits and sequencing change. [DEC-004](decisions/DEC-004-staged-mass-and-size-expansion.md) records the clarification that small particles are the starting campaign and greater masses, larger bodies and other geometries remain explicit research objectives. PLAN-01 v1.3 is current; v1.0, v1.1 and v1.2 are preserved in the archive. G01-G05 remain DRAFT pending procedure review. These directions authorize foundation work and a gated research scope; they do not validate AURA's hypothesis, establish feasibility, or permit claims beyond the available evidence.
+On 2026-10-01, the project owner approved D00-D09 and PLAN-01 as the controlled development baseline. The decision is recorded in [DEC-001](decisions/DEC-001-p0-baseline-approval.md) against commit `8cbd2e2e50a17e96299fd00dbba667b5c3b24ed4`. On 2026-10-02, the owner approved the first measurable force-model benchmark and a staged search for later benchmarks; [DEC-002](decisions/DEC-002-initial-measurable-force-benchmark.md) records the scope. The owner later directed that missing evidence must not stop independent foundation work; [DEC-003](decisions/DEC-003-nonblocking-foundation-work.md) records the evidence limits and sequencing change. [DEC-004](decisions/DEC-004-staged-mass-and-size-expansion.md) records the broader water-particle and scale-progression research direction. [DEC-005](decisions/DEC-005-air-validation-route.md) records the owner-selected air validation medium and P4 route while preserving water as a separate evidence track. PLAN-01 v1.4 is current; v1.0–v1.3 are preserved in the archive. G01-G05 remain DRAFT pending procedure review. These directions authorize foundation work and a gated research scope; they do not validate AURA's hypothesis, establish feasibility, or permit claims beyond the available evidence.
 
 ## Progress while evidence is incomplete
 

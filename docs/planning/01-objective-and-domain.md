@@ -2,11 +2,11 @@
 
 ## Program objective and first operational question
 
-The program investigates whether controlled acoustic forcing can produce a prescribed acceleration for selected bodies across explicitly investigated mass, size and geometry domains, toward microgravity operation. Small particles in water are the first campaign. Greater masses and larger or differently shaped objects are an explicit research objective under [DEC-004](../decisions/DEC-004-staged-mass-and-size-expansion.md); follow [11](11-scale-progression.md) to investigate each transition.
+The program investigates whether controlled acoustic forcing can produce a prescribed acceleration for selected bodies across explicitly investigated mass, size and geometry domains, toward microgravity operation. The owner selected air as the intended validation medium and P4 numerical route under [DEC-005](../decisions/DEC-005-air-validation-route.md), using the distinct DEC-002 sphere/transducer reference as the first field/force path. Small particles in water remain a separate exploratory evidence campaign; they do not validate the air case. Greater masses and other body geometries remain explicit objectives under [DEC-004](../decisions/DEC-004-staged-mass-and-size-expansion.md); follow [11](11-scale-progression.md) for transitions.
 
 The first operational question is:
 
-For a specified small particle suspended in water, can an admissible ultrasonic actuation policy make its resolved center-of-mass acceleration follow a predeclared vector over a finite interval and a bounded workspace, with an independently checked force/motion model and uncertainty budget?
+For the DEC-002 sphere/transducer case in air, can an independently checked field and force model support a later, separately frozen acceleration-target trial in the owner-selected air validation medium? P4 first addresses only acoustic-field computation; force, body dynamics, target acceleration and gravity environment remain later gates.
 
 The long-term environment is microgravity. Earth-gravity comparisons are development controls. Setting a gravity vector to zero is a modeled idealization; it is not evidence about a real flight environment. AURA remains an unvalidated hypothesis.
 
@@ -29,10 +29,10 @@ Freeze the quantifiers: one particle versus every member of a material class; on
 
 | Field | Required declaration | Current planning state |
 |---|---|---|
-| Medium | Water composition, temperature, density, sound speed, viscosity, compressibility, attenuation; uncertainties and sources | Water selected; properties depend on chosen reference |
-| Particle | Material, radius distribution, shape, density, compressibility, surface assumptions | Small particles intended; numeric range/material selection in LIT-02 |
+| Medium | Air state/composition, temperature, density, sound speed, viscosity and attenuation; uncertainties and sources. Keep the water reference separately scoped. | Air selected for the initial numerical route and intended validation medium; actual air state remains to be sourced/frozen |
+| Body | Material, geometry, size, density, compressibility and surface assumptions | P4/P5 field/force reference: 50 mm, 1.46 g EPS sphere from DEC-002; eventual acceleration-trial body is not selected |
 | Concentration | One isolated particle or justified dilute ensemble; interaction assumptions | Start one particle |
-| Chamber | Dimensions, walls, impedance/no-slip assumptions, source arrangement | Select a simple reference geometry before P4 |
+| Chamber | Air volume, transducer face/baffle, sphere geometry/gap, outer radiation boundary | Use DEC-002 geometry for the P4 field route; idealized geometry and outer-boundary treatment must be stated in NUM-01 |
 | Actuation | Frequency, phasor convention, source calibration, limits, bandwidth, total budget | Source-backed selection or explicit hypothetical scenario |
 | Frames | Laboratory/chamber coordinates, +Z convention, medium flow, gravity vector | Must be frozen by FND-01 |
 | Environment | Earth comparison, ideal zero gravity, or sourced residual acceleration/time series | Implement parameterized gravity in P6 |
@@ -56,9 +56,9 @@ Account for radiation force, fluid drag, gravity/buoyancy under the selected fra
 
 Earth and zero-gravity cases must update the consistent fluid/body force balance. Removing gravity does not remove viscosity, walls or acoustic streaming.
 
-## Separate the air reference
+## Air validation route and separate water evidence
 
-Keep [Andrade P1.3](../benchmarks/P1.3-andrade-force-curve-specification.md) and its digitized data intact. It remains an exploratory air-sphere force reference; its experimental uncertainty is unresolved. Its large object regime cannot validate a small-particle water implementation. A matched air scattering backend would be separate, conditional work only if its scientific benefit justifies it. The water simulator need not implement that expensive backend merely to finish an unrelated benchmark.
+[Andrade P1.3](../benchmarks/P1.3-andrade-force-curve-specification.md) and its digitized data now anchor the air-aligned P4/P5 route under DEC-005. P4 field calculations do not reproduce a measured pressure map because none is supplied; they must be verified with independent analytic cases. P5 can compare the modeled force with the published air-sphere curve, but the unresolved experimental uncertainty keeps formal acceptance INDETERMINATE. This route does not establish a prescribed acceleration or microgravity behavior. Retain the water-particle evidence and its missing arrays/uncertainty as a separate track; neither medium transfers validation to the other.
 
 ## Scientific completion and outcomes
 

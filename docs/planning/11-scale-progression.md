@@ -1,14 +1,14 @@
 # 11 — Progression to Greater Masses and Larger Bodies
 
-**Status:** Planned research track · **Authority:** [DEC-004](../decisions/DEC-004-staged-mass-and-size-expansion.md)
+**Status:** Planned research track · **Authorities:** [DEC-004](../decisions/DEC-004-staged-mass-and-size-expansion.md), [DEC-005](../decisions/DEC-005-air-validation-route.md)
 
 ## Objective and relationship to the first campaign
 
-AURA investigates controlled acoustic forcing and prescribed acceleration across explicitly selected body domains. Small particles in water provide the first campaign. Greater masses, larger dimensions and other shapes are part of the research objective, with each step allowed to succeed, fail or remain unresolved.
+AURA investigates controlled acoustic forcing and prescribed acceleration across explicitly selected body domains. Under DEC-005, air is the intended validation medium and the first numerical route follows the DEC-002 sphere benchmark. Small-particle water measurements remain a separate exploratory evidence campaign. Greater masses, larger dimensions and other shapes remain part of the research objective, with each step allowed to succeed, fail or remain unresolved.
 
 The initial P2–P9 sequence builds reusable infrastructure and evidence for its first domain. Subsequent campaigns repeat the applicable model, numerical, force, dynamics, control and independent-evidence gates. Completion of one particle demonstrator does not close the overall scale question.
 
-Water remains the initial medium. A change of medium, enclosure or gravity environment is an explicit new experiment dimension. The existing air sphere is an independent reference for its own arrangement, not evidence that larger bodies in water are already supported.
+Air is the selected medium for the intended validation route; the water reference remains independent evidence for its own arrangement. A change of medium, enclosure or gravity environment is an explicit experiment dimension. Neither reference establishes support for the other domain or for larger bodies without the corresponding model and evidence.
 
 ## Progression dimensions
 
