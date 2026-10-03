@@ -10,27 +10,28 @@ The bounded extraction digitizes only the six one-dimensional plots of the axial
 
 ## Source and derived artifact
 
-The input is THS-W03, Rune Barnkob’s 2012 DTU thesis, which embeds the SRC-W03 supplement. The exact 17,033,914-byte PDF has SHA-256 `8adfc59f1a64b5ea2748b81ecf3171e04488a92520f9a10485d4d99ecfc52a3e`; its extracted PDF page 204 is printed page 4 of the supplement. The source and all local outputs are retained under the ignored path `results/research/SRC-W03-MQ1-FIG3-EXTRACTION-20261003/`.
+The input is THS-W03, Rune Barnkob’s 2012 DTU thesis, which embeds the SRC-W03 supplement. The exact 17,033,914-byte PDF has SHA-256 `8adfc59f1a64b5ea2748b81ecf3171e04488a92520f9a10485d4d99ecfc52a3e`; its extracted PDF page 204 is printed page 4 of the supplement. The initial local extraction and its failures are retained under the ignored path `results/research/SRC-W03-MQ1-FIG3-EXTRACTION-20261003/`. A second evidence package was generated from the tracked tool in `results/research/SRC-W03-MQ1-FIG3-EXTRACTION-20261003-02/`.
 
-The immutable derived identifier is `FIG-W03-MQ1-20261003-01`. Its CSV contains 234 plotted mean-marker centers: 39 spatial positions for each figure diameter label (0.59, 0.99, 1.93, 2.55, 4.94 and 10.6 µm). A flag identifies the 25 red-highlighted profile positions in each panel; these red markers overlie positions in the 39-point profile and are not a second dataset. The extracted ordinate is the plotted velocity normalized to `U_pp = 1 V`. The source’s MQ1 acquisition log and particle-size values are matched to the figure panels in the JSON report.
+The initial derived identifier is `FIG-W03-MQ1-20261003-01`; the reproducible package is `FIG-W03-MQ1-20261003-02`. Both CSVs contain the same 234 plotted mean-marker centers: 39 spatial positions for each figure diameter label (0.59, 0.99, 1.93, 2.55, 4.94 and 10.6 µm). A flag identifies the 25 red-highlighted profile positions in each panel; these red markers overlie positions in the 39-point profile and are not a second dataset. The extracted ordinate is the plotted velocity normalized to `U_pp = 1 V`. The source’s MQ1 acquisition log and particle-size values are matched to the figure panels in each JSON report. The `-02` CSV was verified byte-identical to `-01`; its report additionally binds the clean code revision and tracked extractor hash.
 
 | Artifact | SHA-256 |
 |---|---|
 | Source thesis PDF | `8adfc59f1a64b5ea2748b81ecf3171e04488a92520f9a10485d4d99ecfc52a3e` |
-| `mq1-mean-velocity-profile.csv` | `37d7c05e26a1cab40e52cf1bdcd9fd8d3502b54205ab52c15216d99ef6ea91da` |
-| `extraction-report.json` | `3d6677cdee46284f9f0cc882715194582508f72f96dd6db0e0b7a8614ada0d82` |
-| `extract.py` | `80e6f80dfc55f01402ccb18c4dc09acf5efaa9e06a1693613ee24461164dc19a` |
+| `mq1-mean-velocity-profile.csv` (`-01` and `-02`) | `37d7c05e26a1cab40e52cf1bdcd9fd8d3502b54205ab52c15216d99ef6ea91da` |
+| Initial `-01` extraction report | `3d6677cdee46284f9f0cc882715194582508f72f96dd6db0e0b7a8614ada0d82` |
+| Reproducible `-02` extraction report | `d7ae0ff6a5b22d86b03fbd57ad131be2376b921e07ef2b6f0cba3df734080b3a` |
+| Tracked extractor and `-02` code snapshot | `6423df0b7fadfac89915b70d6ac3661e7b53f7b9a9d1ab7ddb5b793c5a4affd7` |
 | Retained failed affine-transform CSV | `eb2db004d60d66068ec6f2e9f297821a9d44d221d2ff3a9de164fac6383e90db` |
 | Rejected raster trial 4 script / JSON | `d0124afac8f8847bd418ba816510cf47da430733e9c832183fef2fb35f3c142d` / `404b68011bb1895d6761acda47785e57be84e4302ca41773cba212f425d9b96a` |
 | Rejected raster trial 5 script / JSON | `2f357290b622f90e2571abb055a19a83625add0c850247d309c93f4dc64db358` / `2d438567e7f6dbc80c4327d45a51d91845ae503abfa88609436d37675fedad6d` |
 
-The complete per-file digest list, source provenance, package versions, calibrated axes, acquisition rows and validation results are in the local `sha256sums.json` and `extraction-report.json`. Python 3.13.5 was used with PyMuPDF 1.26.7, pdfplumber 0.11.10, pdfminer.six 20260107, pypdfium2 5.13.0 and Pillow 12.3.0. These temporary extraction tools were installed outside AURA’s project environment and are not solver dependencies.
+The complete per-file digest lists, source provenance, package versions, calibrated axes, acquisition rows and validation results are in each package's local `sha256sums.json` and `extraction-report.json`. Python 3.13.5 was used with PyMuPDF 1.26.7, pdfplumber 0.11.10, pdfminer.six 20260107, pypdfium2 5.13.0 and Pillow 12.3.0. These temporary extraction tools were installed outside AURA’s project environment and are not solver dependencies.
 
 ### Tracked reproduction
 
 The executable extraction is maintained at [`tools/research/extract_fig_w03_mq1_profiles.py`](../../tools/research/extract_fig_w03_mq1_profiles.py). It checks the source PDF digest and exact Python/parser versions, records the clean repository revision and script hash, preserves a code copy in the evidence directory, verifies all expected counts and calibration bounds, and refuses to overwrite a differing output. It is an offline data-processing utility; it does not add packages to AURA’s application or development lock.
 
-To reproduce in a separate temporary Python 3.13.5 environment, install exactly PyMuPDF 1.26.7, pdfplumber 0.11.10, pdfminer.six 20260107, pypdfium2 5.13.0 and Pillow 12.3.0. Place the checksum-identified thesis PDF at `results/research/SRC-W03-MQ1-FIG3-EXTRACTION-20261003-02/source-thesis.pdf`, retain the documented attempt log and failed-attempt artifacts there, then run `python tools/research/extract_fig_w03_mq1_profiles.py` from the repository root. The output ID is `FIG-W03-MQ1-20261003-02`; its measurements should match the first extraction byte-for-byte. A differing existing output is left intact and requires a new dataset ID for investigation.
+To reproduce in a separate temporary Python 3.13.5 environment on Linux x86_64, create a virtual environment and install `requirements/research/w03-profile-extraction-linux-py313.lock` with `pip install --require-hashes --only-binary=:all: -r ...`. The lock pins all nine direct and transitive distributions by version and wheel SHA-256; it is separate from AURA's application and development locks. Place the checksum-identified thesis PDF at `results/research/SRC-W03-MQ1-FIG3-EXTRACTION-20261003-02/source-thesis.pdf`, retain the documented attempt log and failed-attempt artifacts there, then run `python tools/research/extract_fig_w03_mq1_profiles.py` from the repository root. The output ID is `FIG-W03-MQ1-20261003-02`; its CSV SHA-256 is `37d7c05e26a1cab40e52cf1bdcd9fd8d3502b54205ab52c15216d99ef6ea91da` and it is byte-identical to the first extraction. It records Git revision `680af68fccaf163f31c806d941643fada12a843b`, and all ten package manifest checksums were verified. A differing existing output is left intact and requires a new dataset ID for investigation.
 
 ## Extraction and checks
 

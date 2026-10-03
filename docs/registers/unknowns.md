@@ -1,6 +1,6 @@
 # Open Scientific and Evidence Unknowns
 
-**Status:** Updated through LIT-05, SC-02, critique assessment and SRC-W03 supplement access follow-up · **Updated:** 2026-10-03
+**Status:** Updated through LIT-05, SC-02, critique assessment, SRC-W03 supplement access and reproducible profile extraction · **Updated:** 2026-10-03
 
 An unknown is not a zero-valued input. Research records may leave it unresolved; an executable scenario must provide a sourced value or use a clearly separate manufactured case. The role listed is accountable for preparing the evidence/task record, not a claim that a named specialist has been assigned. Owner decisions are identified separately.
 
