@@ -92,7 +92,7 @@ Use [00](../00-execution-protocol.md), the [task template](../templates/task-rec
 
 ## NUM-03 — Implement the selected field backend
 
-**Current state:** ACTIVE — isolated spherical Bessel/Legendre, Gauss-Legendre, and stationary-sphere coefficient routines have focused tests recorded in [NUM-03](../../work-items/NUM-03.md) and its [review](../../reviews/NUM-03-numerical-primitives.md). Source diffraction coefficients and the coupled field backend are not complete. A time-limited calibration pilot, if needed, is a separate non-production diagnostic and cannot be reported as production-budgeted. **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
+**Current state:** ACTIVE — isolated spherical Bessel/Legendre, Gauss-Legendre, stationary-sphere coefficient, and piston source-factor routines have focused tests recorded in [NUM-03](../../work-items/NUM-03.md) and its [review](../../reviews/NUM-03-numerical-primitives.md). Higher-order quadrature sensitivity and the coupled field backend remain open. A time-limited calibration pilot, if needed, is a separate non-production diagnostic and cannot be reported as production-budgeted. **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
 
 **Inputs / predecessors:** NUM-02
 

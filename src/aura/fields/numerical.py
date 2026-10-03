@@ -160,3 +160,114 @@ def stationary_sphere_coefficient(order: int, ka: float) -> complex:
             "SPHERE_COEFFICIENT", "/ka", "Scattering coefficient is not finite."
         )
     return result
+
+
+def source_diffraction_coefficients(
+    max_order: int,
+    *,
+    wave_number_rad_m: float,
+    sphere_center_distance_m: float,
+    piston_radius_m: float,
+    quadrature_order: int,
+    workspace_bytes: int,
+) -> tuple[complex, ...]:
+    """Integrate Hasegawa's piston diffraction factors ``f_n`` with ``h_n^(1)``.
+
+    This returns source factors only. A caller must resource-preflight the full
+    field workload before invoking it; ``workspace_bytes`` provides an additional
+    local allocation guard and is not a substitute for that preflight.
+    """
+    if type(max_order) is not int or max_order < 0 or max_order > 4096:
+        raise InvalidInputError("BESSEL_ORDER_RANGE", "/max_order", "Expected an order from 0 through 4096.")
+    for name, value in (
+        ("wave_number_rad_m", wave_number_rad_m),
+        ("sphere_center_distance_m", sphere_center_distance_m),
+        ("piston_radius_m", piston_radius_m),
+    ):
+        if type(value) not in (int, float) or type(value) is bool or not math.isfinite(value) or value <= 0:
+            raise InvalidInputError("SOURCE_GEOMETRY", f"/{name}", "Expected a finite positive value.")
+    if type(quadrature_order) is not int or not 1 <= quadrature_order <= 512:
+        raise InvalidInputError("QUADRATURE_ORDER", "/quadrature_order", "Expected an order from 1 through 512.")
+    if type(workspace_bytes) is not int or workspace_bytes < 0:
+        raise InvalidInputError("FIELD_RESOURCE", "/workspace_bytes", "Expected a nonnegative byte cap.")
+
+    k, r0, radius = float(wave_number_rad_m), float(sphere_center_distance_m), float(piston_radius_m)
+    r1 = math.hypot(r0, radius)
+    lower, upper = _finite(k * r0, "/kr0"), _finite(k * r1, "/kr1")
+    width = _finite(upper - lower, "/integration_width")
+    if width <= 0:
+        raise NumericalDomainError(
+            "SOURCE_INTEGRATION_RANGE", "/piston_radius_m", "The integration interval is not representable."
+        )
+    margin = max(32, int(math.sqrt(40 * (max_order + 1))))
+    bessel_start = max(max_order + 1 + margin, math.ceil(upper) + margin)
+    if bessel_start > 8192:
+        raise InvalidInputError(
+            "BESSEL_WORK_RANGE", "/wave_number_rad_m",
+            "The bounded Miller recurrence workspace would be exceeded.",
+        )
+    estimated = _source_workspace_estimate(max_order + 1, quadrature_order, bessel_start)
+    if workspace_bytes < estimated:
+        raise InvalidInputError(
+            "FIELD_RESOURCE", "/workspace_bytes",
+            f"Need at least {estimated} bytes for source coefficients; received {workspace_bytes}.",
+        )
+
+    nodes, weights = gauss_legendre_rule(quadrature_order)
+    midpoint, half_width = lower + width / 2, width / 2
+    coefficients = [0j] * (max_order + 1)
+    corrections = [0j] * (max_order + 1)
+    for node, weight in zip(nodes, weights, strict=True):
+        argument = _finite(midpoint + half_width * node, "/quadrature_argument")
+        j_values, y_values, _, _ = _spherical_sequences(max_order, argument)
+        cosine = lower / argument
+        legendre_previous, legendre_current = 1.0, cosine
+        quadrature_scale = half_width * weight * 2 / argument
+        for order in range(max_order + 1):
+            if order == 0:
+                polynomial = legendre_previous
+            elif order == 1:
+                polynomial = legendre_current
+            else:
+                next_value = (
+                    (2 * order - 1) * cosine * legendre_current
+                    - (order - 1) * legendre_previous
+                ) / order
+                legendre_previous, legendre_current = legendre_current, _finite(
+                    next_value, "/source_legendre"
+                )
+                polynomial = legendre_current
+            contribution = quadrature_scale * complex(j_values[order], y_values[order]) * polynomial
+            adjusted = contribution - corrections[order]
+            updated = coefficients[order] + adjusted
+            corrections[order] = (updated - coefficients[order]) - adjusted
+            coefficients[order] = complex(
+                _finite(updated.real, f"/f_{order}/real"),
+                _finite(updated.imag, f"/f_{order}/imag"),
+            )
+    return tuple(coefficients)
+
+
+def _source_workspace_estimate(order_count: int, quadrature_order: int, bessel_start: int) -> int:
+    """Conservative local Python-object estimate; NUM-02 adds process headroom."""
+    pointer_bytes = sys.getsizeof((None,)) - sys.getsizeof(())
+    list_header, tuple_header = sys.getsizeof([]), sys.getsizeof(())
+    float_bytes, complex_bytes = sys.getsizeof(0.0), sys.getsizeof(0j)
+
+    def list_bytes(count: int, item_bytes: int) -> int:
+        return list_header + count * (pointer_bytes + item_bytes)
+
+    def tuple_bytes(count: int, item_bytes: int) -> int:
+        return tuple_header + count * (pointer_bytes + item_bytes)
+
+    # Includes two recurrence work vectors, returned/copy Bessel vectors, two
+    # compensated complex sums, the returned coefficient tuple, and rule vectors.
+    return (
+        4096
+        + 2 * list_bytes(bessel_start + 2, float_bytes)
+        + 2 * list_bytes(quadrature_order, float_bytes)
+        + 5 * tuple_bytes(order_count + 1, float_bytes)
+        + 2 * list_bytes(order_count, complex_bytes)
+        + tuple_bytes(order_count, complex_bytes)
+        + 2 * tuple_bytes(quadrature_order, float_bytes)
+    )
