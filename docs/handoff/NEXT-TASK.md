@@ -1,6 +1,10 @@
 # Next Main Task — NUM-03 Air Numerical Backend
 
-**Checkpoint:** Owner-recorded P3 PASS for bounded analytical-software verification · **Prepared:** 2026-10-03 · **State:** NUM-W01, NUM-01, NUM-02 DONE; NUM-03 ACTIVE with isolated special-function primitives, coupled backend incomplete · **Refreshed after:** commit `a6431d7`, order-253 axial derivative sweep and quadrature comparison (1,643 local tests; remote run 37139828998 passed)
+**Checkpoint:** Owner-recorded P3 PASS for bounded analytical-software verification · **Prepared:** 2026-10-03 · **State:** NUM-W01, NUM-01, NUM-02 DONE; NUM-03 ACTIVE with isolated special-function primitives, coupled backend incomplete · **Refreshed after:** commit `4d5f78c`, order-253 axial derivative sweep and quadrature comparison (1,643 local tests; remote run 37140075238 passed)
+
+## Immediate NUM-03 step
+
+A Decimal recurrence diagnostic now verifies Hasegawa Eq. 3 source factors against quadrature through order 24 and compares the observable-weighted axial derivative with the exact Rayleigh derivative through order 300 at the minimum-gap front and rear poles. Residuals cross the exploratory `2e-11` target by order 280 at both poles but are nonmonotone at the front; this is a single-geometry truncation diagnostic, not a production order criterion. Implement or assess a scaled weighted source/derivative term representation beyond the current order-253 binary64 limit, then repeat across the declared gap range before beginning broader piston-only/far-field checks. Keep all existing failure records and do not start the coupled evaluator until the component checks are reviewed.
 
 ## Water evidence status and qualification result
 
