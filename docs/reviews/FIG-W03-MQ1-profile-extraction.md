@@ -19,8 +19,10 @@ The immutable derived identifier is `FIG-W03-MQ1-20261003-01`. Its CSV contains 
 | Source thesis PDF | `8adfc59f1a64b5ea2748b81ecf3171e04488a92520f9a10485d4d99ecfc52a3e` |
 | `mq1-mean-velocity-profile.csv` | `37d7c05e26a1cab40e52cf1bdcd9fd8d3502b54205ab52c15216d99ef6ea91da` |
 | `extraction-report.json` | `3d6677cdee46284f9f0cc882715194582508f72f96dd6db0e0b7a8614ada0d82` |
-| `extract.py` | `894cbb37be05782109e529d5dc6385b47634c6041060ac60f30eaf350fb3e7de` |
+| `extract.py` | `80e6f80dfc55f01402ccb18c4dc09acf5efaa9e06a1693613ee24461164dc19a` |
 | Retained failed affine-transform CSV | `eb2db004d60d66068ec6f2e9f297821a9d44d221d2ff3a9de164fac6383e90db` |
+| Rejected raster trial 4 script / JSON | `d0124afac8f8847bd418ba816510cf47da430733e9c832183fef2fb35f3c142d` / `404b68011bb1895d6761acda47785e57be84e4302ca41773cba212f425d9b96a` |
+| Rejected raster trial 5 script / JSON | `2f357290b622f90e2571abb055a19a83625add0c850247d309c93f4dc64db358` / `2d438567e7f6dbc80c4327d45a51d91845ae503abfa88609436d37675fedad6d` |
 
 The complete per-file digest list, source provenance, package versions, calibrated axes, acquisition rows and validation results are in the local `sha256sums.json` and `extraction-report.json`. Python 3.13.5 was used with PyMuPDF 1.26.7, pdfplumber 0.11.10, pdfminer.six 20260107, pypdfium2 5.13.0 and Pillow 12.3.0. These temporary extraction tools were installed outside AURA’s project environment and are not solver dependencies.
 
@@ -30,7 +32,7 @@ The primary extraction locates the filled point-marker paths on PDF page 204 wit
 
 As an independent raster check, PDFium rendered the page at 432 dpi. Color-thresholded connected components recovered the 150 red-circle centers, 25 per panel. Their centroid differences from the vector centers were RMS `0.0594` PDF point and maximum `0.1025` PDF point. An axis-calibration sensitivity check compared linear fits to all labelled ticks with endpoint-only fits: the maximum spatial-coordinate change was `0.095 µm`; the largest velocity-coordinate change was `0.429 µm/s` (10.6 µm panel). This is extraction sensitivity only, not measurement uncertainty. The displayed marker half-widths are separately reported in the CSV as a visualization-resolution indicator, not as uncertainty intervals.
 
-The extraction asserts the source checksum and 214-page count, checks marker counts and panel assignments, requires all 234 accepted coordinates to lie within the displayed 0–446 µm spatial axis, verifies the exact 25-point red subset per panel, matches both vector parsers within the declared bound, and cross-checks the raster red markers one-to-one. The retained development log records the initial marker-count, parser-tolerance and inverted-coordinate failures, plus a rejected dark-marker raster-localization method: its 7×7-pixel windows saturated at all 84 non-red markers and produced 10–42 tied center candidates each. Its arbitrary tie-breaking offsets are not extraction errors, and no coordinates from that attempt were accepted. Its code and JSON output remain checksummed with the other local artifacts.
+The extraction asserts the source checksum and 214-page count, checks marker counts and panel assignments, requires all 234 accepted coordinates to lie within the displayed 0–446 µm spatial axis, verifies the exact 25-point red subset per panel, matches both vector parsers within the declared bound, and cross-checks the raster red markers one-to-one. The retained development log records the initial marker-count, parser-tolerance and inverted-coordinate failures, plus two rejected raster checks on the 84 non-red markers. The first method's 7×7-pixel windows saturated and produced 10–42 tied centers per marker. The second found connected components but their centroids differed from vector centers by RMS `0.4000` PDF point and maximum `0.8390` point because marker/error-bar geometry biased the centroids. Neither method provides an independent location estimate, and no coordinates from either attempt were accepted. Their scripts and JSON outputs remain checksummed with the other local artifacts.
 
 ## Limits and interpretation
 
