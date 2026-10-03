@@ -33,6 +33,16 @@ These are distinctions for future claim review, not a change to D00:
 
 The word “pseudogravity” may be retained as a project label only with the D00 definition and the selected claim level attached. It must not replace the measurable statement in a result.
 
+## Parameterized acceptance template for future review
+
+The following is a candidate test contract, not an adopted requirement or claim. For a registered body `B`, target acceleration field `a_target(x,t)`, evaluation interval `I` of duration `T`, workspace `Ω`, and fixed observation/filtering rule, define
+
+`e_accel(B; I) = sqrt((1/T) ∫_I ||a_obs,B(t) - a_target(x_B(t), t)||² dt)`.
+
+An object-specific result would require `e_accel(B; I) ≤ ε_a`, the body to remain within `Ω` throughout `I`, and the predeclared uncertainty rule to meet its criterion. `ε_a`, `I`, `Ω`, the body/domain, acceleration observation method and uncertainty rule must be frozen before evaluation. This instantiates D01/D03's `error_accel_rms`; it does not add a new metric.
+
+A stronger gravity-like response test must declare a finite body/pose set and spatial/time test domain. It must distinguish **per-body retuned control**, which supports only a body-specific/adaptive capability claim, from a **shared actuation configuration** tested across bodies and positions, which could support a bounded common-response claim if every registered case meets its criterion. Neither finite test establishes universality outside that set. A target, tolerance, test set, shared-actuation condition or criterion is not selected here; owner review remains necessary at CTL-01/D09 claim review.
+
 ## Changes warranted now
 
 - Add UNK-016 for the still-unfrozen operational acceleration/pseudogravity acceptance contract. D00/D01 provide the conceptual boundary; CTL-01 must define target, metric, frame, evaluation window, workspace and uncertainty before any target run.
