@@ -1,5 +1,6 @@
 """Independent identities for numerical kernels; not field-model validation."""
 
+import cmath
 import math
 from decimal import Decimal, localcontext
 
@@ -207,7 +208,7 @@ def test_low_order_source_factors_match_independent_simpson_quadrature(order, ke
             polynomial = lower / argument
             jn = math.sin(argument) / argument**2 - math.cos(argument) / argument
             yn = -math.cos(argument) / argument**2 - math.sin(argument) / argument
-        return 2 * complex(jn, yn) * polynomial / argument
+        return argument * complex(jn, yn) * polynomial
 
     values = [integrand(lower + index * step) for index in range(count + 1)]
     reference = step / 3 * complex(
@@ -225,6 +226,29 @@ def test_low_order_source_factors_match_independent_simpson_quadrature(order, ke
         workspace_bytes=2_000_000,
     )[order]
     assert observed == pytest.approx(reference, rel=2e-12, abs=2e-14)
+
+
+@pytest.mark.parametrize("order", (0, 1))
+def test_low_order_source_factors_match_hasegawa_closed_forms(order, kernels):
+    *_, source_diffraction_coefficients = kernels
+    wavenumber, center_distance, radius = 1.0, 3.0, 0.7
+    lower = wavenumber * center_distance
+    upper = wavenumber * math.hypot(center_distance, radius)
+    h0_lower = complex(math.sin(lower) / lower, -math.cos(lower) / lower)
+    h0_upper = complex(math.sin(upper) / upper, -math.cos(upper) / upper)
+    expected = (
+        cmath.exp(1j * lower) - cmath.exp(1j * upper)
+        if order == 0 else -lower * (h0_upper - h0_lower)
+    )
+    actual = source_diffraction_coefficients(
+        order,
+        wave_number_rad_m=wavenumber,
+        sphere_center_distance_m=center_distance,
+        piston_radius_m=radius,
+        quadrature_order=32,
+        workspace_bytes=2_000_000,
+    )[order]
+    assert actual == pytest.approx(expected, rel=3e-13, abs=2e-14)
 
 
 def test_source_coefficients_reject_workspace_before_quadrature(kernels, monkeypatch):

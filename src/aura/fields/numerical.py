@@ -176,6 +176,8 @@ def source_diffraction_coefficients(
     This returns source factors only. A caller must resource-preflight the full
     field workload before invoking it; ``workspace_bytes`` provides an additional
     local allocation guard and is not a substitute for that preflight.
+    The integral is the conjugate of Hasegawa et al. (1985), Eq. 2, for the
+    project ``exp(-iwt)`` convention.
     """
     if type(max_order) is not int or max_order < 0 or max_order > 4096:
         raise InvalidInputError("BESSEL_ORDER_RANGE", "/max_order", "Expected an order from 0 through 4096.")
@@ -222,7 +224,7 @@ def source_diffraction_coefficients(
         j_values, y_values, _, _ = _spherical_sequences(max_order, argument)
         cosine = lower / argument
         legendre_previous, legendre_current = 1.0, cosine
-        quadrature_scale = half_width * weight * 2 / argument
+        quadrature_scale = half_width * weight * argument
         for order in range(max_order + 1):
             if order == 0:
                 polynomial = legendre_previous
