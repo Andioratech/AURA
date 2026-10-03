@@ -1,6 +1,6 @@
 # Current Research Checkpoint
 
-**As of:** 2026-10-03 · **Published code checkpoint:** `88ed64c` (Quality [37145905036](https://github.com/Andioratech/AURA/actions/runs/37145905036) passed); published documentation checkpoint `45864ae` (Quality [37147457620](https://github.com/Andioratech/AURA/actions/runs/37147457620) passed) · **Current work:** broaden minimum-gap independent field checks; no accepted coupled reference exists
+**As of:** 2026-10-03 · **Published code checkpoint:** `88ed64c` (Quality [37145905036](https://github.com/Andioratech/AURA/actions/runs/37145905036) passed); latest evidence checkpoint `86e5b69` (Quality [37148834459](https://github.com/Andioratech/AURA/actions/runs/37148834459) passed) · **Current work:** broaden minimum-gap independent field checks; no accepted coupled reference exists
 
 The owner authorized continuing beyond the previously explained core checkpoint. The first coupled kernel is published in commit `ae4788f8f06eba62bb416b9f2cdc2a5232487194`; its full local Quality passed with 1,656 tests and remote [Quality 37143645550](https://github.com/Andioratech/AURA/actions/runs/37143645550) succeeded. The coupled review records a failed but inconclusive broad-aperture/plane-wave comparison and explains why this is not a valid plane-wave limit.
 
@@ -16,7 +16,7 @@ The latest coupled-kernel code is published in `88ed64c` and its GitHub Quality 
 
 New ignored minimum-gap diagnostics on code revision `88ed64c` separate quadrature sensitivity more carefully. Radial 128→256 changed three-point velocity/gradient by `4.240e-6`; 256→512 changed them by `1.659e-9`. At radial256/azimuth256, surface512→1024 and 1024→2048 changed those fields by `5.581e-10` and `1.625e-9`; azimuth256→512 changed them by `6.281e-12`. The earlier radial128 surface sequence was nonmonotone. A 37-angle sample on both `r=a` and `r=a+H/2` found maximum 512→1024 relative changes of `1.017e-9` in pressure and `9.449e-10` in velocity/gradient; sampled boundary-normal velocity was about `1e-16 m/s`. These order-18 comparisons share checked special-function and sphere-coefficient helpers, sample finite points, and provide no error bound or accepted independent solution. Their local checksums and preserved harness/range failures are in the [coupled-kernel review](../reviews/NUM-03-coupled-kernel-review.md). Full independent surface/shell, gap/order, public run-path checks, memory reconciliation, chunking, immutable diagnostics, runtime calibration and pilot remain open.
 
-Full local Quality passed on this documentation revision: locked dependency install, editable install, `pip check`, ENV-1.0, Ruff, required-document checks, diff check and 1,661 tests. The latest prior published Quality run `37147457620` succeeded on `45864ae`; the pending evidence-refresh commit still requires its own remote run.
+Full local Quality passed on this evidence revision: locked dependency install, editable install, `pip check`, ENV-1.0, Ruff, required-document checks, diff check and 1,661 tests. The exact remote Quality run `37148834459` succeeded on `86e5b69`.
 
 ## Objective and present boundary
 

@@ -1,6 +1,6 @@
 # Next Main Task — NUM-03 Air Numerical Backend
 
-**Checkpoint:** Owner-recorded P3 PASS for bounded analytical-software verification · **Prepared:** 2026-10-03 · **State:** NUM-W01, NUM-01, NUM-02 DONE; NUM-03 ACTIVE with coupled kernel, plane-wave overlap, three-gap Rayleigh overlap and exploratory minimum-gap quadrature characterization · **Current code:** `88ed64c` (Quality [37145905036](https://github.com/Andioratech/AURA/actions/runs/37145905036) passed); latest published docs before this refresh: `45864ae` (Quality [37147457620](https://github.com/Andioratech/AURA/actions/runs/37147457620) passed)
+**Checkpoint:** Owner-recorded P3 PASS for bounded analytical-software verification · **Prepared:** 2026-10-03 · **State:** NUM-W01, NUM-01, NUM-02 DONE; NUM-03 ACTIVE with coupled kernel, plane-wave overlap, three-gap Rayleigh overlap and exploratory minimum-gap quadrature characterization · **Current code:** `88ed64c` (Quality [37145905036](https://github.com/Andioratech/AURA/actions/runs/37145905036) passed); latest evidence refresh: `86e5b69` (Quality [37148834459](https://github.com/Andioratech/AURA/actions/runs/37148834459) passed)
 
 ## Immediate NUM-03 step — broaden coupled verification
 
