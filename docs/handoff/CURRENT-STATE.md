@@ -1,8 +1,10 @@
 # Current Research Checkpoint
 
-**As of:** 2026-10-03 · **NUM-02 implementation revision:** `8adf166fde0a8256b0330e4d5548db37fa43e587` (pushed; GitHub Quality passed) · **Main next step:** begin the air numerical backend after the NUM-03 construction checkpoint delivered here
+**As of:** 2026-10-03 · **Published base:** `6232399b603d46a162dec47641219705445699a8` (NUM-01/02 and continuity updates pushed; GitHub Quality passed) · **Current work:** NUM-03 active; isolated special-function primitives implemented, coupled backend still open
 
 NUM-01 and NUM-02 are complete as bounded planning/software tasks. NUM-02's estimator and CLI passed the focused 110-test set and full Quality (ENV-1.0, Ruff, required documents and 1,419 tests). The estimator checks RAM/disk and only estimates runtime from an exact clean-revision/ENV-1.0 calibration. No production calibration exists because the backend has not been implemented; runtime readiness is INDETERMINATE and no solver run or scientific result was produced. The implementation is committed and pushed as `8adf166`; GitHub Quality run 37130551429 passed.
+
+NUM-03 is ACTIVE. The first isolated binary64 spherical Bessel and Legendre primitives are recorded in the [task](../work-items/NUM-03.md) and [intermediate review](../reviews/NUM-03-numerical-primitives.md). Their 149 focused mathematical tests pass, but the coupled Hasegawa evaluator, resource-estimator reconciliation, field comparisons, and diagnostic pilot have not been completed. No air field result exists. Reconcile actual HEAD and the working tree before continuing.
 
 The historical snapshot ended with the air-route decision in commit `5f6e421`; commit `afb6a76` recorded DEC-006 and the completed NUM-W01 audit, ordering a bounded water-like numerical-workflow qualification, then air P4, then initial P5 onward in air only if P4 passes. The current checkout later published through `8b69943`; reconcile with actual Git history and the [live work board](../planning/10-work-board.md), not stale snapshot language.
 

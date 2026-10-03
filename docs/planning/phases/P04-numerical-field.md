@@ -92,7 +92,7 @@ Use [00](../00-execution-protocol.md), the [task template](../templates/task-rec
 
 ## NUM-03 — Implement the selected field backend
 
-**Initial state:** READY — NUM-02 is DONE and the requested pre-construction explanation has been delivered; the backend is not yet implemented. A time-limited calibration pilot, if needed, is a separate non-production diagnostic and cannot be reported as production-budgeted. **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
+**Current state:** ACTIVE — the first isolated spherical Bessel/Legendre primitives and their independent tests are recorded in [NUM-03](../../work-items/NUM-03.md) and its [review](../../reviews/NUM-03-numerical-primitives.md). The coupled field backend is not complete. A time-limited calibration pilot, if needed, is a separate non-production diagnostic and cannot be reported as production-budgeted. **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
 
 **Inputs / predecessors:** NUM-02
 
@@ -102,7 +102,7 @@ Use [00](../00-execution-protocol.md), the [task template](../templates/task-rec
 2. Report solver residuals, iterations, discretization, boundary and precision metadata; propagate typed failure.
 3. Compare an initial bounded pilot with the matched P3 reference before adding geometry features.
 
-**Required artifacts:** Numerical backend; pilot config/manifests; typed solver diagnostics.
+**Required artifacts:** Numerical backend; pilot config/manifests; typed solver diagnostics. Intermediate kernel verification is tracked separately and does not satisfy these deliverables.
 
 **Acceptance / decision:** The pilot returns correctly normalized fields and explicit convergence/failure diagnostics; initial comparisons justify refinement work.
 
