@@ -26,7 +26,7 @@ The focused tests compare Bessel values against separate high-precision Decimal 
 
 ## Remaining steps
 
-1. The generic stationary-sphere modal kernel overlaps the independent plane-wave/sphere reference at common points, including stationary `n=1`. A separate Rayleigh-surface projection now checks the public coupled evaluator at three exterior locations for each of three gaps at one order. Extend independent coupled comparisons across locations, gap/order combinations, and the public run path; the thin-shell regime remains uncharacterized.
+1. The generic stationary-sphere modal kernel overlaps the independent plane-wave/sphere reference at common points, including stationary `n=1`. A separate Rayleigh-surface projection checks the public coupled evaluator at three exterior locations for each of three gaps at one order. Minimum-gap quadrature sensitivity has now been compared at three off-axis points and at 37 polar angles on the sphere and mid-gap shell; the projection shares checked special-function and sphere-coefficient helpers with the public evaluator. Extend independent coupled comparisons across locations, gap/order combinations, and the public run path; the thin-shell regime remains incompletely characterized.
 2. Integrate the kernel with run-level preflight, bounded chunking, immutable provenance and typed diagnostic artifacts without changing FIELD-1.0.
 3. Freeze the observable/order comparisons required for convergence; verify phasor mapping, boundary behavior and the complete 0.1–30 mm gap domain without selecting favorable points or truncations.
 4. Reconcile NUM-02's estimate against all live coupled-evaluator arrays; keep runtime readiness INDETERMINATE until an exact-revision/ENV-1.0 bounded calibration exists.
@@ -34,7 +34,7 @@ The focused tests compare Bessel values against separate high-precision Decimal 
 
 ## Acceptance and disposition
 
-**Acceptance not yet evaluated.** Focused comparisons pass for the generic plane-wave/sphere kernel and for the coupled piston/sphere field at nine points spanning three gaps at one order. The 0.1 mm independent coupled comparison remains open: direct pairwise surface changes are nonmonotone through 512 nodes, radial changes remain at 128 nodes, and azimuth 256→512 stability applies only to three points under fixed remaining quadratures. Broad P3-equivalent public-path checks, run-level preflight, chunked provenance, complete-domain convergence and pilot also remain open. No production or accepted diagnostic air solver run has been made.
+**Acceptance not yet evaluated.** Focused comparisons pass for the generic plane-wave/sphere kernel and for the coupled piston/sphere field at nine points spanning three gaps at one order. Minimum-gap probes show small direct changes at refined radial/surface/azimuth rules over selected samples, but the surface sequence is nonmonotone under radial128 and the comparisons reuse checked special-function and sphere-coefficient helpers; they are not an accepted independent reference or an error bound. Continuous surface/shell coverage, broader P3-equivalent public-path checks, run-level preflight, chunked provenance, complete-domain convergence and pilot remain open. No production or accepted diagnostic air solver run has been made.
 
 ## Failure and change control
 
