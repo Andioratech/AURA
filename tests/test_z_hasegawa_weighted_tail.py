@@ -1,5 +1,6 @@
 """High-precision, observable-weighted check of the Hasegawa piston series."""
 
+import cmath
 import math
 from decimal import Decimal, localcontext
 
@@ -113,18 +114,29 @@ def _spherical_j(order, argument, precision):
         return argument**order * series / denominator
 
 
-def test_decimal_source_recurrence_matches_integral_and_axial_derivative_tail():
+@pytest.mark.parametrize("gap", (0.0001, 0.03))
+def test_decimal_source_recurrence_matches_integral_and_axial_derivative_tail(gap):
     """Resolve whether the order-253 derivative residual is tail or roundoff."""
-    from aura.fields.numerical import source_diffraction_coefficients
+    from aura.fields.numerical import (
+        _scaled_axial_source_derivative_terms,
+        _scaled_source_diffraction_coefficients,
+        source_diffraction_coefficients,
+    )
 
     speed, frequency = 346.0, 25230.0
     wavenumber = 2 * math.pi * frequency / speed
-    piston_radius, sphere_radius, gap = 0.01, 0.025, 0.0001
+    piston_radius, sphere_radius = 0.01, 0.025
     center_distance = sphere_radius + gap
     max_order, precision = 300, 180
 
     factors = _source_factors(
         max_order, wavenumber, center_distance, piston_radius, precision
+    )
+    scaled_factors = _scaled_source_diffraction_coefficients(
+        max_order,
+        wave_number_rad_m=wavenumber,
+        sphere_center_distance_m=center_distance,
+        piston_radius_m=piston_radius,
     )
     quadrature_factors = source_diffraction_coefficients(
         24,
@@ -137,6 +149,17 @@ def test_decimal_source_recurrence_matches_integral_and_axial_derivative_tail():
     for order in (0, 1, 2, 8, 16, 24):
         reference = complex(float(factors[order][0]), float(factors[order][1]))
         assert reference == pytest.approx(quadrature_factors[order], rel=2e-12, abs=2e-13)
+
+    for order in (253, 256, 280, 300):
+        mantissa, exponent = scaled_factors[order]
+        scale = Decimal(2) ** exponent
+        actual = Decimal(mantissa.real) * scale, Decimal(mantissa.imag) * scale
+        expected = factors[order]
+        error = ((actual[0] - expected[0]) ** 2 + (actual[1] - expected[1]) ** 2).sqrt()
+        magnitude = (expected[0] ** 2 + expected[1] ** 2).sqrt()
+        assert error / magnitude < Decimal("3e-12")
+    if gap == 0.0001:
+        assert scaled_factors[280][1] > 1024
 
     ka = wavenumber * sphere_radius
     regular = [_spherical_j(order, ka, precision) for order in range(max_order + 2)]
@@ -160,6 +183,7 @@ def test_decimal_source_recurrence_matches_integral_and_axial_derivative_tail():
         )
         total = (Decimal(0), Decimal(0))
         relative_by_order = {}
+        decimal_derivative = None
         for order, term in enumerate(weighted_terms):
             parity = -1 if sign > 0 and order % 2 else 1
             total = total[0] + parity * term[0], total[1] + parity * term[1]
@@ -176,10 +200,88 @@ def test_decimal_source_recurrence_matches_integral_and_axial_derivative_tail():
                 relative_by_order[order] = (
                     difference[0] ** 2 + difference[1] ** 2
                 ).sqrt() / expected_magnitude
+                if order == 300:
+                    decimal_derivative = predicted
         reference_errors[z_value] = relative_by_order
 
+        scaled_terms = _scaled_axial_source_derivative_terms(
+            max_order,
+            wave_number_rad_m=wavenumber,
+            sphere_center_distance_m=center_distance,
+            piston_radius_m=piston_radius,
+            sphere_radius_m=sphere_radius,
+            side="front" if sign < 0 else "rear",
+        )
+        scaled_derivative = complex(
+            math.fsum(term.real for term in scaled_terms),
+            math.fsum(term.imag for term in scaled_terms),
+        )
+        expected_derivative = complex(
+            float(decimal_derivative[0]), float(decimal_derivative[1])
+        )
+        assert scaled_derivative == pytest.approx(
+            expected_derivative, rel=3e-12, abs=3e-14
+        )
+
     # The 2e-11 value is exploratory, not a production acceptance threshold.
-    for errors in reference_errors.values():
-        assert errors[253] > Decimal("2e-11")
-        assert errors[280] < Decimal("2e-11")
-        assert errors[300] < Decimal("1e-11")
+    if gap == 0.0001:
+        for errors in reference_errors.values():
+            assert errors[253] > Decimal("2e-11")
+            assert errors[280] < Decimal("2e-11")
+            assert errors[300] < Decimal("1e-11")
+    else:
+        for errors in reference_errors.values():
+            assert errors[253] < Decimal("2e-11")
+
+
+def test_scaled_axial_derivative_meets_exploratory_target_on_gap_grid():
+    """Check a sparse gap grid; this is not a continuous-domain error bound."""
+    from aura.fields.numerical import _scaled_axial_source_derivative_terms
+
+    speed, frequency = 346.0, 25230.0
+    wavenumber = 2 * math.pi * frequency / speed
+    piston_radius, sphere_radius = 0.01, 0.025
+    maximum_error_by_order = {253: 0.0, 280: 0.0, 300: 0.0}
+    for gap_mm in (0.1, 1.0, 2.5, 5.0, 10.0, 15.0, 20.0, 25.0, 30.0):
+        gap = gap_mm / 1000
+        center_distance = sphere_radius + gap
+        for side, z in (("front", gap), ("rear", gap + 2 * sphere_radius)):
+            terms = _scaled_axial_source_derivative_terms(
+                300,
+                wave_number_rad_m=wavenumber,
+                sphere_center_distance_m=center_distance,
+                piston_radius_m=piston_radius,
+                sphere_radius_m=sphere_radius,
+                side=side,
+            )
+            expected = z / math.hypot(z, piston_radius) * cmath.exp(
+                1j * wavenumber * math.hypot(z, piston_radius)
+            ) - cmath.exp(1j * wavenumber * z)
+            for order, maximum_error in maximum_error_by_order.items():
+                partial = complex(
+                    math.fsum(term.real for term in terms[: order + 1]),
+                    math.fsum(term.imag for term in terms[: order + 1]),
+                )
+                relative_error = abs(partial - expected) / abs(expected)
+                maximum_error_by_order[order] = max(
+                    maximum_error, relative_error
+                )
+
+    assert maximum_error_by_order[253] > 2e-11
+    assert maximum_error_by_order[280] < 2e-11
+    assert maximum_error_by_order[300] < 2e-11
+
+
+def test_scaled_axial_derivative_rejects_ka_outside_its_checked_series_domain():
+    from aura.errors import InvalidInputError
+    from aura.fields.numerical import _scaled_axial_source_derivative_terms
+
+    with pytest.raises(InvalidInputError, match="BESSEL_ARGUMENT_RANGE"):
+        _scaled_axial_source_derivative_terms(
+            8,
+            wave_number_rad_m=2 * math.pi * 25230 / 346,
+            sphere_center_distance_m=0.031,
+            piston_radius_m=0.01,
+            sphere_radius_m=0.03,
+            side="front",
+        )

@@ -1,10 +1,10 @@
 # Next Main Task — NUM-03 Air Numerical Backend
 
-**Checkpoint:** Owner-recorded P3 PASS for bounded analytical-software verification · **Prepared:** 2026-10-03 · **State:** NUM-W01, NUM-01, NUM-02 DONE; NUM-03 ACTIVE with isolated special-function primitives, coupled backend incomplete · **Refreshed after:** commit `4d5f78c`, order-253 axial derivative sweep and quadrature comparison (1,643 local tests; remote run 37140075238 passed)
+**Checkpoint:** Owner-recorded P3 PASS for bounded analytical-software verification · **Prepared:** 2026-10-03 · **State:** NUM-W01, NUM-01, NUM-02 DONE; NUM-03 ACTIVE with isolated special-function primitives, coupled backend incomplete · **Refreshed after:** commit `d639773`, high-precision order-300 axial modal-tail test (1,644 local tests; remote run 37140804162 passed)
 
 ## Immediate NUM-03 step
 
-A Decimal recurrence diagnostic now verifies Hasegawa Eq. 3 source factors against quadrature through order 24 and compares the observable-weighted axial derivative with the exact Rayleigh derivative through order 300 at the minimum-gap front and rear poles. Residuals cross the exploratory `2e-11` target by order 280 at both poles but are nonmonotone at the front; this is a single-geometry truncation diagnostic, not a production order criterion. Implement or assess a scaled weighted source/derivative term representation beyond the current order-253 binary64 limit, then repeat across the declared gap range before beginning broader piston-only/far-field checks. Keep all existing failure records and do not start the coupled evaluator until the component checks are reviewed.
+The scaled Hasegawa source-factor recurrence now returns mantissa/exponent pairs through order 300, and a scaled axial derivative-term evaluator matches the Decimal recurrence at both gap endpoints. A nine-point sweep over 0.1–30 mm and both poles gives maximum relative residuals `1.912e-10`, `1.258e-11`, and `5.537e-12` at orders 253, 280, and 300; the order-300 front residual is nonmonotone. This sparse grid is diagnostic, not a continuous error bound or production truncation choice. Next, validate scaled piston-only pressure and off-axis velocity/gradient terms against the Rayleigh disk integral at shared points, including the declared gap range and the existing three off-axis angles. Preserve component-specific residuals and failures. Keep the coupled Hasegawa evaluator behind those checks; no owner decision is needed.
 
 ## Water evidence status and qualification result
 

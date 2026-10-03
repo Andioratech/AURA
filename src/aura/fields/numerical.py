@@ -6,6 +6,7 @@ provide binary64 spherical Bessel values and derivatives for that implementation
 
 from __future__ import annotations
 
+import cmath
 import math
 import sys
 
@@ -149,6 +150,230 @@ def _scaled_spherical_neumann(max_order: int, x: float) -> tuple[tuple[float, in
         values.append((next_value, exponent))
         y_previous, y_current = y_current, next_value
     return tuple(values)
+
+
+def _scaled_complex(value: complex, exponent: int = 0) -> tuple[complex, int]:
+    """Represent a complex value as a bounded mantissa times a power of two."""
+    magnitude = max(abs(value.real), abs(value.imag))
+    if magnitude == 0:
+        return 0j, 0
+    if not math.isfinite(magnitude):
+        raise NumericalDomainError("NUMERIC_RANGE", "/scaled_value", "Scaled value is not finite.")
+    _, shift = math.frexp(magnitude)
+    return complex(math.ldexp(value.real, -shift), math.ldexp(value.imag, -shift)), exponent + shift
+
+
+def _scaled_complex_add(
+    left: tuple[complex, int], right: tuple[complex, int]
+) -> tuple[complex, int]:
+    left_mantissa, left_exponent = left
+    right_mantissa, right_exponent = right
+    if left_exponent < right_exponent:
+        left_mantissa, right_mantissa = right_mantissa, left_mantissa
+        left_exponent, right_exponent = right_exponent, left_exponent
+    shift = right_exponent - left_exponent
+    right_scaled = complex(
+        math.ldexp(right_mantissa.real, shift),
+        math.ldexp(right_mantissa.imag, shift),
+    )
+    return _scaled_complex(left_mantissa + right_scaled, left_exponent)
+
+
+def _scaled_complex_multiply(
+    left: tuple[complex, int], right: tuple[complex, int]
+) -> tuple[complex, int]:
+    return _scaled_complex(left[0] * right[0], left[1] + right[1])
+
+
+def _scaled_complex_real(
+    value: tuple[complex, int], factor: float
+) -> tuple[complex, int]:
+    if not math.isfinite(factor):
+        raise NumericalDomainError("NUMERIC_RANGE", "/scaled_factor", "Scaled factor is not finite.")
+    return _scaled_complex(value[0] * factor, value[1])
+
+
+def _unscale_complex(value: tuple[complex, int], path: str) -> complex:
+    try:
+        result = complex(
+            math.ldexp(value[0].real, value[1]),
+            math.ldexp(value[0].imag, value[1]),
+        )
+    except OverflowError as exc:
+        raise NumericalDomainError("NUMERIC_RANGE", path, "Weighted modal term exceeds binary64.") from exc
+    return complex(_finite(result.real, path + "/real"), _finite(result.imag, path + "/imag"))
+
+
+def _regular_bessel_scaled_values(max_order: int, x: float) -> tuple[tuple[complex, int], ...]:
+    """Return scaled j_n(x) from its convergent high-order power series."""
+    # This helper is deliberately bounded to the frozen sphere ka domain. At
+    # these orders the power-series correction is well conditioned and positive.
+    if x > 12.0:
+        raise InvalidInputError(
+            "BESSEL_ARGUMENT_RANGE", "/x", "Scaled regular series is bounded to x <= 12."
+        )
+    base = _scaled_complex(1 + 0j)
+    values = []
+    for order in range(max_order + 1):
+        term = total = 1.0
+        for index in range(1, 100):
+            term *= -(x * x) / (2 * index * (2 * order + 2 * index + 1))
+            updated = total + term
+            total = updated
+            if abs(term) <= 2 * math.ulp(total):
+                break
+        else:
+            raise NumericalDomainError(
+                "BESSEL_SERIES", f"/j_{order}", "Scaled regular power series did not converge."
+            )
+        values.append(_scaled_complex_real(base, total))
+        base = _scaled_complex_real(base, x / (2 * order + 3))
+    return tuple(values)
+
+
+def _scaled_source_diffraction_coefficients(
+    max_order: int,
+    *,
+    wave_number_rad_m: float,
+    sphere_center_distance_m: float,
+    piston_radius_m: float,
+) -> tuple[tuple[complex, int], ...]:
+    """Return conjugated Hasegawa source factors as mantissa/exponent pairs."""
+    if type(max_order) is not int or not 0 <= max_order <= 512:
+        raise InvalidInputError("BESSEL_ORDER_RANGE", "/max_order", "Expected order from 0 through 512.")
+    for name, value in (
+        ("wave_number_rad_m", wave_number_rad_m),
+        ("sphere_center_distance_m", sphere_center_distance_m),
+        ("piston_radius_m", piston_radius_m),
+    ):
+        if type(value) not in (int, float) or type(value) is bool or not math.isfinite(value) or value <= 0:
+            raise InvalidInputError("SOURCE_GEOMETRY", f"/{name}", "Expected a finite positive value.")
+
+    k = float(wave_number_rad_m)
+    center_distance = float(sphere_center_distance_m)
+    piston_radius = float(piston_radius_m)
+    lower_argument = _finite(k * center_distance, "/kr0")
+    upper_radius = math.hypot(center_distance, piston_radius)
+    upper_argument = _finite(k * upper_radius, "/kr1")
+    if lower_argument < 1.0 or upper_argument > 8192:
+        raise InvalidInputError(
+            "BESSEL_ARGUMENT_RANGE", "/sphere_center_distance_m", "Source arguments are outside the bounded regime."
+        )
+
+    lower_h0 = complex(math.sin(lower_argument) / lower_argument, -math.cos(lower_argument) / lower_argument)
+    upper_h0 = complex(math.sin(upper_argument) / upper_argument, -math.cos(upper_argument) / upper_argument)
+    upper_h1 = complex(
+        math.sin(upper_argument) / upper_argument**2 - math.cos(upper_argument) / upper_argument,
+        -math.cos(upper_argument) / upper_argument**2 - math.sin(upper_argument) / upper_argument,
+    )
+    factors = [
+        _scaled_complex(cmath.exp(1j * lower_argument) - cmath.exp(1j * upper_argument)),
+        _scaled_complex(-lower_argument * (upper_h0 - lower_h0)),
+    ]
+    legendre_ratio = center_distance / upper_radius
+    legendre_previous, legendre_current = 1.0, legendre_ratio
+    hankel_previous, hankel_current = _scaled_complex(upper_h0), _scaled_complex(upper_h1)
+
+    for order in range(2, max_order + 1):
+        next_legendre = (
+            (2 * order - 1) * legendre_ratio * legendre_current
+            - (order - 1) * legendre_previous
+        ) / order
+        legendre_difference = next_legendre - legendre_previous
+        factors.append(
+            _scaled_complex_add(
+                _scaled_complex(-factors[order - 2][0], factors[order - 2][1]),
+                _scaled_complex_real(
+                    _scaled_complex_multiply(
+                        hankel_current,
+                        _scaled_complex(complex(legendre_difference, 0.0)),
+                    ),
+                    -upper_argument,
+                ),
+            )
+        )
+        hankel_next = _scaled_complex_add(
+            _scaled_complex_real(hankel_current, (2 * order - 1) / upper_argument),
+            _scaled_complex(-hankel_previous[0], hankel_previous[1]),
+        )
+        hankel_previous, hankel_current = hankel_current, hankel_next
+        legendre_previous, legendre_current = legendre_current, next_legendre
+    return tuple(factors[: max_order + 1])
+
+
+def _scaled_axial_source_derivative_terms(
+    max_order: int,
+    *,
+    wave_number_rad_m: float,
+    sphere_center_distance_m: float,
+    piston_radius_m: float,
+    sphere_radius_m: float,
+    side: str,
+) -> tuple[complex, ...]:
+    """Return piston-only axial d(Phi)/dz modal terms normalized by piston speed.
+
+    The source factors use the conjugated Hasegawa Eqs. (2)-(4) recurrence and
+    remain exponent-scaled; regular j_n and j'_n are combined before conversion
+    to binary64. This is a bounded diagnostic for the frozen air ka <= 12 domain,
+    not the coupled sphere field evaluator.
+    """
+    if type(max_order) is not int or not 0 <= max_order <= 512:
+        raise InvalidInputError("BESSEL_ORDER_RANGE", "/max_order", "Expected order from 0 through 512.")
+    if side not in ("front", "rear"):
+        raise InvalidInputError("FIELD_SIDE", "/side", "Expected 'front' or 'rear'.")
+    for name, value in (
+        ("wave_number_rad_m", wave_number_rad_m),
+        ("sphere_center_distance_m", sphere_center_distance_m),
+        ("piston_radius_m", piston_radius_m),
+        ("sphere_radius_m", sphere_radius_m),
+    ):
+        if type(value) not in (int, float) or type(value) is bool or not math.isfinite(value) or value <= 0:
+            raise InvalidInputError("SOURCE_GEOMETRY", f"/{name}", "Expected a finite positive value.")
+
+    k = float(wave_number_rad_m)
+    center_distance = float(sphere_center_distance_m)
+    piston_radius = float(piston_radius_m)
+    sphere_radius = float(sphere_radius_m)
+    sphere_argument = k * sphere_radius
+    if center_distance <= sphere_radius:
+        raise InvalidInputError(
+            "SOURCE_GEOMETRY", "/sphere_center_distance_m", "Sphere center must lie beyond its radius."
+        )
+    if not 1.0 <= sphere_argument <= 12.0:
+        raise InvalidInputError(
+            "BESSEL_ARGUMENT_RANGE", "/sphere_radius_m", "Scaled axial diagnostic requires 1 <= ka <= 12."
+        )
+    source_factors = _scaled_source_diffraction_coefficients(
+        max_order,
+        wave_number_rad_m=k,
+        sphere_center_distance_m=center_distance,
+        piston_radius_m=piston_radius,
+    )
+
+    regular_values = _regular_bessel_scaled_values(max_order + 1, sphere_argument)
+    derivative_start = min(max_order, max(48, math.ceil(sphere_argument) + 24))
+    _, _, regular_derivatives, _ = _spherical_sequences(derivative_start, sphere_argument)
+    terms = []
+
+    for order in range(max_order + 1):
+        if order < derivative_start:
+            derivative = _scaled_complex(complex(regular_derivatives[order], 0.0))
+        else:
+            derivative = _scaled_complex_add(
+                _scaled_complex_real(regular_values[order], order / sphere_argument),
+                _scaled_complex(-regular_values[order + 1][0], regular_values[order + 1][1]),
+            )
+        parity = -1 if side == "rear" and order % 2 else 1
+        weighted = _scaled_complex_real(
+            _scaled_complex_multiply(source_factors[order], derivative),
+            parity * (2 * order + 1),
+        )
+        # d/dz reverses the radial direction at the piston-facing pole; i is
+        # the source-series prefactor for unit piston velocity.
+        axial_sign = -1 if side == "front" else 1
+        rotated = complex(-axial_sign * weighted[0].imag, axial_sign * weighted[0].real)
+        terms.append(_unscale_complex(_scaled_complex(rotated, weighted[1]), f"/terms/{order}"))
+    return tuple(terms)
 
 
 def spherical_legendre(order: int, cosine: float) -> tuple[float, float]:
