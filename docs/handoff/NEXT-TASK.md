@@ -1,6 +1,6 @@
 # Next Main Task — NUM-03 Air Numerical Backend
 
-**Checkpoint:** Owner-recorded P3 PASS for bounded analytical-software verification · **Prepared:** 2026-10-03 · **State:** NUM-W01, NUM-01, NUM-02 DONE; NUM-03 ACTIVE with isolated special-function primitives, coupled backend incomplete · **Refreshed after:** large-argument `j_n`/derivative checks and full local Quality (1,642 tests); local changes await publication
+**Checkpoint:** Owner-recorded P3 PASS for bounded analytical-software verification · **Prepared:** 2026-10-03 · **State:** NUM-W01, NUM-01, NUM-02 DONE; NUM-03 ACTIVE with isolated special-function primitives, coupled backend incomplete · **Refreshed after:** commit `ca78de5`, large-argument `j_n`/derivative checks and full local/remote Quality (1,642 tests; run 37138327037)
 
 ## Water evidence status and qualification result
 

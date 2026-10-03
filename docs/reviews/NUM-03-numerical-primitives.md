@@ -27,7 +27,7 @@ This review covers isolated binary64 spherical Bessel/Legendre and Gauss-Legendr
 - Invalid domains raise `InvalidInputError`; an unrepresentable outgoing solution raises `NumericalDomainError` rather than returning an infinite value.
 - Ruff and `git diff --check` pass for the intermediate change.
 
-The first full-suite run after adding the upward branch exposed that it bypassed the existing `x=1e9` workspace rejection (`1 failed, 1640 passed`). An explicit argument bound was restored before recurrence selection. This failure is retained here. The corrected complete local Quality workflow then passed in ENV-1.0: hash-locked dependency installation, editable install, `pip check`, environment verification, Ruff, required-document checks and all 1,642 tests; `git diff --check` also passed. The parent commit `ea0f7ec`'s remote Quality run [37137262297](https://github.com/Andioratech/AURA/actions/runs/37137262297) is successful; remote CI for this unpublished change will run after push.
+The first full-suite run after adding the upward branch exposed that it bypassed the existing `x=1e9` workspace rejection (`1 failed, 1640 passed`). An explicit argument bound was restored before recurrence selection. This failure is retained here. The corrected complete local Quality workflow then passed in ENV-1.0: hash-locked dependency installation, editable install, `pip check`, environment verification, Ruff, required-document checks and all 1,642 tests; `git diff --check` also passed. The change was published as `ca78de5`; its exact remote Quality run [37138327037](https://github.com/Andioratech/AURA/actions/runs/37138327037) succeeded.
 
 ## Limits and open verification
 
