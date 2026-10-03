@@ -1,6 +1,6 @@
 # Next Main Task — Owner Choice for NUM-01
 
-**Checkpoint:** Owner-recorded P3 PASS for bounded analytical-software verification · **Prepared:** 2026-10-03 · **State:** NUM-01 comparison complete, including conditional air-route limits; no backend selected · **Refreshed after:** Andrade coverage audit, angular-spectrum screen and conditional gap-geometry calculation
+**Checkpoint:** Owner-recorded P3 PASS for bounded analytical-software verification · **Prepared:** 2026-10-03 · **State:** NUM-01 comparison complete, including conditional air-route limits; no backend selected · **Refreshed after:** Andrade coverage audit, method/gap screen and acoustic feedback-control prior-art follow-up
 
 ## Finding that requires a project choice
 
