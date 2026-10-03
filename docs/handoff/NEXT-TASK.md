@@ -1,6 +1,6 @@
-# Next Main Task — Air P4 Solver Contract and Explanation Checkpoint
+# Next Main Task — NUM-03 Air Numerical Backend
 
-**Checkpoint:** Owner-recorded P3 PASS for bounded analytical-software verification · **Prepared:** 2026-10-03 · **State:** DEC-006 orders water-like software qualification followed by air P4; NUM-W01 bounded audit is DONE; NUM-01 selected the Hasegawa piston/sphere series subject to preflight; no solver code exists · **Refreshed after:** critique and prior-art/source audits; water numerical-workflow qualification audit
+**Checkpoint:** Owner-recorded P3 PASS for bounded analytical-software verification · **Prepared:** 2026-10-03 · **State:** NUM-W01 qualification, NUM-01 method selection, and NUM-02 software preflight are DONE; no numerical solver code exists · **Refreshed after:** NUM-02 estimator and full Quality verification
 
 ## Water evidence status and qualification result
 
@@ -52,7 +52,7 @@ DEC-006 records the owner's connected sequence: qualify the existing water-like 
 
 NUM-01 retains Hasegawa et al.'s stationary rigid-sphere series for the centered circular piston case in air. It is subject to NUM-02 stability, truncation, convergence and resource preflight; the source examples do not establish convergence at AURA's parameters. P4 compares pressure, velocity and gradients against piston-only, P3 and exact sphere-scattering references and tests harmonic-order stability through the declared gap range. The published air force curve remains uncertainty-limited, and P4 is field verification only.
 
-Before NUM-02/NUM-03 implementation, provide the owner the requested plain-Spanish explanation of components, inputs, outputs, verification cases and limitations. Do not start solver/core implementation before that explanation. An air numerical PASS routes downstream work to air; it does not promote a force, acceleration, pseudogravity or gravity-equivalence claim.
+The requested NUM-03 construction checkpoint has now been delivered to the owner in plain Spanish before implementation. The next work item is the stationary rigid-sphere Hasegawa series backend; its planned components are stable source/sphere harmonic coefficients and chunked pressure, velocity and pressure-gradient evaluation, with versioned diagnostics and immutable run provenance. Inputs are the frozen NUM-01 air source/sphere contract plus an explicit harmonic truncation, gap coordinates, resource caps and (for a budgeted run) exact-context runtime calibration. Verification starts with coefficient/normalization checks, piston-only and P3 limiting cases, exact plane-wave/sphere scattering, and order/gap convergence; a short calibration pilot remains a separately identified, time-limited diagnostic. Results are field-only. The series implementation can be unstable or unconverged near the sphere/gap, and a numerical match does not validate the acoustic model against experiment. No force, motion, acceleration, pseudogravity or gravity-equivalence claim follows from this step. This explanation is the requested checkpoint, not a separate approval gate; continue NUM-03 under the existing authorization after reconciling the current work board and source contract.
 
 ## Reconciliation and reading
 

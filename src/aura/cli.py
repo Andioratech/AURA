@@ -3,8 +3,104 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import sys
+from pathlib import Path
+
+
+def _load_preflight_json(path: str) -> tuple[dict, str]:
+    from aura.errors import InvalidInputError
+
+    if "\x00" in path:
+        raise InvalidInputError("INPUT_PATH", "", "Input path contains a null character.")
+    with Path(path).open("rb") as stream:
+        data = stream.read(1024 * 1024 + 1)
+    if len(data) > 1024 * 1024:
+        raise InvalidInputError("INPUT_LIMIT", "", "Preflight JSON exceeds the 1 MiB limit.")
+
+    def object_pairs(pairs):
+        result = {}
+        for key, value in pairs:
+            if key in result:
+                raise InvalidInputError("DUPLICATE_KEY", f"/{key}", "Duplicate JSON key.")
+            result[key] = value
+        return result
+
+    def reject_constant(value):
+        raise InvalidInputError("NONFINITE_JSON", "", f"Non-finite JSON value {value} is not allowed.")
+
+    try:
+        record = json.loads(data, object_pairs_hook=object_pairs, parse_constant=reject_constant)
+    except (json.JSONDecodeError, UnicodeDecodeError, RecursionError) as exc:
+        raise InvalidInputError("INPUT_JSON", "", "Preflight input must be valid UTF-8 JSON.") from exc
+    if type(record) is not dict:
+        raise InvalidInputError("INPUT_JSON", "", "Preflight JSON root must be an object.")
+    return record, hashlib.sha256(data).hexdigest()
+
+
+def _preflight(args) -> int:
+    from aura.errors import IncompleteEvidenceError, InvalidInputError
+    from aura.preflight import estimate_air_series
+    from aura.schema import Scenario, load_document
+
+    try:
+        if "\x00" in args.scenario:
+            raise InvalidInputError("INPUT_PATH", "", "Input path contains a null character.")
+        scenario = load_document(args.scenario)
+        if not isinstance(scenario, Scenario):
+            raise InvalidInputError("DOCUMENT_TYPE", "/document_type", "Expected a scenario.")
+        workload, _ = _load_preflight_json(args.workload)
+        calibration = None
+        calibration_sha256 = None
+        current_source_revision = None
+        current_environment_sha256 = None
+        if args.calibration is not None:
+            calibration, calibration_sha256 = _load_preflight_json(args.calibration)
+            from aura.runs.manifest import digest, encode
+            from aura.runs.provenance import capture
+
+            source, environment, _ = capture()
+            current_source_revision = source["revision"]
+            current_environment_sha256 = digest(encode(environment))
+        report = estimate_air_series(
+            scenario.to_dict(), workload, calibration,
+            calibration_sha256=calibration_sha256,
+            output_dir=args.output_dir,
+            current_source_revision=current_source_revision,
+            current_environment_sha256=current_environment_sha256,
+        )
+    except IncompleteEvidenceError as exc:
+        report = {"status": "INDETERMINATE", "reason": exc.code, "error": exc.as_dict(), "exit_code": 3}
+    except InvalidInputError as exc:
+        report = {"status": "INVALID", "reason": exc.code, "error": exc.as_dict(), "exit_code": 1}
+    except FileNotFoundError as exc:
+        report = {
+            "status": "INVALID", "reason": "FILE_NOT_FOUND",
+            "error": {"code": "FILE_NOT_FOUND", "path": "", "message": str(exc)},
+            "exit_code": 4,
+        }
+    except OSError as exc:
+        report = {
+            "status": "INVALID", "reason": "INPUT_IO",
+            "error": {"code": "INPUT_IO", "path": "", "message": str(exc)},
+            "exit_code": 4,
+        }
+    if args.json:
+        print(json.dumps(report, indent=2, ensure_ascii=True, allow_nan=False))
+    else:
+        status = report["status"]
+        lines = [f"Preflight: {status}"]
+        if "estimates" in report:
+            lines.append("Estimates: " + json.dumps(report["estimates"], sort_keys=True))
+            lines.append("Limits: " + json.dumps(report["limits"], sort_keys=True))
+        if report.get("reason"):
+            lines.append(f"Reason: {report['reason']}")
+        if report.get("error"):
+            lines.append(json.dumps(report["error"], ensure_ascii=True))
+        lines.append("No numerical field solver was imported or executed.")
+        print("\n".join(lines), file=sys.stdout if report["exit_code"] == 0 else sys.stderr)
+    return report["exit_code"]
 
 
 def _validate_config(path: str) -> tuple[dict, str]:
@@ -151,6 +247,15 @@ def main(argv: list[str] | None = None) -> int:
     )
     validation.add_argument("path", help="scenario file with .json, .yaml or .yml extension")
     validation.add_argument("--json", action="store_true", help="emit a JSON validation report")
+    preflight = commands.add_parser(
+        "preflight", help="estimate an air-series workload before solver allocation",
+        allow_abbrev=False,
+    )
+    preflight.add_argument("scenario", help="validated scenario containing resource caps")
+    preflight.add_argument("--workload", required=True, help="AIR-SERIES-WORKLOAD-1.0 JSON")
+    preflight.add_argument("--calibration", help="matching AIR-SERIES-CALIBRATION-1.0 JSON")
+    preflight.add_argument("--output-dir", help="existing directory planned for run artifacts")
+    preflight.add_argument("--json", action="store_true", help="emit a structured estimate")
     run = commands.add_parser("run", help="record a bounded software diagnostic", allow_abbrev=False)
     run.add_argument("path", help="diagnostic scenario JSON/YAML")
     run.add_argument("--experiment", required=True, help="frozen experiment JSON/YAML")
@@ -172,14 +277,17 @@ def main(argv: list[str] | None = None) -> int:
     replay.add_argument("--report-dir", help="new report directory; default adjacent to replay output")
     replay.add_argument("--json", action="store_true", help="emit a structured replay report")
     args = parser.parse_args(argv)
+    if args.command == "preflight":
+        return _preflight(args)
     if args.command in ("run", "check", "reproduce"):
         return _lifecycle(args)
     if args.command == "status":
         print(
             "AURA: single-wave and coherent two-wave kernels are available through Python; recorded runs remain "
-            "software diagnostics. Physical validation is pending."
+            "software diagnostics. Air-series preflight estimates budgets only; no numerical solver is available. "
+            "Physical validation is pending."
         )
-        print("Available: strict scenario schemas, SI helpers, L0 audits and validate-config.")
+        print("Available: strict scenario schemas, SI helpers, L0 audits, validate-config and air-series preflight.")
         print("Available: run/check for immutable software diagnostics; scientific verdicts remain unresolved.")
         return 0
     output, report_text = _validate_config(args.path)

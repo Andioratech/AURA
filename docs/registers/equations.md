@@ -1,6 +1,6 @@
 # Equation and Convention Register
 
-**Register version:** 1.6 · **Date:** 2026-10-03
+**Register version:** 1.7 · **Date:** 2026-10-03
 
 This register records current algebra and representation choices. Source review, implementation verification and experimental validation are distinct statuses. No force model or simulator is validated by this table.
 
@@ -49,3 +49,13 @@ The [model-selection review](../research/particle-model-selection.md) records th
 | EQ-015 | Standing 1D wave specialization of EQ-014: `F_rad = 4*pi*Phi_ac*a^3*k0*E_ac*sin(2*k0*y)*e_y`; `Phi_ac=Re(f0)/3 + Re(f1)/2`; force N. | SRC-W02 Eqs. (79a–b); its standing-wave inputs and energy-density convention are stated in Sec. VIII. Coefficients carry the thermoviscous solid/fluid model and can depend on particle size; no general assertion of material-only contrast is made. | Not implemented. Independent plan: evaluate direction/nodal symmetry and compare against the general vector expression using independently constructed fields; this is a special case only, not a substitute for MQ1's 2D measured velocity map. |
 
 The current bounded choice is SRC-W02 as a preferred *candidate formulation*, SRC-W01 as a viscous comparator and limiting check, and inviscid theory as an ideal limit only. This does not close source-parameter, channel streaming, wall, calibration or measurement uncertainty gaps. No force model is selected for larger bodies or air. See [LIT-03](../work-items/LIT-03.md).
+
+## P4 air-field series (NUM-01)
+
+Hasegawa et al. derive the piston-only velocity potential as a spherical-harmonic series with diffraction integrals `f_n` (Eqs. 1–9), then write the total nearfield in the presence of a rigid sphere as an incident-plus-scattered series with coefficients `c_n` (Eqs. 10–20). The source paper uses `exp(+i*omega*t)` and second-kind spherical Hankel functions for its outgoing-wave convention. Its pressure equation is Eq. (12); its sphere-normal boundary is Eq. (14). AURA uses the conjugated solution under CONV-001. The registered equation is a model specification, not an AURA implementation or convergence result.
+
+| ID | Equation / units | Source, restriction and derivation | Implementation / independent reference |
+|---|---|---|---|
+| EQ-016 | `Phi = A * sum_{n=0..infinity} (2n+1)(-1)^n [j_n(kr)+c_n h_n^(2)(kr)] P_n(cos(theta)) f_n`; `A=-i*V0/k`; `f_n=integral_{k*r0}^{k*r1} 2*h_n^(2)(z)*P_n(k*r0/z)/z dz`; `r1=sqrt(R^2+r0^2)`. For `n != 1`, Eq. (20) gives `c_n=-j_n'(ka)/h_n^(2)'(ka)`; for the stationary sphere, the same `n=1` value follows separately by setting sphere velocity to zero in Eq. (14). `p=rho*d(Phi)/dt` in the source convention; `u=-grad(Phi)` with the source velocity-potential convention. | Hasegawa et al. (1985), Eqs. (1)–(20), especially Eqs. (1)–(3), (10)–(12), (14), (19) and (20); `k` rad/m, `r`, `r0`, `r1`, `R`, `a` m, `V0` m/s, `Phi` m²/s, `p` Pa, `u` m/s. Homogeneous inviscid medium; centered coaxial circular piston in an infinite rigid baffle; stationary sound-hard sphere; harmonic exterior field. Conjugate the complete source series and source phasors to map to CONV-001, giving `u=-grad(Phi)` and `p=-i*omega*rho*Phi` in the project convention. The freely translating-sphere `n=1` coefficient from Eq. (19) is excluded. | Specified, not implemented, in the [P4 air-field solver contract](../research/air-field-solver-contract.md). Independent plan: piston-only Rayleigh quadrature/limits; P3 overlap; exact plane-wave rigid-sphere partial waves; stationary boundary and at least three harmonic-order levels for pressure, velocity and pressure gradient. Convergence, resource feasibility and experimental validation remain unestablished. |
+
+Primary source: T. Hasegawa, K. Matsuzawa, N. Inoue, and A. Yanagihara, “Ultrasonic scattering by a rigid sphere in the nearfield of a circular piston,” *Journal of the Acoustical Society of Japan (E)* 6(1), 9–14 (1985), [DOI 10.1250/ast.6.9](https://doi.org/10.1250/ast.6.9).

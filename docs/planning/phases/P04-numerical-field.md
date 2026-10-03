@@ -56,7 +56,7 @@ Use [00](../00-execution-protocol.md), the [task template](../templates/task-rec
 
 ## NUM-01 — Choose one backend that answers the selected air question
 
-**Current state:** ACTIVE — After NUM-W01 (and NUM-W02 if needed), use the DEC-002 sphere/transducer case selected under [DEC-005](../../decisions/DEC-005-air-validation-route.md). NUM-01 selects Hasegawa et al.'s centered baffled-piston/rigid-sphere spherical-harmonic series, subject to NUM-02 stability/resource/convergence preflight. P4 imposes a stationary sound-hard sphere boundary at every order; derive the special `n=1` coefficient from zero normal velocity and do not reuse the source's separate translating-sphere coefficient. P4 verifies field calculations only: no measured air pressure/velocity map exists, the later force comparison remains uncertainty-limited, and acceleration/gravity equivalence remain outside this gate. Prior-art examples do not establish convergence at AURA's source/body parameters. No solver code has started; give the required simulation-core explanation before NUM-02/03 implementation. See [NUM-01](../../research/NUM-01-method-comparison.md). **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
+**Current state:** NUM-01 DONE as a method/contract task; NUM-02 ACTIVE. After NUM-W01 (and NUM-W02 if needed), use the DEC-002 sphere/transducer case selected under [DEC-005](../../decisions/DEC-005-air-validation-route.md). NUM-01 records Hasegawa et al.'s centered baffled-piston/rigid-sphere spherical-harmonic series and its FIELD-1.0 interface in the [solver contract](../../research/air-field-solver-contract.md), subject to NUM-02 stability/resource/convergence preflight. P4 imposes a stationary sound-hard sphere boundary at every order; derive the special `n=1` coefficient from zero normal velocity and do not reuse the source's separate translating-sphere coefficient. P4 verifies field calculations only: no measured air pressure/velocity map exists, the later force comparison remains uncertainty-limited, and acceleration/gravity equivalence remain outside this gate. Prior-art examples do not establish convergence at AURA's source/body parameters. NUM-02 implements only conservative resource estimation and pre-allocation rejection; field arrays and the numerical solver remain gated on its completion. See [NUM-01](../../work-items/NUM-01.md) and [method comparison](../../research/NUM-01-method-comparison.md). **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
 
 **Inputs / predecessors:** NUM-W01; NUM-W02 if activated; ANA-07; LIT-02
 
@@ -74,25 +74,25 @@ Use [00](../00-execution-protocol.md), the [task template](../templates/task-rec
 
 ## NUM-02 — Implement resource preflight before allocation
 
-**Initial state:** BLOCKED by predecessors / applicable gates. **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
+**Initial state:** DONE — estimator software delivered; a real solver/runtime calibration remains pending NUM-03. **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
 
 **Inputs / predecessors:** NUM-01
 
 **Steps**
 
-1. Estimate mesh/sample/element dimensions, precision, temporary arrays, solver workspace/factorization, iterations/time steps and output size.
+1. Estimate declared gap/point/order dimensions, temporary order vectors, one streamed observation chunk, runtime calibration, and output size for the selected harmonic-series implementation.
 2. Require explicit memory/disk/wall-time caps and safety headroom; record how estimates are obtained.
 3. Implement rejection before allocating solver arrays and test deliberate over-budget scenarios.
 
-**Required artifacts:** `preflight.py`; CLI preflight; resource fixtures and budget rejection checks.
+**Required artifacts:** `preflight.py`; CLI preflight; resource fixtures and budget rejection checks; [NUM-02 review](../../reviews/NUM-02-resource-preflight.md).
 
-**Acceptance / decision:** Oversized cases fail before allocation with named estimates and alternatives; no machine-specific assumption changes the physics.
+**Acceptance / decision:** Oversized cases fail before solver allocation with named estimates and alternatives; no machine-specific assumption changes the physics. An estimate cannot be BUDGETS_WITHIN_CAPS without a calibration tied to the exact clean source revision and ENV-1.0 digest. The delivered estimator has no production calibration because the solver does not exist; runtime therefore remains INDETERMINATE and no solver execution is authorized.
 
 **If unsuccessful:** F-05; refine cost model or select a scientifically justified smaller experiment.
 
 ## NUM-03 — Implement the selected field backend
 
-**Initial state:** BLOCKED by predecessors / applicable gates. **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
+**Initial state:** READY — NUM-02 is DONE and the requested pre-construction explanation has been delivered; the backend is not yet implemented. A time-limited calibration pilot, if needed, is a separate non-production diagnostic and cannot be reported as production-budgeted. **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
 
 **Inputs / predecessors:** NUM-02
 

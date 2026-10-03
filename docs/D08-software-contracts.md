@@ -1,6 +1,6 @@
 # AURA-D08: Software Architecture and Contracts
 
-**Version:** 1.0 · **Status:** BASELINE · **Date:** 2026-10-01
+**Version:** 1.1 · **Status:** BASELINE · **Date:** 2026-10-03
 
 ## Proposed package boundaries
 
@@ -24,6 +24,8 @@ No solver may silently supply missing physical parameters or units.
 ## Dependencies and CLI
 
 Keep the core CPU install small. High-fidelity and accelerator libraries are optional extras. Candidate dependencies require license and compatibility review. Provide commands conceptually equivalent to validate-config, preflight, run, check, compare and reproduce; every command returns a nonzero code for failed validation or required gate failure.
+
+`aura preflight <scenario> --workload <json> [--calibration <json>] [--output-dir <path>] [--json]` implements the NUM-02 AIR-SERIES-PREFLIGHT-1.0 contract. It validates the scenario resource caps and explicit workload dimensions, checks bounded RAM/disk estimates against declared and currently available resources, and estimates wall time only from a calibration bound to the exact clean source revision and ENV-1.0 digest. Missing or stale calibration is INDETERMINATE (exit 3); an exceeded cap is REJECTED (exit 1); a matching estimate within caps is BUDGETS_WITHIN_CAPS (exit 0). Exit 0 means only that this estimate fits its recorded budgets. It never imports or runs a numerical field solver and always reports `execution_authorized: false`. It is not a hard real-time guarantee or evidence of solver accuracy, convergence, or physical validity. See the [CLI contract](cli-usage.md) and [NUM-02](work-items/NUM-02.md).
 
 ## Errors and testing
 

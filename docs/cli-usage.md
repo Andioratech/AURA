@@ -1,8 +1,8 @@
 # Command-Line Usage
 
-**Interface:** CLI-1.0 · **Implemented by:** [FND-06](work-items/FND-06.md)
+**Interface:** CLI-1.1 · **Implemented by:** [FND-06](work-items/FND-06.md), [NUM-02](work-items/NUM-02.md)
 
-The available commands are `status`, `validate-config`, bounded software-diagnostic `run`/`check`, and analytical-run `reproduce`. The run commands are described in the [RUN lifecycle contract](research/run-lifecycle.md) and [examples](../examples/runs/README.md). Numerical solvers, physical simulation runs, general run-to-reference comparison and study-level evidence export remain planned. The configuration command reads a scenario and checks its declarations; it does not demonstrate that AURA works.
+The available commands are `status`, `validate-config`, air-series `preflight`, bounded software-diagnostic `run`/`check`, and analytical-run `reproduce`. The run commands are described in the [RUN lifecycle contract](research/run-lifecycle.md) and [examples](../examples/runs/README.md). The Hasegawa numerical field solver, physical simulation runs, general run-to-reference comparison and study-level evidence export remain planned. The configuration command reads a scenario and checks its declarations; it does not demonstrate that AURA works.
 
 ## Install and inspect
 
@@ -45,6 +45,16 @@ Keep the report and inspect `schema_status`, `verdict` and `error`; do not treat
 - Do not allocate solver resources, invoke a physical model, read external evidence artifacts, authenticate hashes, create a scientific run or modify the scenario. Higher audit levels and actual execution integration remain future work.
 
 These checks cannot recognize every mislabeled physical value. The [B-01/B-02 report](benchmarks/B01-B02-foundation-verification.md) records the radius/diameter and peak/RMS coverage limits.
+
+## Estimate an air-series workload
+
+```bash
+.venv/bin/aura preflight <scenario.json> --workload <air-workload.json> --output-dir <planned-run-directory> --json
+```
+
+The scenario supplies declared RAM, disk and wall-time caps. The workload is a strict `AIR-SERIES-WORKLOAD-1.0` JSON object with solver ID/version, number of gaps, points per gap, harmonic order and point-chunk size (at most 256). A calibration may be supplied with `--calibration`; it must match the solver version, the current clean source revision and ENV-1.0 environment digest. Input JSON is limited to 1 MiB, rejects duplicate keys and nonfinite values, and rejects unknown fields.
+
+The report estimates retained harmonic-order vectors, one streamed point chunk and its serialization, full requested output storage, and runtime from measured seconds per order plus the declared safety multiplier. It checks scenario limits and currently available Linux memory and free space at the planned output filesystem. `REJECTED` (exit 1) means a named budget was exceeded. `INDETERMINATE` (exit 3) means usable runtime calibration is missing or stale, so the run is not ready. `BUDGETS_WITHIN_CAPS` (exit 0) means only that the estimates fit the declared and observed resource limits for this exact calibration context. No outcome executes or authorizes a solver; `execution_authorized` is always false. Runtime remains INDETERMINATE until the numerical backend exists and can be calibrated. Estimates do not demonstrate field convergence, accuracy, force or experimental behavior. See [NUM-02](work-items/NUM-02.md) for the estimator basis and acceptance boundary.
 
 ## Replay a recorded analytical run
 
