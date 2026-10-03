@@ -17,11 +17,13 @@ This contract defines a field calculation and its verification domain. It does n
 | Source | Coaxial circular piston, radius `R = 10 mm`, mounted in an infinite rigid planar baffle; prescribed uniform face displacement amplitude `15 um` |
 | Sphere | Centered, stationary, rigid sound-hard sphere, radius `a = 25 mm`; the 1.46 g EPS mass is recorded for benchmark identity but does not enter this field boundary condition |
 | Separation | `H` is the axial distance from the piston face plane to the nearest sphere surface; declared sweep `0.1 mm <= H <= 30 mm`. The center-to-piston-plane distance is `a + H` |
-| Geometry | Axisymmetric, source and sphere coaxial; evaluate only fluid points outside the sphere and outside the solid piston/baffle |
+| Geometry | Axisymmetric, source and sphere coaxial; evaluate only fluid points outside the solid piston/baffle and within the source-centered series domain `a <= r < d`, where `r` is distance from sphere center and `d = a + H` is center-to-piston-plane distance |
 | Model | Single-frequency exterior field; no chamber walls, finite baffle, attenuation, thermal effects, nonlinear propagation, transducer loading, sphere elasticity, translation, or rotation |
 | Arithmetic | Complex binary64 (`complex128`); no unreported precision fallback |
 
 The face displacement gives a prescribed harmonic normal-velocity amplitude through the declared phasor convention (`v_n = -i*omega*xi` for positive displacement along the declared normal). The field solver must preserve this normalization in every output and diagnostic. The source condition is an idealized input from the published case, not a calibrated measurement of the actual transducer field.
+
+The source-to-sphere-centered expansion is restricted to `r < d`, the distance from sphere center to the closest point on the piston disk. This is the interior convergence domain of the spherical Bessel/outgoing Hankel addition used in Hasegawa's source expansion (Eqs. 2–3). Since `d = a + H`, the supported exterior region is a shell from the sphere surface to, but not including, the piston-plane distance from the sphere center; its radial thickness is the declared gap `H`. Samples at or beyond `r=d` must fail closed. This is a method domain restriction, not a claim that the physical field ceases to exist outside it. The full sphere boundary remains inside the expansion domain at every declared positive gap.
 
 ## Numerical interface
 

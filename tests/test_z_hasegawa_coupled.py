@@ -35,7 +35,7 @@ def test_coupled_field_matches_independent_unscaled_modal_sum():
     radius, center, piston_radius = 0.025, 0.035, 0.01
     order = 36
     theta, azimuth = 0.73, 0.41
-    radial = 0.041
+    radial = 0.030
     point = (
         radial * math.sin(theta) * math.cos(azimuth),
         radial * math.sin(theta) * math.sin(azimuth),
@@ -200,3 +200,15 @@ def test_coupled_field_checks_resource_cap_before_scaled_source_work(monkeypatch
     monkeypatch.setattr(hasegawa, "_scaled_source_diffraction_coefficients", forbidden)
     with pytest.raises(InvalidInputError, match="Need at least"):
         _evaluate([(0.0, 0.0, 0.06)], order=40, workspace=1)
+
+
+def test_coupled_field_rejects_samples_outside_source_series_domain(monkeypatch):
+    from aura.errors import InvalidInputError
+    from aura.fields import hasegawa
+
+    def forbidden(*args, **kwargs):
+        raise AssertionError("Out-of-domain samples must fail before source arrays are constructed.")
+
+    monkeypatch.setattr(hasegawa, "_scaled_source_diffraction_coefficients", forbidden)
+    with pytest.raises(InvalidInputError, match="radius < sphere-center distance"):
+        _evaluate([(0.0, 0.0, 0.071)], order=24)

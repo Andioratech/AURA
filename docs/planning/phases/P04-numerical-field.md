@@ -92,7 +92,7 @@ Use [00](../00-execution-protocol.md), the [task template](../templates/task-rec
 
 ## NUM-03 — Implement the selected field backend
 
-**Current state:** ACTIVE — isolated numerical kernels and a first scaled coupled Hasegawa piston/stationary-sphere evaluator have focused checks recorded in [NUM-03](../../work-items/NUM-03.md), the [primitive review](../../reviews/NUM-03-numerical-primitives.md) and [coupled-kernel review](../../reviews/NUM-03-coupled-kernel-review.md). The first kernel check is not a pilot or phase PASS. Coupled P3/exact-sphere/Rayleigh comparisons, run-level preflight, chunking, live-array estimation, full-domain convergence and a diagnostic pilot remain open. Any initial calibration pilot is separate and non-production. **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
+**Current state:** ACTIVE — isolated numerical kernels and a first scaled coupled Hasegawa piston/stationary-sphere evaluator have focused checks recorded in [NUM-03](../../work-items/NUM-03.md), the [primitive review](../../reviews/NUM-03-numerical-primitives.md) and [coupled-kernel review](../../reviews/NUM-03-coupled-kernel-review.md). The source-centered expansion is now explicitly restricted to `a<=r<d`; the full sphere surface stays inside this domain for every declared positive gap. The first kernel checks are not a pilot or phase PASS. Coupled P3/Rayleigh comparisons, run-level preflight, chunking, live-array estimation, full-domain convergence and a diagnostic pilot remain open. Any initial calibration pilot is separate and non-production. **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
 
 **Inputs / predecessors:** NUM-02
 

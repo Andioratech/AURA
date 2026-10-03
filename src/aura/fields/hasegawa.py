@@ -100,8 +100,9 @@ def evaluate_hasegawa_piston_sphere_field(
     Geometry is axisymmetric: a baffled, uniformly moving circular piston is
     at ``z=0`` and the stationary rigid sphere center is at ``z=...distance``.
     The sphere surface is sound-hard, the air is homogeneous/lossless/linear,
-    and phasors use exp(-iwt). Coordinates are in the exterior fluid, including
-    the sphere surface. The caller must preflight its complete run and choose
+    and phasors use exp(-iwt). Coordinates must lie in the series domain
+    ``sphere_radius_m <= r < sphere_center_distance_m`` measured from the sphere
+    center, including the sphere surface. The caller must preflight its complete run and choose
     ``max_order``; this routine makes no convergence or physical-validation
     claim. Its local workspace gate runs before special-function allocations.
     """
@@ -148,6 +149,11 @@ def evaluate_hasegawa_piston_sphere_field(
             raise InvalidInputError("FIELD_EXCLUSION", f"/coordinates_m/{index}", "Sample must lie on or outside the sphere.")
         if abs(radius - sphere_radius_m) <= surface_roundoff:
             radius = float(sphere_radius_m)
+        if radius >= sphere_center_distance_m:
+            raise InvalidInputError(
+                "FIELD_SERIES_DOMAIN", f"/coordinates_m/{index}",
+                "The source-centered expansion is restricted to radius < sphere-center distance.",
+            )
         maximum_argument = max(maximum_argument, _finite(wave_number * radius, f"/coordinates_m/{index}/argument"))
         points.append((tuple(point), relative, radius))
 
