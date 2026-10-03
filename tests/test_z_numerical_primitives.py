@@ -10,9 +10,14 @@ from aura.errors import InvalidInputError, NumericalDomainError
 
 @pytest.fixture
 def kernels():
-    from aura.fields.numerical import spherical_bessel_jy, spherical_legendre
+    from aura.fields.numerical import (
+        gauss_legendre_rule,
+        spherical_bessel_jy,
+        spherical_legendre,
+        stationary_sphere_coefficient,
+    )
 
-    return spherical_bessel_jy, spherical_legendre
+    return spherical_bessel_jy, spherical_legendre, gauss_legendre_rule, stationary_sphere_coefficient
 
 
 def _decimal_spherical_j(order, argument):
@@ -35,7 +40,7 @@ def _decimal_spherical_j(order, argument):
 @pytest.mark.parametrize("order", range(8))
 @pytest.mark.parametrize("x", (0.25, 1.0, 4.5, 12.0))
 def test_spherical_bessel_recurrence_and_derivative_identities(order, x, kernels):
-    spherical_bessel_jy, _ = kernels
+    spherical_bessel_jy, _, _, _ = kernels
     jn, yn, j_derivative, y_derivative = spherical_bessel_jy(order, x)
     if order == 0:
         j_previous = math.sin(x) / x
@@ -55,7 +60,7 @@ def test_spherical_bessel_recurrence_and_derivative_identities(order, x, kernels
 @pytest.mark.parametrize("order", range(13))
 @pytest.mark.parametrize("x", (0.25, 4.5, 12.0, 100.0))
 def test_miller_j_values_against_independent_decimal_series(order, x, kernels):
-    spherical_bessel_jy, _ = kernels
+    spherical_bessel_jy, _, _, _ = kernels
     actual = spherical_bessel_jy(order, x)[0]
     expected = float(_decimal_spherical_j(order, x))
     assert actual == pytest.approx(expected, rel=2e-13, abs=2e-15)
@@ -64,7 +69,7 @@ def test_miller_j_values_against_independent_decimal_series(order, x, kernels):
 @pytest.mark.parametrize("order", range(12))
 @pytest.mark.parametrize("cosine", (-1.0, -0.6, 0.0, 0.4, 1.0))
 def test_legendre_derivative_matches_finite_difference_and_parity(order, cosine, kernels):
-    _, spherical_legendre = kernels
+    _, spherical_legendre, _, _ = kernels
     value, derivative = spherical_legendre(order, cosine)
     assert math.isfinite(value)
     assert math.isfinite(derivative)
@@ -83,18 +88,40 @@ def test_legendre_derivative_matches_finite_difference_and_parity(order, cosine,
     ((-1, 1.0, "BESSEL_ORDER"), (1.0, 1.0, "BESSEL_ORDER"), (0, 0.0, "BESSEL_ARGUMENT")),
 )
 def test_bessel_rejects_invalid_domain(order, x, code, kernels):
-    spherical_bessel_jy, _ = kernels
+    spherical_bessel_jy, _, _, _ = kernels
     with pytest.raises(InvalidInputError, match=code):
         spherical_bessel_jy(order, x)
 
 
 def test_bessel_fails_typed_when_outgoing_solution_exceeds_binary64(kernels):
-    spherical_bessel_jy, _ = kernels
+    spherical_bessel_jy, _, _, _ = kernels
     with pytest.raises(NumericalDomainError, match="NUMERIC_RANGE"):
         spherical_bessel_jy(512, 0.01)
 
 
 def test_bessel_bounds_miller_workspace_before_allocation(kernels):
-    spherical_bessel_jy, _ = kernels
+    spherical_bessel_jy, _, _, _ = kernels
     with pytest.raises(InvalidInputError, match="BESSEL_WORK_RANGE"):
         spherical_bessel_jy(0, 1e9)
+
+
+@pytest.mark.parametrize("order", range(1, 10))
+def test_gauss_legendre_rule_integrates_polynomial_moments(order, kernels):
+    _, _, gauss_legendre_rule, _ = kernels
+    nodes, weights = gauss_legendre_rule(order)
+    assert nodes == tuple(sorted(nodes))
+    assert weights == pytest.approx(tuple(reversed(weights)), abs=2e-15)
+    for degree in range(2 * order):
+        observed = math.fsum(weight * node**degree for node, weight in zip(nodes, weights, strict=True))
+        expected = 0.0 if degree % 2 else 2 / (degree + 1)
+        assert observed == pytest.approx(expected, rel=2e-13, abs=2e-14)
+
+
+@pytest.mark.parametrize("order", range(16))
+def test_stationary_sphere_coefficient_enforces_zero_normal_velocity(order, kernels):
+    spherical_bessel_jy, _, _, stationary_sphere_coefficient = kernels
+    _, _, j_derivative, y_derivative = spherical_bessel_jy(order, 11.45)
+    coefficient = stationary_sphere_coefficient(order, 11.45)
+    residual = complex(j_derivative, 0.0) + coefficient * complex(j_derivative, y_derivative)
+    scale = math.hypot(j_derivative, y_derivative)
+    assert abs(residual) <= 8 * math.ulp(scale)

@@ -14,13 +14,13 @@ Implement the selected Hasegawa stationary sound-hard sphere field series for th
 
 ## Delivered intermediate component
 
-`src/aura/fields/numerical.py` currently provides binary64 spherical Bessel values/derivatives and Legendre values/derivatives. It uses a downward Miller recurrence for `j_n`, upward recurrence for `y_n`, and explicit typed domain/range errors. The Miller start accounts for both order and argument and has a fixed workspace guard. It contains no coupled-field evaluator and produces no air-case field data.
+`src/aura/fields/numerical.py` currently provides binary64 spherical Bessel/Legendre values and derivatives, Gauss-Legendre nodes/weights, and the stationary sound-hard sphere coefficient. It uses a downward Miller recurrence for `j_n`, upward recurrence for `y_n`, and explicit typed domain/range errors. The Miller start accounts for both order and argument and has a fixed workspace guard. It contains no source diffraction coefficient or coupled-field evaluator and produces no air-case field data.
 
-The focused tests compare Bessel values against a separate high-precision Decimal series, test derivative/recurrence identities, check Legendre parity and finite differences, and verify invalid-domain and unrepresentable-output behavior. These are mathematical primitive checks only; they do not demonstrate Hasegawa-series stability or convergence.
+The focused tests compare Bessel values against a separate high-precision Decimal series, test derivative/recurrence identities, check Legendre parity and finite differences, verify Gauss-Legendre polynomial moments and stationary-sphere modal boundary cancellation, and exercise invalid-domain/workspace and unrepresentable-output failures. These are mathematical component checks only; they do not demonstrate Hasegawa-series stability or convergence.
 
 ## Remaining steps
 
-1. Implement and independently verify source diffraction coefficients and stationary-sphere scattering coefficients, including stationary `n=1`.
+1. Implement source diffraction coefficients and compare stationary-sphere scattering against the separate exact plane-wave partial-wave oracle, including stationary `n=1`.
 2. Add the preflight-approved, chunked field evaluator and typed diagnostics without changing the frozen `FieldSamples` normalization.
 3. Verify phasor mapping, boundary behavior, piston-only Rayleigh/P3/exact-sphere comparisons, then gap and order behavior.
 4. Update the estimator for the actual live arrays and keep runtime readiness INDETERMINATE until an exact-revision/ENV-1.0 bounded calibration exists.
