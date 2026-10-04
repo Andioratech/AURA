@@ -1,6 +1,6 @@
-# Next Main Task — Establish a Tolerance Basis for NUM-03
+# Next Main Task — Decide the NUM-03 Field-Tolerance Basis
 
-**Prepared:** 2026-10-04 · **State:** NUM-W01, NUM-01 and NUM-02 DONE; NUM-03 ACTIVE · **Published revision:** `30f4c21` (GitHub Quality [37184594681](https://github.com/Andioratech/AURA/actions/runs/37184594681) passed)
+**Prepared:** 2026-10-04 · **State:** NUM-W01, NUM-01 and NUM-02 DONE; NUM-03 ACTIVE · **Solver revision:** `f8302cb` (GitHub Quality [37184239104](https://github.com/Andioratech/AURA/actions/runs/37184239104) passed)
 
 ## Current implementation under review
 
@@ -10,10 +10,11 @@ The adapter supports one gap per run and one complete bounded chunk per request.
 
 On clean revision `f8302cb` and ENV-1.0, a 48-sample timing record produced a calibration for one gap, one point, quadrature order 256, maximum Bessel argument 12.378996, and order up to 512. The profile uses maximum observed rates and a safety multiplier of 3.0. One bounded order-512/one-point diagnostic fit the NUM-02 caps, completed, and passed `aura check` integrity verification; its science verdict remains INDETERMINATE. Its local evidence pack is under ignored `results/num03-runtime-calibration/f8302cbf39cb06105c7602e946d66bdd2a0a9f33/`; artifact-index SHA-256: `b4b75b1b227b22fe0ef2fe0b5a0d6291c9119df77025c39237948a2daf5c630c`.
 
-## Immediate next work
+## Owner decision needed
 
-1. Establish a source-grounded basis for numerical tolerances on pressure, particle velocity and pressure gradient in the declared air field domain. Keep numerical consistency targets distinct from measurement uncertainty and downstream force requirements; no threshold has been frozen.
-2. With a reviewed tolerance basis, design complete-domain convergence and boundary-contamination checks within the existing order-512 cap and resource limits. The current exact-context runtime profile is not evidence that larger workloads fit.
+Review the [field-tolerance decision brief](../research/NUM-03-field-tolerance-decision.md). It recommends a field-only P4 numerical error budget based on an independent reference, its uncertainty and observable convergence, with force/acceleration accuracy budgeted separately in later phases. No numerical threshold has been selected. The alternative is to wait for a downstream force/acceleration error budget before freezing P4 tolerance, which would defer the air field gate. Either choice preserves the current cap, domain and evidence.
+
+After this direction is clear, define the benchmark-specific pressure, particle-velocity and pressure-gradient metrics, reference uncertainty, sample set, refinement sequence and stopping rule. Do not begin broad convergence runs or declare P4 until those are frozen. The current exact-context runtime profile does not establish that larger workloads fit.
 
 ## Scientific work still open
 
