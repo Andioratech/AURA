@@ -74,7 +74,7 @@ Use [00](../00-execution-protocol.md), the [task template](../templates/task-rec
 
 ## NUM-02 — Implement resource preflight before allocation
 
-**Initial state:** DONE — estimator software delivered; a real solver/runtime calibration remains pending NUM-03. **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
+**Initial state:** DONE — estimator software delivered. NUM-03 has a measured runtime profile for one exact bounded workload; it does not generalize to larger point counts, other gaps or Bessel arguments. **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
 
 **Inputs / predecessors:** NUM-01
 
@@ -86,13 +86,13 @@ Use [00](../00-execution-protocol.md), the [task template](../templates/task-rec
 
 **Required artifacts:** `preflight.py`; CLI preflight; resource fixtures and budget rejection checks; [NUM-02 review](../../reviews/NUM-02-resource-preflight.md).
 
-**Acceptance / decision:** Oversized cases fail before solver allocation with named estimates and alternatives; no machine-specific assumption changes the physics. An estimate cannot be BUDGETS_WITHIN_CAPS without a calibration tied to the exact clean source revision and ENV-1.0 digest. The delivered estimator has no production calibration because the solver does not exist; runtime therefore remains INDETERMINATE and no solver execution is authorized.
+**Acceptance / decision:** Oversized cases fail before solver allocation with named estimates and alternatives; no machine-specific assumption changes the physics. An estimate cannot be BUDGETS_WITHIN_CAPS without a calibration tied to the exact clean source revision and ENV-1.0 digest. The measured NUM-03 calibration is restricted to the workload recorded in the [task evidence](../../work-items/NUM-03.md); other contexts without a matching profile remain INDETERMINATE. A budget-fit report never authorizes or starts execution by itself.
 
 **If unsuccessful:** F-05; refine cost model or select a scientifically justified smaller experiment.
 
 ## NUM-03 — Implement the selected field backend
 
-**Current state:** ACTIVE — isolated numerical kernels and a first scaled coupled Hasegawa piston/stationary-sphere evaluator have focused checks recorded in [NUM-03](../../work-items/NUM-03.md), the [primitive review](../../reviews/NUM-03-numerical-primitives.md) and [coupled-kernel review](../../reviews/NUM-03-coupled-kernel-review.md). The source-centered expansion is now explicitly restricted to `a<=r<d`; the full sphere surface stays inside this domain for every declared positive gap. The first kernel checks are not a pilot or phase PASS. Coupled P3/Rayleigh comparisons, run-level preflight, chunking, live-array estimation, full-domain convergence and a diagnostic pilot remain open. Any initial calibration pilot is separate and non-production. **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
+**Current state:** ACTIVE — isolated numerical kernels, the scaled coupled Hasegawa piston/stationary-sphere evaluator, the run-level preflight adapter and immutable field bundle are recorded in [NUM-03](../../work-items/NUM-03.md) and the linked reviews. The source-centered expansion is explicitly restricted to `a<=r<d`; the full sphere surface stays inside this domain for every declared positive gap. A measured exact-context profile supported one bounded one-gap, one-point, order-512 software diagnostic on clean revision `f8302cb`; its bundle is integrity-verified, but its verdict is INDETERMINATE. It was not compared with an independent field reference and establishes no convergence or field accuracy. The matched-P3 comparison, full-domain convergence and resource review remain open; no P4 PASS exists. **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
 
 **Inputs / predecessors:** NUM-02
 
