@@ -26,12 +26,12 @@ The focused tests compare Bessel values against separate high-precision Decimal 
 
 ## Remaining steps
 
-1. Qualify the `H=0.1 mm` endpoint for the frozen air case. Before execution, bound a finite sphere/mid-gap/outer-shell observation grid, order sequence and quadrature using NUM-02 and existing diagnostics. Runtime remains INDETERMINATE without an exact-revision ENV-1.0 calibration; any diagnostic must be separately identified and time-limited.
-2. Compare the public evaluator with a separately projected Rayleigh incident field followed by the stationary sound-hard sphere modal sum. Keep sample precision, modal truncation and surface/disk quadrature changes separate. Report pressure, velocity and gradient independently; preserve every nonmonotone or rejected case.
+1. Establish a high-order-safe independent stationary-sphere response or select a separate independent formulation. Begin with a bounded analytical control and preserve precision, truncation, quadrature, and representability failures separately.
+2. If that control passes, test whether the independent path can overlap the coupled Rayleigh field at `H=0.1 mm` across the existing sphere/mid-gap/outer-shell sample grid. The public order240–500 changes are internal finite-grid sensitivity only and cannot serve as the independent reference.
 3. Continue full-domain gap/order/surface verification, then integrate the public run path with preflight, bounded chunks and immutable diagnostics without changing FIELD-1.0.
-4. Reconcile NUM-02's estimate against all live coupled-evaluator arrays. Keep production runtime readiness INDETERMINATE until an exact-revision/ENV-1.0 calibration exists. Do not declare NUM-03 DONE before bounded pilot evidence and its required review.
+4. Reconcile NUM-02's estimator against all live coupled-evaluator arrays. Keep production runtime readiness INDETERMINATE until an exact-revision/ENV-1.0 calibration exists. Preserve failures and do not declare NUM-03 DONE before bounded pilot evidence and required review.
 
-The latest multi-gap propagation diagnostic is recorded in the [coupled-kernel review](../reviews/NUM-03-coupled-kernel-review.md). Its order-36 binary64-versus-Decimal velocity/gradient difference rises to `1.93e-5` at 30 mm; the Decimal-path field differs from the public evaluator by `7.98e-6` on the finite grid. The paths share checked sphere-response primitives, so neither comparison selects a more accurate solution or establishes convergence.
+The minimum-gap diagnostics are recorded in the [coupled-kernel review](../reviews/NUM-03-coupled-kernel-review.md). They show sample-arithmetic differences around `1e-14` but nonmonotone public-path discrepancies up to `3.57e-4` across the tested quadratures. The auxiliary binary64 special-function path fails at order256; the public scaled evaluator remains stable on the sampled three-shell grid through order500. These facts establish neither convergence nor an accepted reference.
 
 ## Acceptance and disposition
 
