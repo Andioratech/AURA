@@ -26,11 +26,11 @@ The focused tests compare Bessel values against separate high-precision Decimal 
 
 ## Remaining steps
 
-1. Quantify modal-order and arithmetic sensitivity beyond order800 at the 30 mm outer shell, including source-radial refinement, and reconcile feasible order/resource costs against NUM-02.
-2. Do not change the public order cap or declared field domain until outer-shell resolution and its resource implications are reviewed; preserve observed order changes without treating them as bounds.
-3. Complete continuous surface/shell and public run-path verification across the declared gap range, then reconcile NUM-02 live-array estimates, bounded chunks, immutable diagnostics and exact-revision runtime calibration. Keep production execution unauthorized without the matching calibration.
+1. Complete shell/gap verification across the declared interval, three radial shells and adequately sampled angular positions; separate same-order public overlap from truncation sensitivity.
+2. Integrate the verified field path with NUM-02 preflight, bounded chunks, immutable manifests and diagnostic-only run policy. Keep execution refused without exact-revision ENV-1.0 calibration.
+3. Review a field-accuracy tolerance across pressure, particle velocity and pressure gradient before changing the public order cap or declared field domain. Preserve the NUM-01 independent-solver fallback if resolution or resource limits cannot be established.
 
-The gap sweep and outer-shell order extension are documented in the [coupled-kernel review](../reviews/NUM-03-coupled-kernel-review.md). The direct source coefficients overlap the public coupled implementation at matched orders on finite grids across four gaps, but the order512 outer-shell result changes against order800. Gap/domain resolution, continuous coverage, the prior projection discrepancy and run-level readiness remain open. No force, dynamics, acceleration or physical-validation outcome is implied.
+The gap sweep and 30 mm outer-shell extension through order1600 are documented in the [coupled-kernel review](../reviews/NUM-03-coupled-kernel-review.md). The direct source coefficients overlap the public coupled implementation at matched orders on finite grids across four gaps. At the outer shell, the sampled order512 result differs from order1600 by up to `6.72e-7` in velocity/gradient, while order1200 differs by `9.05e-14`; radial rules128/256/512 agree at displayed precision through order1600. These observations lack a pre-registered field tolerance and are not tail bounds. Public path, continuous coverage and run-level calibration remain open. No force, dynamics, acceleration or physical-validation outcome is implied.
 
 ## Acceptance and disposition
 

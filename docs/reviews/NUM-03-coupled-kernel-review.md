@@ -169,9 +169,7 @@ The separate unscattered incident-potential check at `theta=175°`, `r=a+H/2` ag
 
 Artifacts are ignored under `results/diagnostics/`. Main script/output SHA-256: `c298d363d756607eb3a78219f240ca064b1f718f0e97bda073f2ee98a279cd01` / `0fe3a983c81830dd9e0ce103d0613ab52e8a1863ace95eee95057ba56a90b236`; radial-64 script/output: `1f3d583792ef008631dd92427e5a16a868ef3da036bf300e1c50322d457558f3` / `f06a1d5b5666ab6942f330cd8934cc8b1ad872c3e3526b92da091443db3b0752`; radial-256 script/output: `73856a5bb983b51d2a75fe66a4ab8ce3657582efe187fe7867fb6ce01a29f7ed` / `5e6e8bdce88243a6ae0fafcc4d311b22c3dbc02b82a6f1cef150751f3a5ae145`. A diagnostic implementation failure and its correction are preserved in `NUM03-RAYLEIGH-DISK-COUPLED-MODAL-OVERLAP-ATTEMPT-01-FAILURE.txt`; the first source snapshot was not hashed before correction. Source revision `b5c93ec9c024d0ff937f21dc56f3cd2d23bc6b03`, environment profile ENV-1.0.
 
-This result materially strengthens the minimum-gap mathematical overlap and provides a controlled source-coefficient path through the tested order/grid. It does not settle the earlier surface-projection discrepancy's cause, establish convergence over the complete 0.1–30 mm gap interval or continuous surfaces, reconcile run-level preflight/runtime, or pass P4. Next extend the direct modal comparison across both gap endpoints and intermediate gaps, retain separate radial-rule and order refinements, then resume full NUM-03 integration and resource reconciliation.
-
-Full local Quality for this public record update passes under ENV-1.0: hash-locked dependency installation, editable installation, `pip check`, environment verification, Ruff, all 1,661 tests, required-document checks and `git diff --check`. The exact commit and corresponding remote Quality result will be recorded by the repository history after publication.
+At that earlier checkpoint, this result materially strengthened the minimum-gap mathematical overlap and provided a controlled source-coefficient path through the tested order/grid. It did not settle the earlier surface-projection discrepancy's cause, establish convergence over the complete 0.1–30 mm gap interval or continuous surfaces, reconcile run-level preflight/runtime, or pass P4. The then-next task was to extend the direct modal comparison across both gap endpoints and intermediate gaps; that finite-grid gap sweep is recorded below.
 
 ### Four-gap overlap and 30 mm outer-shell order extension
 
@@ -188,4 +186,36 @@ These values establish same-order overlap between two implementations on the sta
 
 The gap-sweep script/output SHA-256 values are `496e43d4278d8cba6def4fb2d0a014d46f39591e34119dc8ec309666244d973a` / `10b15aaaea9334becb316a28487ce9686e89f84b5bd07f8178c8eca8eb77902a`. The outer-shell order-extension script/output hashes for source radial orders256, 128 and512 are `cead8b7beb483d381d7e6fbede34bc39c33c32d73e58eac3b30f94596c69ca60` / `a8938074993637f29a06903fa8d20afe3532733e7b6b139d35eaa5506ef335a2`; `c51ca71039cebd4f5cb5cda25036c106ba52beab3cf20ad03b4484e51f51cd80` / `27a27d6774f02cb1ddc8911db8eda39f3b124d4e8a0e4e6fea60bb4cd8336e18`; and `eaeba1c53853be023be32d6eb1979441b054d67e2864c07491d0fcf8e7183058` / `79c7b3e9bc8ae8c445123f86a3b239f994e358587ddccac7996ccba9942b7a42`. All artifacts remain ignored under `results/diagnostics/`; source revision is `20cccc9e89d9b6111745295e25eafbe66d23f5a4`, ENV-1.0. A failed code-generation attempt before the order extension is recorded with the other diagnostic execution failures; no result from that attempt is used.
 
-The next NUM-03 question is whether modal orders beyond800 can establish stable observables at this outer shell and whether those orders fit NUM-02's resource/preflight contract. Do not increase the public order cap or narrow the declared field domain without a measured, reviewed numerical and resource basis. Full P4 remains INDETERMINATE.
+At that checkpoint, the next NUM-03 question was whether modal orders beyond800 could establish stable observables at this outer shell and fit NUM-02's resource/preflight contract. The order extension and resource comparison below address that question. Do not increase the public order cap or narrow the declared field domain without a measured, reviewed numerical and resource basis. Full P4 remains INDETERMINATE.
+
+### 30 mm outer-shell order extension and NUM-02 resource comparison
+
+The same direct Rayleigh-disk coefficient integral and independent stationary-sphere modal response were extended at 300 Decimal digits for the demanding `H=30 mm` outer shell, `r=a+0.99H=54.7 mm`, `d=55 mm`, `r/d≈0.994545`, over 37 polar angles (5°–185°). With source radial Gauss-Legendre rule256, the order sequence was evaluated through 1600. Differences below are maximum absolute differences divided by the maximum magnitude of the order1600 field over the sampled grid:
+
+| Order compared with 1600 | Pressure | Velocity | Pressure gradient |
+|---:|---:|---:|---:|
+| 512 | `3.456776e-8` | `6.723552e-7` | `6.723552e-7` |
+| 800 | `7.235722e-12` | `2.260131e-10` | `2.260132e-10` |
+| 1000 | `3.099286e-13` | `6.799266e-12` | `6.799219e-12` |
+| 1200 | `9.325836e-16` | `9.047262e-14` | `9.047488e-14` |
+| 1400 | `1.554306e-16` | `3.685239e-16` | `2.530766e-16` |
+
+The same-order overlap at order512 remains near roundoff versus the public evaluator: normalized differences are `3.056125e-14` pressure, `2.639718e-14` velocity and `2.639464e-14` pressure gradient. Repeating the order1600 calculation with source radial rules128 and512 reproduces the same reported order-difference metrics as radial rule256. Together with the earlier 200-digit/radial-rule 128/256/512 comparison through order800, this reduces observed arithmetic and source-radial quadrature sensitivity for this discrete outer-shell case. It does not prove a truncation tail bound, continuous angular/radial coverage, or convergence for other gaps. No field tolerance has been specified. The public evaluator remains capped at512; do not call the full declared domain resolved from these data alone.
+
+For an explicit NUM-02 comparison, the solver-free estimator was run on a hypothetical workload of 4 gaps ×111 points, quadrature order256, maximum Bessel argument25.1, point chunks64, and baseline RSS set to zero. Results remain `INDETERMINATE` with no calibration and `wall_time_s=null`:
+
+| Harmonic order | Estimated RAM | Estimated disk |
+|---:|---:|---:|
+| 512 | `1,005,568 B` | `946,176 B` |
+| 800 | `1,268,096 B` | `946,176 B` |
+| 1000 | `1,450,112 B` | `946,176 B` |
+| 1200 | `1,631,744 B` | `946,176 B` |
+| 1600 | `1,994,496 B` | `946,176 B` |
+
+These are NUM-02's O(N) workspace estimate with a 2× incremental-memory factor, not measured memory for a production field run. Baseline RSS was deliberately zero and the source field solver rejects orders above512. The estimates show the modeled workspace is modest for this hypothetical point count, but cannot justify raising the cap: runtime has not been calibrated on an exact clean source revision and ENV-1.0, and high-order evaluation behavior has not been integrated with the public run lifecycle.
+
+The 300-digit order800, 1000, 1200, 1600 and radial-refinement diagnostic scripts/outputs are ignored under `results/diagnostics/`. Their script/output SHA-256 pairs are: order800 `0452203d9f91d3d909188c5928ca025cc2edb6f46410356edfd2fc582223f008` / `a1421fbfbc449167e920c88468bbee07b216186c104ec1c0c82afcf60c8e9056`; order1000 `8497de234b86359eecf003a694c9a220023ad33cf2f69d1e955b661deb2f4663` / `45220d9e671d7a1648b3699041595d4b04896a5801315e5578d960cd4f01f9bf`; order1200 `f5178de64d63ce8b939feac7fb399efe8e22b73af1a735d2aca5f6074dd118b0` / `c0b2ea3c408618acd70ec403b4b3b659ba63f6c82b96ebad9af30aed9e4c6fc3`; order1600/radial256 `f727ff000c4a1a44d6e32a0310a550b1725eff7563ba9500c6c4df6f0a143b4e` / `e96127d6a875bd618f7a2f9e0380d7217762fc68440749b847efbf0f3f2eff66`; radial128 `72c559bf6324ce2c10f51486a9108b4d34a5abf916f49f2caabb2d5cd8af9836` / `7b2f52b82c0ed826e0879cfe34531fffc27204ae76614e82fce97c10d8380587`; radial512 `00018a421a6baedc9ff35682122863c3498835ee7bcb840d8991048a3b0fcba5` / `365fa17d590e9125b15c2b1daa35efbee957111bd688a7f8843ebe00817a6b0e`. Report-generation and reference-selection mistakes from earlier attempts are preserved in `NUM03-RAYLEIGH-DISK-COUPLED-MODAL-OVERLAP-ATTEMPT-01-FAILURE.txt`; their outputs are explicitly marked invalid and are not used in this review.
+
+This closes the focused outer-shell order/arithmetic/resource diagnostic, not NUM-03. The next task is the declared shell/gap sweep and public run-path integration. Keep the field cap/domain unchanged until a field-accuracy tolerance is reviewed; retain the exact-revision calibration gate and do not promote these numerical calculations to experimental or gravity-equivalence evidence.
+
+Full local Quality for this public record update passes under ENV-1.0: hash-locked dependency installation, editable installation, `pip check`, environment verification, Ruff, all 1,661 tests, required-document checks and `git diff --check`. The exact commit and corresponding remote Quality result will be recorded by the repository history after publication.
