@@ -324,3 +324,42 @@ The public field domain only requires `r<d`; it has no fixed clearance `d-r>0`. 
 The immediate method task is therefore to determine whether a reproducible all-order majorant can be completed on an explicitly bounded subdomain and whether its resulting pressure, velocity and gradient bounds are useful at the current order cap. If the intended accuracy claim must cover every point arbitrarily close to `r=d`, the current compact-domain route cannot substantiate it without an additional argument. Keep the scientific verdict **INDETERMINATE** until that distinction and the bound are resolved.
 
 The next step is a source-grounded derivation and independent check of a bound for the pressure, velocity and pressure-gradient tails over the declared domain, or a documented conclusion that this series cannot provide such a bound with the available validated methods. Only after the reference uncertainty and benchmark-specific protocol are frozen may the broad NUM-04 campaign begin. Finite-order extensions and additional sparse samples alone do not close this gate.
+
+
+### Fixed-gap full-radial modal-tail candidate — 2026-10-04
+
+A recurrence-based absolute majorant now covers the mathematical order>512 tail of the ideal Hasegawa piston / stationary rigid-sphere field for all polar angles and every accepted radius `a<=r<d`, evaluated separately at the four frozen gaps. It replaces the earlier conclusion that the outer-boundary limit alone prevents any full-radial geometric bound: the source Hankel argument is `k*sqrt(d^2+R^2)`, strictly greater than the field argument `kr` for each fixed geometry. It does not provide one bound for every intermediate gap in 0.1–30 mm.
+
+The exact-rational certificates give these source-normalized upper bounds:
+
+| Gap | Potential tail (`|v0|/k`) | Potential-gradient tail (`|v0|`) |
+|---:|---:|---:|
+| 0.1 mm | `1.809131951558e-16` | `3.738553673049e-14` |
+| 10 mm | `8.356869464251e-9` | `1.727021734707e-6` |
+| 20 mm | `1.470307004326e-5` | `3.038666299351e-3` |
+| 30 mm | `8.120926582880e-4` | `1.678422038935e-1` |
+
+The potential bounds map to pressure, and the gradient bounds map to particle velocity and pressure gradient, through the frozen linear-acoustic relations. They are mathematical truncation bounds for the stated ideal model, not estimates of floating-point error, source-integration error, measurement uncertainty, or physical-model discrepancy. The large 30 mm gradient bound does not show that the order-512 result meets an accuracy requirement. No numerical tolerance has been chosen, so these bounds do not pass or fail P4.
+
+The certificate set is under ignored local `results/research/NUM03-MODAL-TAIL-FOUR-GAP-CANDIDATES-20261004-01/`. Its metadata SHA-256 is `61d56aeecd3ba45c6a906b0c566224c5b1fb73ae59e8ff668283064a82c5b059`; the standalone derivation note SHA-256 is `a92dcc5884cabfb39f576aff30502f71ca9f99a21f1a1fdff5d3bdabfdf90bcb`. A second exact-`Fraction` implementation re-derived the geometry, recurrence, infinite sums and sphere/gradient factors without importing the candidate scripts; it enclosed all four candidate outputs and reproduced its own output byte-for-byte. Both implementations were produced by the same working agent, so this is an independent software path, not external peer review. Primary equations are Hasegawa et al. (1985), Eqs. 1–20, and NIST DLMF §10.53.
+
+Keep NUM-03 **ACTIVE / INDETERMINATE**, the order cap at 512, and `a<=r<d`. The remaining method task is to freeze a benchmark-specific field-error protocol with an uncertainty basis, metrics, samples, refinement levels, acceptance/stopping rule and resource cap. Before broad runs, clarify whether acceptance is required only at the four frozen gap cases or over a continuous gap range; do not interpolate the four bounds as though they prove that range. No force, acceleration, experiment, or gravity-equivalence conclusion follows.
+
+
+### Extension to all 300 measured P1.3 gaps — 2026-10-04
+
+The approved P1.3 experimental sweep consists of 300 gap samples, `H=0.1` through `30.0 mm` in `0.1 mm` increments. A separate exact-rational calculation now evaluates the candidate order>512 tail at each of those 300 fixed gap values. For each sample, it bounds all polar angles and the complete accepted radial interval `a<=r<d`. This matches the benchmark's sampled gap set; it is not a proof for arbitrary real-valued gaps between samples. The approved 0.1 mm measurement spacing is documented in the [P1.3 benchmark specification](../benchmarks/P1.3-andrade-force-curve-specification.md) and [DEC-002](../decisions/DEC-002-initial-measurable-force-benchmark.md).
+
+The largest candidate bounds occur at `H=29.9 mm`, not at the final `30.0 mm` sample. Safe interval rounding can make adjacent upper bounds nonmonotone, so the largest sample was selected from the computed 300-row table rather than inferred from an endpoint trend. Representative results are:
+
+| Gap | Potential tail (`|v0|/k`) | Potential-gradient tail (`|v0|`) |
+|---:|---:|---:|
+| 0.1 mm | `1.809131951558e-16` | `3.737215120957e-14` |
+| 10.0 mm | `8.356869464251e-9` | `1.726403422131e-6` |
+| 20.0 mm | `1.470307004326e-5` | `3.037578442583e-3` |
+| 29.9 mm | `9.794870592449e-4` | `2.023664973981e-1` |
+| 30.0 mm | `8.120926582880e-4` | `1.677821185822e-1` |
+
+The exact-`Fraction` script builds rational wavenumber and square-root intervals, applies the source recurrence and stationary-sphere envelopes, and asserts the all-order geometric sums. The 300-row run was repeated and produced byte-identical output. It also confirms that the earlier four-gap outputs enclose the corresponding independently recalculated rows. Artifact metadata SHA-256: `7654cf9108854caf79a0e414685435ec14a1f48ab03d6dd1fa93e6260bf91e6e`; script/output SHA-256: `ae528997de62fcc78ed78764ac1734bd0f482a9792097b091e4e071fea2894b8` / `19932fe246c6037dda69944c202f79a713c16814a4fc33df2e7cb54f185cf17a`. This remains same-agent mathematical verification, not external peer review.
+
+These bounds concern ideal-model modal truncation only. They do not bound floating-point or source-integration error, the uncertainty of the figure-derived force measurements, or physical-model discrepancy. The 29.9 mm gradient bound is broad and no field tolerance has been selected. NUM-03 remains **ACTIVE / INDETERMINATE**; the order cap 512, accepted `a<=r<d` domain, and failed higher-order runs are unchanged. The remaining gate is a defensible benchmark-specific field-error protocol and acceptance rule before broad convergence runs. No force, acceleration, physical validation or gravity-equivalence result follows.
