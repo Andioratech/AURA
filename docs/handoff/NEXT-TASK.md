@@ -1,6 +1,6 @@
 # Next Main Task — Characterize the NUM-03 Reference Error
 
-**Prepared:** 2026-10-04 · **State:** NUM-W01, NUM-01 and NUM-02 DONE; NUM-03 ACTIVE · **Solver revision:** `f8302cb` (GitHub Quality [37184239104](https://github.com/Andioratech/AURA/actions/runs/37184239104) passed)
+**Prepared:** 2026-10-04 · **State:** NUM-W01, NUM-01 and NUM-02 DONE; NUM-03 ACTIVE · **Documentation checkpoint:** `39a29bb` (GitHub Quality [37210532021](https://github.com/Andioratech/AURA/actions/runs/37210532021) passed) · **Solver revision:** `f8302cb` (GitHub Quality [37184239104](https://github.com/Andioratech/AURA/actions/runs/37184239104) passed)
 
 ## Current implementation under review
 
@@ -14,7 +14,7 @@ On clean revision `f8302cb` and ENV-1.0, a 48-sample timing record produced a ca
 
 The owner selected a field-only P4 numerical budget, with force/acceleration accuracy handled later. [DEC-007](../decisions/DEC-007-p4-field-only-error-budget.md) records this direction. No numerical threshold was selected, and no physical assumptions changed.
 
-The first bounded reference sensitivity check is recorded in the [NUM-03 coupled-kernel review](../reviews/NUM-03-coupled-kernel-review.md). At the 30 mm outer shell and order 512, P300 versus P600 arithmetic and radial Gauss-Legendre rules 128/256/512 produce extremely small paired differences across 37 angles, while the order-512 versus order-1200 finite-sum change reaches `1.14e-6` in velocity/gradient. These are not error bounds. The P600/order1600 extension exceeded a 300 s cap. Next, extend arithmetic/radial-rule checks across the other declared gaps and shells and assess modal-tail uncertainty. Then freeze pressure, particle-velocity and pressure-gradient metrics, sample set, reference-uncertainty treatment, at least three harmonic truncations, acceptance/stopping rule and resource cap. Do not begin broad convergence runs or declare P4 until the protocol is frozen. The current exact-context runtime profile does not establish that larger workloads fit.
+The [NUM-03 coupled-kernel review](../reviews/NUM-03-coupled-kernel-review.md) now records Decimal radial-rule checks across all four gaps and 111 samples per gap, plus corrected Chudnovsky-based P300/P600 arithmetic checks across the same sample layout at the 0.1 and 30 mm endpoint gaps. An earlier precision comparison used a shared 121-digit pi constant and is superseded. All comparisons are finite-grid sensitivities, not bounds. The order-512 versus finite order-1200 change reaches `1.14e-6` in velocity/gradient at the 30 mm outer shell; the P600/order1600 extension exceeded a 300 s cap. Next assess modal-tail uncertainty independently. Then freeze pressure, particle-velocity and pressure-gradient metrics, sample set, reference-uncertainty treatment, at least three harmonic truncations, acceptance/stopping rule and resource cap. Do not begin broad convergence runs or declare P4 until the protocol is frozen. The current exact-context runtime profile does not establish that larger workloads fit.
 
 ## Scientific work still open
 
