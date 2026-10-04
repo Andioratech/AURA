@@ -1,6 +1,6 @@
-# Next Main Task — Freeze the NUM-03 Field-Error Protocol
+# Next Main Task — Qualify NUM-03 Reference Uncertainty
 
-**Prepared:** 2026-10-04 · **State:** NUM-W01, NUM-01 and NUM-02 DONE; NUM-03 ACTIVE · **Solver revision:** `f8302cb` (GitHub Quality [37184239104](https://github.com/Andioratech/AURA/actions/runs/37184239104) passed) · **Documentation base before this update:** `e76e39e`
+**Prepared:** 2026-10-05 · **State:** NUM-W01, NUM-01 and NUM-02 DONE; NUM-03 ACTIVE · **Current published source revision:** `bbf666660344315325e3bd47dea8240ecbb487be` (GitHub Quality [37236915200](https://github.com/Andioratech/AURA/actions/runs/37236915200) passed) · **Targeted diagnostic revision:** same · **Local diagnostic environment:** ENV-1.0 / CPython 3.12.14
 
 ## Current implementation and bounded run
 
@@ -29,3 +29,9 @@ The evidence audit and the comparison method that can be fixed without inventing
 Do not infer force, acceleration, hardware performance or gravity equivalence from the field bounds. A future arbitrary-gap claim needs its own bound or validated interpolation method.
 
 DEC-007 selected a field-only numerical budget and deferred force/acceleration budgets; it did not select a tolerance. Do not borrow the unrelated 2% simple-wave proposal or infer a threshold from the computed tail bound. Retain the [NUM-01 method fallback](../research/NUM-01-method-comparison.md) if the chosen requirement cannot be supported by the current series or resource envelope.
+
+## Latest bounded reference check — 2026-10-05
+
+The exact next step is no longer to draft comparison metrics; the protocol basis already records those. A 300-digit Decimal direct Rayleigh-disk/modal comparison was run at `H=29.9 mm`, order512, using radial rules128/256 on the same 111-point set (37 angles and three radii). Same-order overlap with the public field is about `1.2e-13` for pressure and `6.4e-14` for velocity/gradient. The paired R128/R256 difference is reported around `10^-235`, without analysis that would make it a quadrature error bound. This is one finite grid at one gap and does not establish reference uncertainty for all 300 gaps. See the [protocol basis](../research/NUM-03-field-error-protocol.md), [review](../reviews/NUM-03-coupled-kernel-review.md), and [task record](../work-items/NUM-03.md). The metadata SHA-256 is `a8fad79b6caea510e504ea222df6c41e68f6a2cad86527cf141ef4e7a5493908`; generated artifacts and failure records are local-only.
+
+Continue with a bounded investigation of a reference/quadrature uncertainty method that can be independently justified for the frozen sampled domain. Preserve the failed/mislabeled attempts. Do not begin broad NUM-04, invent a field tolerance, change order/domain, or treat a tiny paired difference as proof of accuracy. If the uncertainty method cannot be supported within the declared model and resource limits, document the failure and revisit the NUM-01 fallback without promoting P4.
