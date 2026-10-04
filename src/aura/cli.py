@@ -190,7 +190,7 @@ def _lifecycle(args):
     import signal
     import threading
 
-    from aura.errors import InvalidInputError
+    from aura.errors import IncompleteEvidenceError, InvalidInputError
     from aura.runs import check_run, execute, reproduce
 
     class Terminated(KeyboardInterrupt):
@@ -205,7 +205,10 @@ def _lifecycle(args):
             if threading.current_thread() is threading.main_thread():
                 previous = signal.signal(signal.SIGTERM, terminate)
             try:
-                output = execute(args.path, args.experiment, output=args.output, seed=args.seed)
+                output = execute(
+                    args.path, args.experiment, output=args.output, seed=args.seed,
+                    calibration=getattr(args, "calibration", None),
+                )
             finally:
                 if previous is not None:
                     signal.signal(signal.SIGTERM, previous)
@@ -217,6 +220,8 @@ def _lifecycle(args):
         output = {"command": args.command, "error": {"code": "RUN_INTERRUPTED",
                   "message": "Interrupted before terminal publication; preserve any partial directory."},
                   "exit_code": 128 + getattr(exc, "signal_number", 2)}
+    except IncompleteEvidenceError as exc:
+        output = {"command": args.command, "error": exc.as_dict(), "exit_code": 3}
     except InvalidInputError as exc:
         output = {"command": args.command, "error": exc.as_dict(), "exit_code": 1}
     except OSError as exc:
@@ -260,6 +265,7 @@ def main(argv: list[str] | None = None) -> int:
     run.add_argument("path", help="diagnostic scenario JSON/YAML")
     run.add_argument("--experiment", required=True, help="frozen experiment JSON/YAML")
     run.add_argument("--output", help="new directory; default results/<experiment>/<run-id>")
+    run.add_argument("--calibration", help="exact-revision ENV-1.0 AIR-SERIES-CALIBRATION-1.1 JSON")
     seeds = run.add_mutually_exclusive_group(required=True)
     seeds.add_argument("--seed", type=int, help="explicit seed (unused by current diagnostics)")
     seeds.add_argument("--no-randomness", action="store_true", help="explicitly record a null seed")

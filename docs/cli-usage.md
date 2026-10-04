@@ -2,7 +2,7 @@
 
 **Interface:** CLI-1.1 · **Implemented by:** [FND-06](work-items/FND-06.md), [NUM-02](work-items/NUM-02.md)
 
-The available commands are `status`, `validate-config`, air-series `preflight`, bounded software-diagnostic `run`/`check`, and analytical-run `reproduce`. The run commands are described in the [RUN lifecycle contract](research/run-lifecycle.md) and [examples](../examples/runs/README.md). The Hasegawa numerical field solver, physical simulation runs, general run-to-reference comparison and study-level evidence export remain planned. The configuration command reads a scenario and checks its declarations; it does not demonstrate that AURA works.
+The available commands are `status`, `validate-config`, air-series `preflight`, bounded software-diagnostic `run`/`check`, and analytical-run `reproduce`. The Hasegawa stationary piston/sphere field diagnostic is admitted by `run` with an exact-context calibration; this integration does not pass P4 or establish physical validation. The run commands are described in the [RUN lifecycle contract](research/run-lifecycle.md) and [examples](../examples/runs/README.md). Physical simulation, general run-to-reference comparison and study-level evidence export remain planned. The configuration command reads a scenario and checks its declarations; it does not demonstrate that AURA works.
 
 ## Install and inspect
 
@@ -39,7 +39,7 @@ Keep the report and inspect `schema_status`, `verdict` and `error`; do not treat
 ## Input behavior
 
 - Accept one `.json`, `.yaml` or `.yml` file, through the existing bounded strict reader (1 MiB limit). The extension chooses the parser; content guessing is not supported.
-- Require a complete version-1.0 Scenario, even though the underlying library also supports other record types. A valid Medium or RunManifest is not a scenario.
+- Require a complete version-1.0 or version-1.1 Scenario, even though the underlying library also supports other record types. Scenario 1.1 adds the circular-piston displacement input used by NUM-03; a valid Medium or RunManifest is not a scenario.
 - Reject duplicate keys, unsupported versions, unknown fields, unsafe YAML constructs, nonfinite numbers, missing physics and invalid units/shapes/ranges according to the existing schema. Report the first reader failure and its path. The full L0 audit runs only after the reader accepts the scenario.
 - Do not infer radius from diameter, convert units, normalize vectors, insert gravity or choose a model. Explicit conversion adapters remain separate library functions.
 - Do not allocate solver resources, invoke a physical model, read external evidence artifacts, authenticate hashes, create a scientific run or modify the scenario. Higher audit levels and actual execution integration remain future work.
@@ -54,7 +54,16 @@ These checks cannot recognize every mislabeled physical value. The [B-01/B-02 re
 
 The scenario supplies declared RAM, disk and wall-time caps. The workload is a strict `AIR-SERIES-WORKLOAD-1.1` JSON object with solver ID/version, number of gaps, points per gap, harmonic order, Gauss-Legendre quadrature order (1–512), maximum dimensionless Bessel argument, and point-chunk size (at most 256). The maximum argument bounds the Miller recurrence workspace. A calibration uses `AIR-SERIES-CALIBRATION-1.1` and must match both numerical dimensions as well as solver version, current clean source revision and ENV-1.0 environment digest. Input JSON is limited to 1 MiB, rejects duplicate keys and nonfinite values, and rejects unknown fields.
 
-The report estimates retained harmonic-order vectors, Miller recurrence scratch, Gauss node/weight workspace, one streamed point chunk and its serialization, full requested output storage, and runtime from measured seconds per order at the matching quadrature and Bessel-argument dimensions plus the declared safety multiplier. It checks scenario limits and currently available Linux memory and free space at the planned output filesystem. `REJECTED` (exit 1) means a named budget was exceeded. `INDETERMINATE` (exit 3) means usable runtime calibration is missing, stale, or bound to another numerical dimension, so the run is not ready. `BUDGETS_WITHIN_CAPS` (exit 0) means only that the estimates fit the declared and observed resource limits for this exact calibration context. No outcome executes or authorizes a solver; `execution_authorized` is always false. Runtime remains INDETERMINATE until the numerical backend exists and can be calibrated. Estimates do not demonstrate field convergence, accuracy, force or experimental behavior. See [NUM-02](work-items/NUM-02.md) for the estimator basis and acceptance boundary.
+The report estimates retained harmonic-order vectors, Miller recurrence scratch, Gauss node/weight workspace, one streamed point chunk and its serialization, full requested output storage, and runtime from measured seconds per order at the matching declared dimensions plus the safety multiplier. In the current Hasegawa evaluator, source factors use an order recurrence rather than Gauss integration; quadrature order remains a conservative preflight workspace/calibration dimension and does not change solver results. The report checks scenario limits and currently available Linux memory and free space at the planned output filesystem. `REJECTED` (exit 1) means a named budget was exceeded. `INDETERMINATE` (exit 3) means usable runtime calibration is missing, stale, or bound to another numerical dimension, so the run is not ready. `BUDGETS_WITHIN_CAPS` (exit 0) means only that estimates fit the declared and observed resource limits for this exact calibration context. No preflight result executes or authorizes a solver; `execution_authorized` is always false. Estimates do not demonstrate field convergence, accuracy, force or experimental behavior. See [NUM-02](work-items/NUM-02.md) for the estimator basis and acceptance boundary.
+
+## Record the Hasegawa field diagnostic
+
+```bash
+.venv/bin/aura run <scenario-v1.1.json> --experiment <experiment.json> \
+  --calibration <AIR-SERIES-CALIBRATION-1.1.json> --no-randomness --json
+```
+
+The run accepts only the frozen 25.23 kHz, 10 mm uniformly displaced coaxial piston and stationary 25 mm sound-hard sphere scenario, one ordered sample chunk of at most 256 points in the `a <= r < d` series shell, and an explicit harmonic order no greater than 512. It converts face displacement to peak face velocity using `v_n=-i*omega*xi` with the declared `exp(-iwt)` phasor. NUM-02 must report `BUDGETS_WITHIN_CAPS` using a calibration bound to the executing clean source revision, ENV-1.0, solver version, Bessel argument and workload dimensions. Without that exact calibration, the CLI returns exit 3 before creating a run directory or allocating field arrays. Rejected and failed executions are preserved; completed bundles record scenario, request, calibration, environment, code identity, preflight and output checksums. Their science verdict remains INDETERMINATE. The Hasegawa driver is not yet admitted to `reproduce`.
 
 ## Replay a recorded analytical run
 

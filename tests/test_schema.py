@@ -289,6 +289,30 @@ def test_piston_aperture_required(scenario):
     validate_document(scenario)
 
 
+def test_scenario_11_circular_piston_uses_displacement_amplitude(scenario):
+    source = scenario["sources"]["elements"][0]
+    source.clear()
+    source.update({
+        "id": "PISTON-01",
+        "position": {"value": [0, 0, 0], "unit": "m"},
+        "normal": {"value": [0, 0, 1], "unit": "1"},
+        "phase": {"value": 0, "unit": "rad"},
+        "model": "circular_piston",
+        "aperture_radius": {"value": 0.01, "unit": "m"},
+        "displacement_amplitude": {"value": 15e-6, "unit": "m"},
+        "displacement_limit": {"value": 20e-6, "unit": "m"},
+    })
+    scenario["schema_version"] = "1.1"
+    validated = Scenario(scenario).to_dict()
+    assert validated["sources"]["elements"][0]["displacement_amplitude"]["value"] == 15e-6
+    assert "pressure_amplitude" not in validated["sources"]["elements"][0]
+
+    source["pressure_amplitude"] = {"value": 1, "unit": "Pa"}
+    source["pressure_limit"] = {"value": 2, "unit": "Pa"}
+    with pytest.raises(InvalidInputError, match="SCHEMA_INVALID"):
+        Scenario(scenario)
+
+
 def test_versioned_spherical_source_contract(scenario):
     source = scenario["sources"]["elements"][0]
     source.pop("position")

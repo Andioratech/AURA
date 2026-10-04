@@ -12,7 +12,7 @@ from jsonschema import Draft202012Validator, FormatChecker
 
 from aura.errors import InvalidInputError
 
-from .definitions import DEFINITIONS, VERSION, document_schema
+from .definitions import DEFINITIONS, SCENARIO_VERSION, VERSION, document_schema
 from .quantities import MAX_BYTES, check_json_tree, pointer
 
 _FORMATS = FormatChecker()
@@ -32,9 +32,11 @@ def _utc_timestamp(value: object) -> bool:
 
 _VALIDATORS = {}
 for _kind in DEFINITIONS:
-    _schema = document_schema(_kind)
-    Draft202012Validator.check_schema(_schema)
-    _VALIDATORS[_kind] = Draft202012Validator(_schema, format_checker=_FORMATS)
+    _versions = (VERSION, SCENARIO_VERSION) if _kind == "scenario" else (VERSION,)
+    for _version in _versions:
+        _schema = document_schema(_kind, _version)
+        Draft202012Validator.check_schema(_schema)
+        _VALIDATORS[(_kind, _version)] = Draft202012Validator(_schema, format_checker=_FORMATS)
 
 
 def _require(condition: bool, path: str, message: str) -> None:
@@ -80,9 +82,15 @@ def _cross_checks(kind: str, data: dict, path: str = "") -> None:
                     base + "/reference_radius/value",
                     "Reference radius must be at or outside the exclusion radius.",
                 )
+            amplitude_name = (
+                "displacement_amplitude"
+                if "displacement_amplitude" in element
+                else "pressure_amplitude"
+            )
+            limit_name = "displacement_limit" if amplitude_name == "displacement_amplitude" else "pressure_limit"
             _require(
-                element["pressure_amplitude"]["value"] <= element["pressure_limit"]["value"],
-                base + "/pressure_amplitude",
+                element[amplitude_name]["value"] <= element[limit_name]["value"],
+                base + "/" + amplitude_name,
                 "Amplitude exceeds the declared source limit.",
             )
     elif kind == "scenario":
@@ -159,21 +167,25 @@ def _validate(data: dict, expected_type: str | None = None) -> str:
     check_json_tree(data)
     if type(data) is not dict:
         raise InvalidInputError("INPUT_TYPE", "", "Expected an object document.")
-    if data.get("schema_version") != VERSION:
-        raise InvalidInputError("SCHEMA_VERSION", "/schema_version", "Expected schema version 1.0.")
     kind = data.get("document_type")
+    version = data.get("schema_version")
     if (
         type(kind) is not str
-        or kind not in _VALIDATORS
+        or (kind, version) not in _VALIDATORS
         or (expected_type and kind != expected_type)
     ):
+        if type(kind) is str and kind in DEFINITIONS and (expected_type is None or kind == expected_type):
+            expected = "1.0 or 1.1" if kind == "scenario" else "1.0"
+            raise InvalidInputError(
+                "SCHEMA_VERSION", "/schema_version", f"Expected schema version {expected}."
+            )
         raise InvalidInputError(
             "DOCUMENT_TYPE", "/document_type", "Unsupported or unexpected type."
         )
     # Also bound direct Python callers; serialized readers check byte size before parsing.
     if len(json.dumps(data, ensure_ascii=True, allow_nan=False).encode("utf-8")) > MAX_BYTES:
         raise InvalidInputError("INPUT_LIMIT", "", "Document exceeds 1 MiB after JSON encoding.")
-    error = next(_VALIDATORS[kind].iter_errors(data), None)
+    error = next(_VALIDATORS[(kind, version)].iter_errors(data), None)
     if error is not None:
         path = ""
         for part in error.absolute_path:

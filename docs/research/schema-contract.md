@@ -1,18 +1,18 @@
-# Initial Schema Contract — Version 1.0
+# Initial Schema Contract — Versions 1.0 and Scenario 1.1
 
-**State:** Implemented and verified within FND-02; no physical validation implied. **Date:** 2026-10-02.
+**State:** Scenario 1.0 implemented in FND-02; Scenario 1.1 extension added for NUM-03; no physical validation implied. **Date:** 2026-10-04.
 
 Authority: [D07](../D07-experiments-data.md), [D08](../D08-software-contracts.md), [CONV-1.0](si-and-conventions.md). The executable field definitions are in [definitions.py](../../src/aura/schema/definitions.py); cross-field predicates are in [models.py](../../src/aura/schema/models.py). Changes to accepted fields require an explicit version/migration decision; readers never guess a version or silently discard fields.
 
 ## Envelope and records
 
-Every standalone document requires `document_type`, `schema_version: "1.0"` and `id`. Nested records omit the envelope. Identifiers are nonempty ASCII letters/digits with hyphens, underscores or dots; the first character is alphanumeric. Example IDs are parser fixtures, not registered experiments or actual scientific runs.
+Every standalone document requires `document_type`, `schema_version` and `id`. Existing records remain on immutable schema 1.0. Scenario 1.1 is an explicit, separately validated extension for the DEC-002 circular-piston air case; other document types remain at 1.0. Readers select the declared version and never guess or discard fields. Nested records omit the envelope. Identifiers are nonempty ASCII letters/digits with hyphens, underscores or dots; the first character is alphanumeric. Example IDs are parser fixtures, not registered experiments or actual scientific runs.
 
 | Document type / Python type | Required content | Explicit optional or unavailable content |
 |---|---|---|
 | `medium` / `Medium` | Temperature, density, sound speed, viscosity, compressibility, amplitude attenuation and provenance | No material database defaults |
 | `body` / `Body` | Material, discriminated geometry, mass, density, compressibility, position, velocity, orientation, angular velocity and provenance | Optional body-frame 3×3 inertia tensor; missing inertia cannot authorize rotation |
-| `transducer_array` / `TransducerArray` | Frequency, peak amplitude convention, harmonic sign, element positions/unit normals, phases, pressure amplitudes/limits, source models and provenance | Circular piston requires aperture radius; ideal plane wave forbids it |
+| `transducer_array` / `TransducerArray` | Frequency, peak amplitude convention, harmonic sign, element positions/unit normals, phases, source models and provenance | Scenario 1.0 requires pressure amplitude/limit for every source. Scenario 1.1 keeps those fields for ideal plane/spherical waves and gives a circular piston displacement amplitude/limit in metres; pressure and displacement amplitudes cannot be mixed. Circular piston requires aperture radius. |
 | `solver_spec` / `SolverSpec` | Model ID/version, equation IDs, regime, precision and parameter object | Parameters currently permit iteration cap, tolerance, mesh spacing and time step only |
 | `scenario` / `Scenario` | CONV-1.0, chamber frame, medium, bodies, sources, solver, domain/boundaries, explicit gravity, target/window, resources and provenance | No missing physics receives a default |
 | `experiment` / `Experiment` | Scenario ID/digest, hypothesis/claim, primary observable/window/unit, acceptance rule, uncertainty plan, protocol reference and provenance | Unknown uncertainty is recorded; no measurement is synthesized |
@@ -30,7 +30,7 @@ Dimensional values use `{"value": number, "unit": "canonical SI symbol"}`; vecto
 Implemented cross-field checks:
 
 - Source normals and orientation quaternions have unit norm within absolute 1e-12; no normalization occurs. Body/source IDs are unique within their collections.
-- Pressure amplitudes cannot exceed their declared limits. End time must exceed start time.
+- Pressure or displacement amplitudes cannot exceed their corresponding declared limits. End time must exceed start time.
 - Body centers lie inside the declared box domain; domain upper bounds must remain finite and distinguishable from their origins.
 - Reported uncertainty requires a reference. Unknown uncertainty remains unknown.
 - Dirty source state requires a patch digest; clean state requires null. Failed/aborted executions require a failure code; other states require null. Completed executions require an output reference.
@@ -59,7 +59,7 @@ copy = loads_document(dumps_document(record, format="yaml"), format="yaml")
 assert copy.to_dict() == record.to_dict()
 ```
 
-`validate_document(dictionary)` chooses the typed record; direct constructors such as `Body(dictionary)` enforce their document type. Records store isolated serialized snapshots and return new dictionaries. Input dictionaries and returned copies cannot mutate validated state. Display serialization preserves values; [FND-07 canonical identity](content-identity.md) is a separate API. [FND-06 CLI validation](../cli-usage.md) implements `aura validate-config`; `aura status` remains available.
+`validate_document(dictionary)` chooses the typed record; direct constructors such as `Body(dictionary)` enforce their document type. `Scenario` accepts the declared 1.0 and 1.1 envelopes, with distinct version-specific source schemas; all other current records accept 1.0. Records store isolated serialized snapshots and return new dictionaries. Input dictionaries and returned copies cannot mutate validated state. Display serialization preserves values; [FND-07 canonical identity](content-identity.md) is a separate API. [FND-06 CLI validation](../cli-usage.md) implements `aura validate-config`; `aura status` remains available.
 
 FND-07 defines full canonical configuration and raw artifact digest meanings without changing schema 1.0 fields. The existing RunManifest model remains an immutable in-memory snapshot; persistence and run creation are RUN-01. Configuration/link verification and bounded local file checks must be called explicitly. Merely parsing a digest string still does not authenticate content.
 

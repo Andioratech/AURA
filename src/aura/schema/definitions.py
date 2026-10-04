@@ -7,6 +7,7 @@ from copy import deepcopy
 from .quantities import SI_UNITS, quantity
 
 VERSION = "1.0"
+SCENARIO_VERSION = "1.1"
 TEXT = {"type": "string", "minLength": 1}
 IDENTIFIER = {"type": "string", "pattern": r"^[A-Za-z0-9][A-Za-z0-9_.-]*$(?!\n)"}
 HASH = {"type": "string", "pattern": "^[0-9a-f]{64}$", "minLength": 64, "maxLength": 64}
@@ -119,6 +120,48 @@ SOURCE["allOf"] = [
             )]},
         },
     },
+]
+
+# Scenario 1.1 gives a uniformly displaced baffled piston its own SI amplitude
+# contract. Scenario 1.0 remains frozen for existing records.
+SOURCE_V11 = deepcopy(SOURCE)
+SOURCE_V11["properties"].update({
+    "displacement_amplitude": quantity("m", nonnegative=True),
+    "displacement_limit": quantity("m", positive=True),
+})
+SOURCE_V11["properties"]["pressure_amplitude"] = quantity("Pa", nonnegative=True)
+SOURCE_V11["properties"]["pressure_limit"] = quantity("Pa", positive=True)
+SOURCE_V11["required"] = [
+    name for name in SOURCE_V11["required"] if name not in ("pressure_amplitude", "pressure_limit")
+]
+SOURCE_V11["allOf"] = [
+    {
+        "if": {"properties": {"model": {"const": model}}, "required": ["model"]},
+        "then": {
+            "required": required,
+            "not": {"anyOf": [{"required": [name]} for name in forbidden]},
+        },
+    }
+    for model, required, forbidden in (
+        (
+            "ideal_plane_wave",
+            ["position", "normal", "pressure_amplitude", "pressure_limit"],
+            ["model_contract", "center", "reference_radius", "minimum_radius",
+             "aperture_radius", "displacement_amplitude", "displacement_limit"],
+        ),
+        (
+            "circular_piston",
+            ["position", "normal", "aperture_radius", "displacement_amplitude", "displacement_limit"],
+            ["model_contract", "center", "reference_radius", "minimum_radius",
+             "pressure_amplitude", "pressure_limit"],
+        ),
+        (
+            "ideal_spherical_wave",
+            ["model_contract", "center", "reference_radius", "minimum_radius",
+             "pressure_amplitude", "pressure_limit"],
+            ["position", "normal", "aperture_radius", "displacement_amplitude", "displacement_limit"],
+        ),
+    )
 ]
 CHECK_STATE = {
     "oneOf": [
@@ -355,18 +398,26 @@ DEFINITIONS = {
     ),
 }
 
+DEFINITIONS_V11 = deepcopy(DEFINITIONS)
+DEFINITIONS_V11["transducer_array"]["properties"]["elements"]["items"] = SOURCE_V11
 
-def document_schema(document_type: str) -> dict:
+
+def document_schema(document_type: str, version: str = VERSION) -> dict:
     """Return an isolated schema; every reference is local to this document."""
-    domain = deepcopy(DEFINITIONS[document_type])
+    definitions = DEFINITIONS_V11 if document_type == "scenario" and version == SCENARIO_VERSION else DEFINITIONS
+    if document_type not in definitions or version not in (VERSION, SCENARIO_VERSION):
+        raise KeyError((document_type, version))
+    if document_type != "scenario" and version != VERSION:
+        raise KeyError((document_type, version))
+    domain = deepcopy(definitions[document_type])
     domain["properties"] = {
         "document_type": {"const": document_type},
-        "schema_version": {"const": VERSION},
+        "schema_version": {"const": version},
         **domain["properties"],
     }
     domain["required"] += ["document_type", "schema_version"]
     return {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
-        "$defs": deepcopy(DEFINITIONS),
+        "$defs": deepcopy(definitions),
         **domain,
     }

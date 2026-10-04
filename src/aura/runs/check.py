@@ -12,9 +12,9 @@ from aura.schema import (
     verify_manifest_configuration,
 )
 
-from . import analytic
+from . import analytic, hasegawa
 from .execute import DRIVERS, LIMITATION, VERSION
-from .manifest import decode, digest, fail, read_bytes, safe_file, verified_bytes
+from .manifest import decode, digest, encode, fail, read_bytes, safe_file, verified_bytes
 from .provenance import LOCK_NAMES
 
 INPUT_NAMES = {"scenario.json", "experiment.json", "protocol.md", "source.json",
@@ -62,6 +62,9 @@ def check_run(folder, *, expected_sha256=None):
     if type(protocol_uri) is not str or Path(protocol_uri).name != protocol_uri or protocol_uri in ("", ".", ".."):
         fail("RUN_PROTOCOL", "Stored protocol reference must be one local filename.")
     expected_inputs = (INPUT_NAMES - {"protocol.md"}) | {protocol_uri}
+    hasegawa_run = hasegawa.is_driver(data["solver"]["model_id"])
+    if hasegawa_run:
+        expected_inputs.add("calibration.json")
     if {ref["uri"] for ref in data["inputs"]} != expected_inputs:
         fail("RUN_INPUTS", "The required RUN-1.0 input set is incomplete or changed.")
     if digest(content[protocol_uri]) != exp["protocol"]["sha256"]:
@@ -96,13 +99,51 @@ def check_run(folder, *, expected_sha256=None):
     if DRIVERS.get(data["solver"]["model_id"]) != data["solver"]["model_version"]:
         fail("RUN_MODEL", "Unrecognized recorded diagnostic model.")
     analytical = analytic.is_analytical_driver(data["solver"]["model_id"])
+    field_driver = analytical or hasegawa_run
     request = None
-    if analytical:
-        request = analytic.parse_request(content[protocol_uri])
-        analytic.check_preflight(decode(content["preflight.json"]), scenario, request)
+    if field_driver:
+        if hasegawa_run:
+            request = hasegawa.parse_request(content[protocol_uri])
+            calibration_digest = digest(content["calibration.json"])
+            preflight_record = decode(content["preflight.json"])
+            hasegawa.check_preflight(
+                preflight_record.get("num02_report"), scenario, request, calibration_digest,
+            )
+            calibration = decode(content["calibration.json"])
+            from aura.preflight import estimate_air_series
+            bound = hasegawa.admit(scenario, request)
+            workload = {
+                "contract": "AIR-SERIES-WORKLOAD-1.1", "solver_model_id": hasegawa.DRIVER,
+                "solver_model_version": hasegawa.VERSION, "gap_count": 1,
+                "points_per_gap": len(request["coordinates_m"]), "harmonic_order": request["max_order"],
+                "quadrature_order": request["quadrature_order"],
+                "bessel_argument_max": bound["maximum_argument"],
+                "point_chunk_size": request["point_chunk_size"],
+            }
+            fresh_report = estimate_air_series(
+                scenario.to_dict(), workload, calibration, calibration_sha256=calibration_digest,
+                baseline_rss_bytes=preflight_record["num02_report"]["components"]["baseline_peak_rss_bytes"],
+                available_ram_bytes=preflight_record["num02_report"]["available"]["ram_bytes"],
+                available_disk_bytes=preflight_record["num02_report"]["available"]["disk_bytes"],
+                current_source_revision=source["revision"],
+                current_environment_sha256=digest(encode(env)),
+            )
+            hasegawa.check_preflight(fresh_report, scenario, request, calibration_digest)
+            if fresh_report != preflight_record["num02_report"]:
+                fail("RUN_PREFLIGHT", "Stored NUM-02 report cannot be reconstructed from its calibration and run inputs.")
+            estimates = fresh_report["estimates"]
+            if any(preflight_record.get(key) != estimates[key] for key in (
+                "ram_bytes", "disk_bytes", "wall_time_s"
+            )) or preflight_record.get("field_samples") != len(request["coordinates_m"]) or (
+                preflight_record.get("cpu_workers") != 1 or preflight_record.get("gpu") is not False
+            ) or preflight_record.get("basis") != fresh_report["basis"]:
+                fail("RUN_PREFLIGHT", "Run-level resource receipt differs from its NUM-02 report.")
+        else:
+            request = analytic.parse_request(content[protocol_uri])
+            analytic.check_preflight(decode(content["preflight.json"]), scenario, request)
         if sum(len(value) for value in content.values()) > 16 * 1024**2:
             fail("RUN_RESOURCE", "Analytical bundle inputs/artifacts exceed the 16 MiB cap.")
-    scope = analytic.scope_for(data["solver"]["model_id"]) if analytical else LIMITATION
+    scope = analytic.scope_for(data["solver"]["model_id"]) if analytical else hasegawa.SCOPE if hasegawa_run else LIMITATION
     if not terminal:
         return {"lifecycle_version": VERSION, "run_id": data["id"], "integrity": "INCOMPLETE",
                 "execution_status": "running", "verdict": "INDETERMINATE", "exit_code": 3,
@@ -126,7 +167,7 @@ def check_run(folder, *, expected_sha256=None):
         fail("RUN_AUDIT", "Final execution/audit identity or verdict differs.")
     expected_limitations = [
         "Lifecycle integrity postcheck only; independent numerical comparison and physical-result audits are unavailable."
-        if analytical else
+        if field_driver else
         "Lifecycle postcheck only; physical-result L0/L1-L5 checks unavailable."
     ]
     if post["scope"] != scope or post["limitations"] != expected_limitations or (
@@ -143,25 +184,29 @@ def check_run(folder, *, expected_sha256=None):
     ):
         fail("RUN_STATE", "Failure record and manifest disagree.")
     analytical_outputs = {ref["uri"] for ref in data["outputs"]}
-    if analytical:
+    if field_driver:
         required = {"execution.json", "running.json"}
-        allowed = analytic.OUTPUT_NAMES | required
+        field_outputs = analytic.OUTPUT_NAMES if analytical else hasegawa.OUTPUT_NAMES
+        allowed = field_outputs | required
         if not required <= analytical_outputs or not analytical_outputs <= allowed or (
             state == "completed" and analytical_outputs != allowed
         ):
             fail("FIELD_OUTPUTS", "Analytical run output index is incomplete or changed.")
         driver_id = data["solver"]["model_id"]
-        if usage["scope"] != analytic.scope_for(driver_id) or usage["backend"] != "analytic-closed-form" or (
-            usage["run_policy"] != analytic.run_policy_for(driver_id) or (
-                usage["expected_driver_outputs"] != sorted(analytic.OUTPUT_NAMES)
-            )
+        expected_scope = analytic.scope_for(driver_id) if analytical else hasegawa.SCOPE
+        expected_policy = analytic.run_policy_for(driver_id) if analytical else hasegawa.RUN_POLICY
+        expected_backend = "analytic-closed-form" if analytical else "hasegawa-complex128"
+        if usage["scope"] != expected_scope or usage["backend"] != expected_backend or (
+            usage["run_policy"] != expected_policy or usage["expected_driver_outputs"] != sorted(field_outputs)
         ):
             fail("RUN_SCOPE", "Analytical driver provenance or scope differs.")
-    if state == "completed" and analytical:
-        analytic.check_field_outputs(
+    if state == "completed" and field_driver:
+        field_outputs = analytic.OUTPUT_NAMES if analytical else hasegawa.OUTPUT_NAMES
+        check_outputs = hasegawa.check_field_outputs if hasegawa_run else analytic.check_field_outputs
+        check_outputs(
             data["id"], scenario.to_dict(), request,
-            [ref for ref in data["outputs"] if ref["uri"] in analytic.OUTPUT_NAMES],
-            {name: decode(content[name]) for name in analytic.OUTPUT_NAMES},
+            [ref for ref in data["outputs"] if ref["uri"] in field_outputs],
+            {name: decode(content[name]) for name in field_outputs},
         )
     elif state == "completed":
         receipt = decode(content["receipt.json"])

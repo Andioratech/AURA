@@ -10,15 +10,16 @@ from jsonschema import Draft202012Validator
 
 from aura.errors import InvalidInputError
 from aura.schema import validate_document
-from aura.schema.definitions import document_schema
+from aura.schema.definitions import SCENARIO_VERSION, document_schema
 from aura.schema.quantities import MAX_BYTES, check_json_tree, pointer
 
 from .reports import AuditReport, Check, Finding
 from .rules import RULES
 
 _SCHEMAS = {
-    kind: Draft202012Validator(document_schema(kind))
+    (kind, version): Draft202012Validator(document_schema(kind, version))
     for kind in ("scenario", "run_manifest", "field_result", "force_result")
+    for version in (("1.0", SCENARIO_VERSION) if kind == "scenario" else ("1.0",))
 }
 
 
@@ -102,7 +103,13 @@ def evaluate_scenario(
             add("R-001", "INPUT_LIMIT", base, "Document exceeds 1 MiB after JSON encoding.")
             blocked.add(base)
             return False
-        errors = list(islice(_SCHEMAS[kind].iter_errors(data), 65))
+        schema_version = data.get("schema_version")
+        validator = _SCHEMAS.get((kind, schema_version)) if type(schema_version) is str else None
+        if validator is None:
+            add("R-001", "SCHEMA_INVALID", base + "/schema_version", "Unsupported schema version.")
+            blocked.add(base)
+            return False
+        errors = list(islice(validator.iter_errors(data), 65))
         if len(errors) > 64:
             add(
                 "R-001",
@@ -173,12 +180,18 @@ def evaluate_scenario(
                     path + "/normal/value",
                     "Source normal is not unit length.",
                 )
-            if source["pressure_amplitude"]["value"] > source["pressure_limit"]["value"]:
+            amplitude_name = (
+                "displacement_amplitude"
+                if "displacement_amplitude" in source
+                else "pressure_amplitude"
+            )
+            limit_name = "displacement_limit" if amplitude_name == "displacement_amplitude" else "pressure_limit"
+            if source[amplitude_name]["value"] > source[limit_name]["value"]:
                 add(
                     "R-005",
                     "SOURCE_LIMIT",
-                    path + "/pressure_amplitude",
-                    "Declared pressure limit exceeded.",
+                    path + "/" + amplitude_name,
+                    "Declared source-amplitude limit exceeded.",
                 )
         window = scenario["target"]["window"]
         if window["end"]["value"] <= window["start"]["value"]:

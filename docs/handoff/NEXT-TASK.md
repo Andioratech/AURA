@@ -1,30 +1,21 @@
-# Next Main Task — NUM-03 Public Run-Path Integration
+# Next Main Task — Complete NUM-03 Run-Path Delivery
 
-**Prepared:** 2026-10-04 · **State:** NUM-W01, NUM-01 and NUM-02 DONE; NUM-03 ACTIVE · **Validated source revision:** `d07b197` (GitHub Quality [37182422621](https://github.com/Andioratech/AURA/actions/runs/37182422621) passed)
+**Prepared:** 2026-10-04 · **State:** NUM-W01, NUM-01 and NUM-02 DONE; NUM-03 ACTIVE · **Published base:** `410317f` (GitHub Quality [37182663256](https://github.com/Andioratech/AURA/actions/runs/37182663256) passed)
 
-## Completed discrete-grid verification
+## Current implementation under review
 
-The direct Decimal Rayleigh-disk-to-modal implementation overlaps the public evaluator at matched orders18–500 over 37 angles, three radial shells and gaps0.1/10/20/30 mm (444 locations per order). Maximum normalized absolute differences are about `1.5e-13` pressure and `5.3e-13` velocity/pressure gradient. A separate order512 comparison over all 444 points also agrees near the same numerical scale. These are mathematical cross-formulation checks for finite sums, not validation against a physical reference.
+The local working change adds a versioned Scenario 1.1 piston displacement representation while keeping Scenario 1.0 records unchanged; a Hasegawa stationary piston/sphere adapter to `aura run`; exact-source/ENV-1.0 NUM-02 calibration gating; one ordered field chunk of at most 256 samples; immutable input, calibration, preflight, provenance and output hashes; and read-only bundle verification. Missing calibration and over-cap tests refuse before solver evaluation and run-directory creation. Synthetic rates are used only inside tests. Full local Quality passes: locked ENV-1.0 install, editable install, `pip check`, environment verification, Ruff, required-document checks, `git diff --check` and 1,667 tests.
 
-At 300 Decimal digits, a direct order1200 calculation compared with order512 over the full sampled grid gives the following outer-shell differences. Velocity/gradient use the norm of both nonzero axisymmetric Cartesian components and are normalized by the order1200 grid maximum:
-
-| Gap | Outer-shell `r/d` | Pressure | Velocity | Pressure gradient |
-|---:|---:|---:|---:|---:|
-| 0.1 mm | `0.999960` | `0` | `<1e-18` | `<1e-18` |
-| 10 mm | `0.997143` | `4.67e-13` | `1.96e-11` | `1.96e-11` |
-| 20 mm | `0.995556` | `4.97e-10` | `1.21e-8` | `1.21e-8` |
-| 30 mm | `0.994545` | `3.46e-8` | `1.14e-6` | `1.14e-6` |
-
-At the 30 mm outer shell, direct order1200 differs from order1600 by `9.33e-16` pressure and about `9.05e-14` in velocity/gradient; source radial rules128/256/512 agree at displayed precision through order1600. These finite-grid comparisons are not rigorous tail/error bounds, and no field tolerance has been set. The public evaluator remains capped at512; do not claim the complete declared field domain has passed.
-
-NUM-02 was evaluated for a hypothetical workload of 4 gaps ×111 points, quadrature order256, maximum Bessel argument25.1, chunk size64 and baseline RSS zero. Hypothetical RAM is `1,005,568 B` at order512, `1,450,112 B` at1000, and `1,994,496 B` at1600; disk is `946,176 B`. Every report remains `INDETERMINATE`, with no wall-time estimate, because there is no matching exact-revision production calibration. These values are estimator outputs, not production solver measurements.
-
-The order-extension and all-gap artifacts, hashes and preserved invalid attempts are documented in the [NUM-03 coupled-kernel review](../reviews/NUM-03-coupled-kernel-review.md); the generated files remain ignored in `results/diagnostics/`.
+The adapter supports one gap per run and one complete bounded chunk per request. It keeps the solver's 0–512 order cap and declared shell `a <= r < d`. The current source-factor implementation uses a recurrence rather than Gauss integration; NUM-02 retains the quadrature workspace as a conservative allowance and calibration dimension. It is not a solver accuracy parameter. No production calibration or air field run exists.
 
 ## Immediate next work
 
-Integrate the coupled Hasegawa evaluator into the public run lifecycle. Use the frozen air scenario and exact dimensions to create a Hasegawa run request; bind it to NUM-02 workload preflight, reject before field allocation when preflight is incomplete or resources exceed caps, evaluate one bounded point chunk at a time, and produce immutable configuration/code/environment/seed/output provenance with checksums. Add a diagnostic-only policy that preserves failed runs and never reports field software verification as model validation. Exercise the missing-calibration refusal path; do not execute a production workload while the exact clean revision lacks ENV-1.0 runtime calibration.
+1. Review all diffs, including the schema-version extension; confirm local-only instructions, credentials and generated outputs are excluded; inspect the staged diff; and verify the effective author and committer are JuanFelipeLH <felipelamos2003@gmail.com>.
+2. Commit and push only with all required checks passing, then verify remote Quality for that exact revision.
+3. On the clean published revision and ENV-1.0, measure and retain the Hasegawa coefficient/field runtime calibration. Run only a bounded, declared diagnostic request whose exact NUM-02 report fits the frozen scenario limits. Its result remains numerical software verification with an INDETERMINATE science verdict.
 
-Keep `max_order` explicit and retain the current public cap512 during this integration. Before changing the cap or declaring P4 acceptance, review a field-accuracy tolerance for pressure, velocity and pressure gradient across the full domain. If the integration reveals that the public model or resource contract needs a change, preserve the evidence and consult the documented NUM-01 fallback. No force, dynamics, acceleration, control or gravity-equivalence work belongs to NUM-03.
+## Scientific work still open
 
-See [NUM-03](../work-items/NUM-03.md), the [coupled-kernel review](../reviews/NUM-03-coupled-kernel-review.md), [NUM-02](../work-items/NUM-02.md), and the [P4 plan](../planning/phases/P04-numerical-field.md).
+The order512 versus direct order1200 overlap changes on the sampled outer shell reach `1.14e-6` in velocity/pressure-gradient norm at the 30 mm gap. Extending the separate sum to order1600 reduces the observed finite-sum difference but gives no tail bound. The matched-order direct/public overlaps are near roundoff across 444 discrete points, not independent physical validation. Continuous shell coverage, a predeclared tolerance for pressure/velocity/gradient, and complete resource and convergence evidence remain open. Do not change the order cap or claim P4 acceptance until these are reviewed. Keep the NUM-01 BEM/high-order-FD fallback available if the series cannot meet a justified error/resource bound.
+
+No force, dynamics, acceleration, control, microgravity or gravity-equivalence work belongs to NUM-03. Preserve failed attempts and all limits described in [NUM-03](../work-items/NUM-03.md), the [coupled-kernel review](../reviews/NUM-03-coupled-kernel-review.md), [NUM-02](../work-items/NUM-02.md), and the [P4 phase plan](../planning/phases/P04-numerical-field.md).

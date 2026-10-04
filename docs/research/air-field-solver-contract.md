@@ -27,7 +27,7 @@ The source-to-sphere-centered expansion is restricted to `r < d`, the distance f
 
 ## Numerical interface
 
-The eventual numerical evaluator receives a validated field scenario, an immutable ordered list of Cartesian observation coordinates in metres, and a preflight-approved harmonic truncation/work plan. It must not choose missing medium/source/body values, resize the case silently, or allocate series workspaces before preflight accepts the request.
+The numerical evaluator receives a validated Scenario 1.1, an immutable ordered list of Cartesian observation coordinates in metres, and a preflight-approved harmonic truncation/work plan. Scenario 1.1 represents the circular-piston input with peak face displacement and a displacement limit in metres; the v1.0 pressure-amplitude fields remain unchanged and are never substituted. The run adapter maps the declared displacement and phase to face velocity using the convention below. The evaluator must not choose missing medium/source/body values, resize the case silently, or allocate series workspaces before preflight accepts the request.
 
 For each observation point, return the complex pressure in Pa, fluid particle velocity in m/s, and pressure gradient in Pa/m using the existing `FieldSamples`/FIELD-1.0 conventions: peak amplitudes, `exp(-iwt)`, chamber-frame coordinates, and complex128 values. Intermediate velocity potential may be retained as a solver diagnostic but is not a replacement for these canonical observables. Map the axisymmetric radial and axial components into the declared Cartesian frame, with an explicit on-axis limit.
 

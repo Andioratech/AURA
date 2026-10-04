@@ -8,6 +8,7 @@ import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 
+from aura.errors import IncompleteEvidenceError
 from aura.mclf import evaluate_scenario
 from aura.schema import (
     Experiment,
@@ -19,7 +20,7 @@ from aura.schema import (
     verify_manifest_configuration,
 )
 
-from . import analytic, provenance
+from . import analytic, hasegawa, provenance
 from .manifest import decode, digest, encode, fail, publish, read_bytes, verified_bytes
 
 VERSION = "RUN-1.0"
@@ -27,6 +28,7 @@ DRIVERS = {
     "lifecycle-receipt": "1.0",
     "lifecycle-failure": "1.0",
     **analytic.DRIVERS,
+    hasegawa.DRIVER: hasegawa.VERSION,
 }
 LIMITATION = "Software diagnostic only; no physical simulation or scientific acceptance."
 
@@ -77,7 +79,7 @@ def _driver(config, emit):
                           "physical_simulation": False, "scope": LIMITATION})
 
 
-def execute(scenario_path, experiment_path, *, output=None, seed):
+def execute(scenario_path, experiment_path, *, output=None, seed, calibration=None):
     """Validate before allocating a new directory; retain failures once a run starts."""
     scenario = _load(scenario_path, Scenario)
     experiment = _load(experiment_path, Experiment)
@@ -87,9 +89,14 @@ def execute(scenario_path, experiment_path, *, output=None, seed):
     solver = config["solver"]
     model_id = solver["model_id"]
     analytical = analytic.is_analytical_driver(model_id)
+    hasegawa_run = hasegawa.is_driver(model_id)
+    field_driver = analytical or hasegawa_run
+    driver_scope = analytic.scope_for(model_id) if analytical else hasegawa.SCOPE if hasegawa_run else LIMITATION
+    driver_policy = analytic.run_policy_for(model_id) if analytical else hasegawa.RUN_POLICY if hasegawa_run else "SOFTWARE-DIAGNOSTIC-1.0"
+    driver_outputs = analytic.OUTPUT_NAMES if analytical else hasegawa.OUTPUT_NAMES if hasegawa_run else {"receipt.json"}
     if DRIVERS.get(model_id) != solver["model_version"]:
         fail("RUN_MODEL", "Only a registered versioned run driver is available.")
-    if not analytical and (
+    if not field_driver and (
         solver["precision"] != "float64" or solver["parameters"]
         or solver["equation_ids"] != ["SOFTWARE-RUN-01"]
     ):
@@ -104,15 +111,39 @@ def execute(scenario_path, experiment_path, *, output=None, seed):
     protocol = read_bytes(Path(experiment_path).parent / protocol_uri)
     if digest(protocol) != exp["protocol"]["sha256"]:
         fail("HASH_MISMATCH", "Protocol bytes differ from the frozen experiment.")
-    request = analytic.parse_request(protocol) if analytical else None
+    request = (analytic.parse_request(protocol) if analytical else
+               hasegawa.parse_request(protocol) if hasegawa_run else None)
     field_estimate = None
     if analytical:
         field_estimate = analytic.preflight(scenario, request)
+    elif hasegawa_run:
+        hasegawa.admit(scenario, request)
     run_id = "RUN-" + datetime.now(timezone.utc).strftime("%Y%m%d") + "-" + uuid.uuid4().hex
     pre = evaluate_scenario(config, report_id=run_id + "-PRE", run_id=run_id, stage="pre")
     if pre.verdict in ("INVALIDATED", "ALERT"):
         pre.require_accepted()
     source, environment, locks = provenance.capture()
+    calibration_bytes = None
+    num02_report = None
+    if hasegawa_run:
+        if calibration is None:
+            raise IncompleteEvidenceError(
+                "PREFLIGHT_CALIBRATION", "/calibration",
+                "Hasegawa execution requires a matching runtime calibration file.",
+            )
+        calibration_bytes = read_bytes(Path(calibration))
+        calibration_record = decode(calibration_bytes)
+        if type(calibration_record) is not dict:
+            fail("PREFLIGHT_CALIBRATION", "Calibration file must contain one JSON object.")
+        calibration_digest = digest(calibration_bytes)
+        num02_report = hasegawa.preflight(
+            scenario, request, calibration_record, calibration_digest, source, environment,
+            Path(output) if output is not None else provenance.SOURCE_ROOT / "results",
+        )
+        field_estimate = {
+            **num02_report["estimates"], "cpu_workers": 1, "gpu": False,
+            "field_samples": len(request["coordinates_m"]), "basis": num02_report["basis"],
+        }
     destination = Path(output) if output is not None else (
         provenance.SOURCE_ROOT / "results" / exp["id"] / run_id
     )
@@ -129,7 +160,11 @@ def execute(scenario_path, experiment_path, *, output=None, seed):
         Path(protocol_uri).name: protocol, "source.json": encode(source),
         "environment.json": encode(environment), **locks,
     }
+    if hasegawa_run:
+        payloads["calibration.json"] = calibration_bytes
     estimate = _preflight(config, payloads, destination, field_estimate)
+    if hasegawa_run:
+        estimate["num02_report"] = num02_report
     payloads["preflight.json"] = encode(estimate)
     inputs = [{"uri": name, "sha256": digest(data)} for name, data in payloads.items()]
     manifest = {
@@ -147,7 +182,7 @@ def execute(scenario_path, experiment_path, *, output=None, seed):
         "mclf_pre": {"status": "completed", "verdict": pre.verdict,
                      "report": {"uri": "audit-pre.json", "sha256": digest(encode(pre.to_dict()))}},
         "mclf_post": {"status": "not_run"}, "failure_code": None,
-        "operator_notes": (analytic.scope_for(model_id) if analytical else LIMITATION)
+        "operator_notes": driver_scope
         + " Exploratory permission: DEC-003; seed is recorded but unused.",
     }
     verify_manifest_configuration(RunManifest(manifest), scenario, experiment=experiment)
@@ -171,6 +206,8 @@ def execute(scenario_path, experiment_path, *, output=None, seed):
     try:
         if analytical:
             analytic.execute_field(scenario, request, run_id, emit)
+        elif hasegawa_run:
+            hasegawa.execute_field(scenario, request, run_id, num02_report, emit)
         else:
             _driver(config, emit)
         source_after, environment_after, locks_after = provenance.capture()
@@ -178,12 +215,15 @@ def execute(scenario_path, experiment_path, *, output=None, seed):
             fail("RUN_SOURCE_CHANGED", "Source changed during execution.")
         for ref in [*inputs, *outputs, manifest["mclf_pre"]["report"]]:
             verified_bytes(destination, ref)
-        expected_outputs = analytic.OUTPUT_NAMES if analytical else {"receipt.json"}
+        expected_outputs = driver_outputs
         if {ref["uri"] for ref in outputs} != expected_outputs:
             fail("RUN_OUTPUT_MISSING", "Required driver outputs are absent or unexpected.")
-        if analytical:
-            stored = {name: decode(read_bytes(destination / name)) for name in analytic.OUTPUT_NAMES}
-            analytic.check_field_outputs(run_id, config, request, outputs, stored)
+        if field_driver:
+            stored = {name: decode(read_bytes(destination / name)) for name in driver_outputs}
+            if hasegawa_run:
+                hasegawa.check_field_outputs(run_id, config, request, outputs, stored)
+            else:
+                analytic.check_field_outputs(run_id, config, request, outputs, stored)
             if sum(path.stat().st_size for path in destination.iterdir()) > 15 * 1024**2:
                 fail("RUN_RESOURCE", "Analytical bundle crossed the reserved 16 MiB storage cap.")
         if time.monotonic() - started > config["resources"]["wall_time"]["value"]:
@@ -202,19 +242,19 @@ def execute(scenario_path, experiment_path, *, output=None, seed):
              "process_cpu_time_s": time.process_time() - cpu_started,
              "logical_cpu_count": os.cpu_count(), "gpu_used": False,
              "driver_artifact_bytes": sum((destination / ref["uri"]).stat().st_size for ref in outputs),
-             "expected_driver_outputs": sorted(analytic.OUTPUT_NAMES) if analytical else ["receipt.json"],
-             "seed_used": False, "scope": analytic.scope_for(model_id) if analytical else LIMITATION,
-             "backend": "analytic-closed-form" if analytical else "software-diagnostic",
-             "run_policy": analytic.run_policy_for(model_id) if analytical else "SOFTWARE-DIAGNOSTIC-1.0"}
+             "expected_driver_outputs": sorted(driver_outputs),
+             "seed_used": False, "scope": driver_scope,
+             "backend": "analytic-closed-form" if analytical else "hasegawa-complex128" if hasegawa_run else "software-diagnostic",
+             "run_policy": driver_policy}
     emit("execution.json", usage)
     post = {"audit_version": "RUN-POST-1.0", "run_id": run_id,
             "verdict": "INDETERMINATE" if state == "completed" else "INVALIDATED",
             "execution_status": state, "pre_verdict": pre.verdict,
             "artifact_check": "PASS" if state == "completed" else "NOT_ESTABLISHED",
-            "physical_result": "NOT_REQUESTED", "scope": analytic.scope_for(model_id) if analytical else LIMITATION,
+            "physical_result": "NOT_REQUESTED", "scope": driver_scope,
             "limitations": [
                 "Lifecycle integrity postcheck only; independent numerical comparison and physical-result audits are unavailable."
-                if analytical else
+                if field_driver else
                 "Lifecycle postcheck only; physical-result L0/L1-L5 checks unavailable."
             ]}
     post_ref = publish(destination, "audit-post.json", encode(post))
@@ -230,4 +270,4 @@ def execute(scenario_path, experiment_path, *, output=None, seed):
     return {"lifecycle_version": VERSION, "run_id": run_id, "output": str(destination),
             "execution_status": state, "verdict": post["verdict"], "error": error,
             "manifest_sha256": ref["sha256"], "exit_code": code,
-            "scope": analytic.scope_for(model_id) if analytical else LIMITATION}
+            "scope": driver_scope}
