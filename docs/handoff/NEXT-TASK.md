@@ -1,18 +1,18 @@
-# Next Main Task — Complete NUM-03 Run-Path Delivery
+# Next Main Task — Calibrate the NUM-03 Run Path
 
-**Prepared:** 2026-10-04 · **State:** NUM-W01, NUM-01 and NUM-02 DONE; NUM-03 ACTIVE · **Published base:** `410317f` (GitHub Quality [37182663256](https://github.com/Andioratech/AURA/actions/runs/37182663256) passed)
+**Prepared:** 2026-10-04 · **State:** NUM-W01, NUM-01 and NUM-02 DONE; NUM-03 ACTIVE · **Published revision:** `f8302cb` (GitHub Quality [37184239104](https://github.com/Andioratech/AURA/actions/runs/37184239104) passed)
 
 ## Current implementation under review
 
-The local working change adds a versioned Scenario 1.1 piston displacement representation while keeping Scenario 1.0 records unchanged; a Hasegawa stationary piston/sphere adapter to `aura run`; exact-source/ENV-1.0 NUM-02 calibration gating; one ordered field chunk of at most 256 samples; immutable input, calibration, preflight, provenance and output hashes; and read-only bundle verification. Missing calibration and over-cap tests refuse before solver evaluation and run-directory creation. Synthetic rates are used only inside tests. Full local Quality passes: locked ENV-1.0 install, editable install, `pip check`, environment verification, Ruff, required-document checks, `git diff --check` and 1,667 tests.
+Published commit `f8302cb` adds a versioned Scenario 1.1 piston displacement representation while keeping Scenario 1.0 records unchanged; a Hasegawa stationary piston/sphere adapter to `aura run`; exact-source/ENV-1.0 NUM-02 calibration gating; one ordered field chunk of at most 256 samples; immutable input, calibration, preflight, provenance and output hashes; and read-only bundle verification. GitHub Quality passed. Full local Quality passed: locked ENV-1.0 install, editable install, `pip check`, environment verification, Ruff, required-document checks, `git diff --check` and 1,667 tests.
 
 The adapter supports one gap per run and one complete bounded chunk per request. It keeps the solver's 0–512 order cap and declared shell `a <= r < d`. The current source-factor implementation uses a recurrence rather than Gauss integration; NUM-02 retains the quadrature workspace as a conservative allowance and calibration dimension. It is not a solver accuracy parameter. No production calibration or air field run exists.
 
 ## Immediate next work
 
-1. Review all diffs, including the schema-version extension; confirm local-only instructions, credentials and generated outputs are excluded; inspect the staged diff; and verify the effective author and committer are JuanFelipeLH <felipelamos2003@gmail.com>.
-2. Commit and push only with all required checks passing, then verify remote Quality for that exact revision.
-3. On the clean published revision and ENV-1.0, measure and retain the Hasegawa coefficient/field runtime calibration. Run only a bounded, declared diagnostic request whose exact NUM-02 report fits the frozen scenario limits. Its result remains numerical software verification with an INDETERMINATE science verdict.
+1. Measure Hasegawa coefficient-preparation and field-evaluation seconds per harmonic order on this exact clean source revision and ENV-1.0. Bind the calibration file to commit `f8302cb`, environment digest, workload Bessel argument and the declared quadrature preflight dimension. Keep raw measurement data, timing method, repeated-run distribution and calibration artifact digest with the run record.
+2. Run one bounded, declared diagnostic request only if its exact NUM-02 report fits the frozen scenario caps. The run's verdict stays INDETERMINATE and demonstrates software execution only.
+3. Review a target-specific numerical tolerance for pressure, particle velocity and pressure gradient before full-domain convergence work or any P4 claim. Keep the order512 cap and declared domain unchanged until that review.
 
 ## Scientific work still open
 

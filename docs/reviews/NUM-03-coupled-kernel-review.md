@@ -2,6 +2,14 @@
 
 **Date:** 2026-10-03 · **Disposition:** Focused kernel checks PASS; NUM-03 remains ACTIVE and no pilot is accepted
 
+## Implementation addendum — 2026-10-04
+
+The public run-path adapter is now published in owner-authored commit `f8302cbf39cb06105c7602e946d66bdd2a0a9f33`; GitHub Quality [37184239104](https://github.com/Andioratech/AURA/actions/runs/37184239104) passed. Full local Quality passed ENV-1.0 installation and verification, `pip check`, Ruff, required-document checks, `git diff --check` and 1,667 tests.
+
+Scenario 1.1 now carries the DEC-002 piston face displacement in metres without reinterpreting existing Scenario 1.0 pressure amplitudes. The `aura run` Hasegawa adapter admits the exact declared 25 °C air, piston, sphere, phase, sample shell and model inputs; derives the complex piston face velocity under `exp(-iwt)`; binds one explicit ordered chunk and max order; and requires exact clean-source/ENV-1.0 NUM-02 calibration before output-directory creation or solver evaluation. Tests show missing calibration and exceeded RAM caps refuse before the evaluator, and a test-only synthetic-calibration run survives immutable bundle checks with a final scientific verdict of INDETERMINATE. The NUM-02 incremental RAM estimate also exceeds the evaluator's local workspace estimate in the integration test. These synthetic rates verify contract wiring only; they are not production timing evidence.
+
+This closes run-path software integration, not NUM-03 or P4 acceptance. There is still no production calibration or air solver run, no frozen tolerance for pressure/velocity/gradient, no continuous shell convergence evidence, and no change to the order512 cap or `a <= r < d` domain. The original kernel evidence and its finite-grid limitations below remain in force.
+
 ## Scope reviewed
 
 This review covers the initial `evaluate_hasegawa_piston_sphere_field` implementation in `src/aura/fields/hasegawa.py` and its explicit-order diagnostic. The modeled case uses a coaxial uniformly moving circular piston at `z=0` and a stationary rigid sound-hard sphere centered on `+z`, in homogeneous, linear, lossless air under `exp(-iwt)`. Source factors are the conjugated Hasegawa series for the project convention. The sphere scattering branch is `-j'_n(ka)/h'_n(ka)` at every order, including stationary `n=1`; the translating-sphere branch is not used.
