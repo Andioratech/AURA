@@ -1,12 +1,12 @@
 # NUM-03 Field-Tolerance Decision Brief
 
-**Prepared:** 2026-10-04 · **Status:** Decision basis only; no numerical tolerance is adopted
+**Prepared:** 2026-10-04 · **Status:** DEC-007 recorded; no numerical tolerance is adopted
 
-## Decision requested
+## Owner decision recorded
 
-For the air P4 gate, should AURA accept a **field-only numerical error budget** for pressure, particle velocity and pressure gradient, derived from independent reference uncertainty and observable convergence, with force/acceleration accuracy budgeted separately in later phases? This is the recommended route and preserves DEC-006's sequence: air field verification first, then air force and dynamics work only after the applicable field gate. The alternative is to hold P4 tolerance selection until a downstream force/acceleration accuracy target can allocate an error budget backward; that would defer the air field gate until the downstream target is defined.
+The owner agreed to a **field-only numerical error budget** for pressure, particle velocity and pressure gradient in air P4. Force/acceleration accuracy will be budgeted separately in the applicable later phases. [DEC-007](../decisions/DEC-007-p4-field-only-error-budget.md) records the decision.
 
-This request concerns how the field-gate tolerance is justified. It does not ask to approve a particular percentage or to change any current numerical or physical assumptions.
+No percentage or numerical threshold was selected. The decision does not change any current numerical or physical assumptions.
 
 ## Evidence and limits
 
@@ -17,12 +17,14 @@ This request concerns how the field-gate tolerance is justified. It does not ask
 - The new order-512 air diagnostic is one point at the 0.1 mm gap. Its bundle verifies, but its science verdict is INDETERMINATE and it has no independent field reference. It cannot determine a tolerance.
 - Roache's Grid Convergence Index and Celik et al.'s uncertainty procedure concern grid/discretization refinement in CFD. They support reporting observable-specific convergence uncertainty, but their formulas do not automatically apply to AURA's harmonic-truncation sequence; use would require a justified mapping and evidence of an appropriate convergence regime ([Roache 1994](https://doi.org/10.1115/1.2910291), [Celik et al. 2008](https://doi.org/10.1115/1.2960953)).
 
-## Recommended method after the decision
+## Next method task
 
-Keep P4's numerical field gate separate from later force and acceleration validation. Before the next convergence campaign, predeclare a matched reference and its uncertainty, field sample set over the declared domain, at least three harmonic truncations, and separate complex-pressure, vector-velocity and vector-pressure-gradient error summaries. Include both a norm over the fixed sample set and an absolute local error criterion so that near-zero reference values do not make relative error singular. Report observed order behavior and keep truncation, floating-point, reference, parameter and measurement/model uncertainty separate. Do not fit a convergence rate or call a threshold passed if the sequence is nonmonotone or outside an evidenced asymptotic regime.
+Before the next broad convergence campaign, determine whether the separately implemented high-precision coupled calculation can provide an uncertainty-characterized reference across the frozen air domain. Its quadrature, arithmetic and modal-truncation errors must be assessed separately; agreement between implementations at a matched finite order is not a tail bound. Preserve the published force measurement uncertainty and physical-model uncertainty as separate, out-of-scope terms for this numerical P4 budget.
 
-The numerical budget should be justified against the reference's numerical uncertainty and a predeclared use requirement. If no suitable reference uncertainty or downstream use requirement can be established, retain `INDETERMINATE`; do not select a percentage from the order-512 diagnostic, the source proposal's 2% simple-wave target, or the current highest-order difference. Any later force or acceleration budget must include sensitivity to pressure, velocity and gradient errors and remain distinct from field verification.
+Once reference uncertainty is characterized, freeze: complex-pressure, vector-velocity and vector-pressure-gradient metrics; a deterministic sample set; at least three harmonic truncations; independent quadrature/precision checks; benchmark-specific acceptance and stopping rules; and the resource cap. Use both a fixed-grid norm and a maximum absolute local error in SI units, without phase fitting, so nodes do not make the relative error singular. Report truncation, floating-point and reference numerical uncertainties separately. Do not fit a convergence rate or pass a threshold if the sequence is nonmonotone or outside an evidenced asymptotic regime.
+
+If the reference uncertainty or an explicitly scoped field-use requirement cannot be justified, retain `INDETERMINATE`; do not select a percentage from the order-512 diagnostic, the source proposal's 2% simple-wave target, or the current highest-order difference. Any later force or acceleration budget must account for sensitivity to pressure, velocity and gradient errors while remaining distinct from field verification.
 
 ## Consequences
 
-Either route keeps the order-512 cap, the `a <= r < d` domain and all current evidence unchanged. A field-only P4 pass would support only the declared ideal air-field model and tested domain. It would not validate acoustic force, acceleration, gravity equivalence, hardware behavior, water, or larger bodies. NUM-03 remains ACTIVE; NUM-04 remains blocked until its observable, tolerance and refinement protocol are frozen.
+DEC-007 keeps the order-512 cap, the `a <= r < d` domain and all current evidence unchanged. A future field-only P4 pass would support only the declared ideal air-field model and tested domain. It would not validate acoustic force, acceleration, gravity equivalence, hardware behavior, water, or larger bodies. NUM-03 remains ACTIVE; broad NUM-04 convergence runs remain blocked until reference uncertainty, observable metrics, acceptance rule, refinement protocol and resource cap are frozen.

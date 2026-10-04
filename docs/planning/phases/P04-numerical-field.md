@@ -92,7 +92,7 @@ Use [00](../00-execution-protocol.md), the [task template](../templates/task-rec
 
 ## NUM-03 — Implement the selected field backend
 
-**Current state:** ACTIVE — isolated numerical kernels, the scaled coupled Hasegawa piston/stationary-sphere evaluator, the run-level preflight adapter and immutable field bundle are recorded in [NUM-03](../../work-items/NUM-03.md) and the linked reviews. The source-centered expansion is explicitly restricted to `a<=r<d`; the full sphere surface stays inside this domain for every declared positive gap. A measured exact-context profile supported one bounded one-gap, one-point, order-512 software diagnostic on clean revision `f8302cb`; its bundle is integrity-verified, but its verdict is INDETERMINATE. It was not compared with an independent field reference and establishes no convergence or field accuracy. The matched-P3 comparison, full-domain convergence and resource review remain open; no P4 PASS exists. **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
+**Current state:** ACTIVE — isolated numerical kernels, the scaled coupled Hasegawa piston/stationary-sphere evaluator, the run-level preflight adapter and immutable field bundle are recorded in [NUM-03](../../work-items/NUM-03.md) and the linked reviews. The owner selected a field-only P4 numerical error budget, with force/acceleration budgets deferred to their later gates ([DEC-007](../../decisions/DEC-007-p4-field-only-error-budget.md)); no numerical threshold was adopted. The source-centered expansion is explicitly restricted to `a<=r<d`; the full sphere surface stays inside this domain for every declared positive gap. A measured exact-context profile supported one bounded one-gap, one-point, order-512 software diagnostic on clean revision `f8302cb`; its bundle is integrity-verified, but its verdict is INDETERMINATE. It was not compared with an independent field reference and establishes no convergence or field accuracy. Before broad convergence runs, characterize the uncertainty of the independent high-precision reference and freeze the benchmark-specific comparison protocol. The matched-P3 comparison, full-domain convergence and resource review remain open; no P4 PASS exists. **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
 
 **Inputs / predecessors:** NUM-02
 
@@ -110,7 +110,7 @@ Use [00](../00-execution-protocol.md), the [task template](../templates/task-rec
 
 ## NUM-04 — Measure observable convergence across three levels
 
-**Initial state:** BLOCKED by predecessors / applicable gates. **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
+**Initial state:** BLOCKED until the benchmark-specific observables, sample set, reference uncertainty, acceptance/stopping rule and resource cap are frozen under NUM-03/DEC-007. **Owner role:** research implementer; phase review by the roles in [00](../00-execution-protocol.md).
 
 **Inputs / predecessors:** NUM-03
 

@@ -1,4 +1,4 @@
-# Next Main Task — Decide the NUM-03 Field-Tolerance Basis
+# Next Main Task — Characterize the NUM-03 Reference Error
 
 **Prepared:** 2026-10-04 · **State:** NUM-W01, NUM-01 and NUM-02 DONE; NUM-03 ACTIVE · **Solver revision:** `f8302cb` (GitHub Quality [37184239104](https://github.com/Andioratech/AURA/actions/runs/37184239104) passed)
 
@@ -10,11 +10,11 @@ The adapter supports one gap per run and one complete bounded chunk per request.
 
 On clean revision `f8302cb` and ENV-1.0, a 48-sample timing record produced a calibration for one gap, one point, quadrature order 256, maximum Bessel argument 12.378996, and order up to 512. The profile uses maximum observed rates and a safety multiplier of 3.0. One bounded order-512/one-point diagnostic fit the NUM-02 caps, completed, and passed `aura check` integrity verification; its science verdict remains INDETERMINATE. Its local evidence pack is under ignored `results/num03-runtime-calibration/f8302cbf39cb06105c7602e946d66bdd2a0a9f33/`; artifact-index SHA-256: `b4b75b1b227b22fe0ef2fe0b5a0d6291c9119df77025c39237948a2daf5c630c`.
 
-## Owner decision needed
+## Owner decision recorded
 
-Review the [field-tolerance decision brief](../research/NUM-03-field-tolerance-decision.md). It recommends a field-only P4 numerical error budget based on an independent reference, its uncertainty and observable convergence, with force/acceleration accuracy budgeted separately in later phases. No numerical threshold has been selected. The alternative is to wait for a downstream force/acceleration error budget before freezing P4 tolerance, which would defer the air field gate. Either choice preserves the current cap, domain and evidence.
+The owner selected a field-only P4 numerical budget, with force/acceleration accuracy handled later. [DEC-007](../decisions/DEC-007-p4-field-only-error-budget.md) records this direction. No numerical threshold was selected, and no physical assumptions changed.
 
-After this direction is clear, define the benchmark-specific pressure, particle-velocity and pressure-gradient metrics, reference uncertainty, sample set, refinement sequence and stopping rule. Do not begin broad convergence runs or declare P4 until those are frozen. The current exact-context runtime profile does not establish that larger workloads fit.
+The next task is to characterize the uncertainty of the separate high-precision coupled calculation as a field reference across the declared air domain. Existing same-order agreement checks code-path overlap; observed order-512 to order-1200 changes are finite-sum differences, not tail bounds. Assess quadrature, precision and modal-tail uncertainty separately. Then freeze pressure, particle-velocity and pressure-gradient metrics, sample set, reference-uncertainty treatment, at least three harmonic truncations, acceptance/stopping rule and resource cap. Do not begin broad convergence runs or declare P4 until the protocol is frozen. The current exact-context runtime profile does not establish that larger workloads fit.
 
 ## Scientific work still open
 
