@@ -1,6 +1,6 @@
 # Next Main Task — NUM-03 Public Run-Path Integration
 
-**Prepared:** 2026-10-04 · **State:** NUM-W01, NUM-01 and NUM-02 DONE; NUM-03 ACTIVE · **Validated source revision:** `7b0923d` (GitHub Quality [37180838930](https://github.com/Andioratech/AURA/actions/runs/37180838930) passed)
+**Prepared:** 2026-10-04 · **State:** NUM-W01, NUM-01 and NUM-02 DONE; NUM-03 ACTIVE · **Validated source revision:** `d07b197` (GitHub Quality [37182422621](https://github.com/Andioratech/AURA/actions/runs/37182422621) passed)
 
 ## Completed discrete-grid verification
 
