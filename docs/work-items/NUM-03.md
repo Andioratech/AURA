@@ -58,3 +58,7 @@ The gap sweep and 30 mm outer-shell extension through order1600 are documented i
 ## Failure and change control
 
 If special-function scaling, boundary normalization, independent comparisons, or conservative resource bounds fail, preserve the evidence and reopen NUM-01's documented method comparison. Do not silently change the air source, sphere, medium, phasor, gap range, arithmetic, or acceptance rules.
+
+## Field-error protocol basis — 2026-10-04
+
+The separate [protocol basis](../research/NUM-03-field-error-protocol.md) records what can be specified without inventing a threshold: separate complex-field residuals for pressure, vector velocity and pressure gradient; fixed-coordinate weighted RMS and maximum absolute local errors in SI units; no phase fit or local relative division near nodes; and separate reporting of modal tail, floating-point, quadrature and reference uncertainty. The P1.3 observations are figure-derived force values, not field measurements or a field-accuracy requirement. Current candidate bounds address modal truncation only. No acceptance tolerance is adopted; P4 remains INDETERMINATE and NUM-04 remains BLOCKED. Continue only bounded reference/error-source qualification until a justified use requirement and reference-uncertainty method are available.

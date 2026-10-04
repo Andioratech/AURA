@@ -1,6 +1,6 @@
 # Next Main Task — Freeze the NUM-03 Field-Error Protocol
 
-**Prepared:** 2026-10-04 · **State:** NUM-W01, NUM-01 and NUM-02 DONE; NUM-03 ACTIVE · **Solver revision:** `f8302cb` (GitHub Quality [37184239104](https://github.com/Andioratech/AURA/actions/runs/37184239104) passed) · **Documentation base before this update:** `3159dfe`
+**Prepared:** 2026-10-04 · **State:** NUM-W01, NUM-01 and NUM-02 DONE; NUM-03 ACTIVE · **Solver revision:** `f8302cb` (GitHub Quality [37184239104](https://github.com/Andioratech/AURA/actions/runs/37184239104) passed) · **Documentation base before this update:** `e76e39e`
 
 ## Current implementation and bounded run
 
@@ -24,9 +24,8 @@ The bounds concern mathematical truncation in the ideal model only; they do not 
 
 ## Next authorized work
 
-1. Derive a target-specific basis for the field-error requirement and reference uncertainty for the approved 300-point P1.3 gap set. The figure-derived force measurements have no pointwise uncertainty, so do not invent a percentage tolerance.
-2. Keep complex pressure, vector particle velocity and pressure gradient separate; freeze deterministic field samples, at least three harmonic truncations, independent quadrature/precision checks, acceptance/stopping rule and workload-specific resource cap.
-3. Use fixed-grid norms and maximum absolute local error in SI units, without phase fitting or singular relative errors at nodes. Report modal truncation, floating-point and reference numerical uncertainty separately.
-4. Keep NUM-04 BLOCKED until those inputs are recorded. Do not infer force, acceleration, hardware performance or gravity equivalence from the field bounds. A future arbitrary-gap claim needs its own bound or validated interpolation method.
+The evidence audit and the comparison method that can be fixed without inventing a requirement are recorded in the [NUM-03 field-error protocol basis](../research/NUM-03-field-error-protocol.md). A numeric pass/fail budget is not currently derivable: P1.3 supplies figure-derived force values, not a field-accuracy requirement or measured field reference. Preserve that distinction and continue bounded qualification of reference/error sources. Do not begin broad NUM-04 until the listed preconditions are satisfied. Keep complex pressure, vector particle velocity and pressure gradient separate; use fixed coordinates, SI absolute-error summaries, no phase fitting, and report each uncertainty source separately.
+
+Do not infer force, acceleration, hardware performance or gravity equivalence from the field bounds. A future arbitrary-gap claim needs its own bound or validated interpolation method.
 
 DEC-007 selected a field-only numerical budget and deferred force/acceleration budgets; it did not select a tolerance. Do not borrow the unrelated 2% simple-wave proposal or infer a threshold from the computed tail bound. Retain the [NUM-01 method fallback](../research/NUM-01-method-comparison.md) if the chosen requirement cannot be supported by the current series or resource envelope.

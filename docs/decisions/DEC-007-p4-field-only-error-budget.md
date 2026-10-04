@@ -28,3 +28,7 @@ NUM-03 needs a defensible field-accuracy criterion before a broad convergence ca
 - NUM-03 remains ACTIVE. The next task is to establish whether the separate high-precision coupled calculation can supply an uncertainty-characterized reference over the frozen air sample domain, then freeze the benchmark-specific comparison protocol before broad runs.
 - Keep the `0.1–30 mm` gap scope, `a <= r < d` solver domain and order-512 public cap unchanged unless separate reviewed evidence and a new decision justify a change.
 - Force, acceleration, dynamics, control and gravity-equivalence work remain outside NUM-03 and P4.
+
+## Implementation follow-up — 2026-10-04
+
+The [NUM-03 field-error protocol basis](../research/NUM-03-field-error-protocol.md) specifies comparison metrics that do not require an invented threshold and records the missing requirement/reference basis. P1.3 provides figure-derived force values, not a field measurement or field-accuracy requirement. This decision remains unchanged: no numeric field tolerance is adopted, P4 remains INDETERMINATE, and broad NUM-04 work remains blocked until the documented prerequisites are met.
