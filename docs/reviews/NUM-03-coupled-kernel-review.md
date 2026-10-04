@@ -254,3 +254,26 @@ Full local Quality for this public record update passes under ENV-1.0: hash-lock
 ## Field-budget direction — 2026-10-04
 
 The owner selected a field-only numerical error budget for P4, with force and acceleration accuracy reserved for later gates; [DEC-007](../decisions/DEC-007-p4-field-only-error-budget.md) records the decision. No numeric threshold is adopted. The current order-512 versus order-1200/1600 results remain finite-sum differences rather than tail bounds. The next review task is to characterize uncertainty in the separate high-precision coupled calculation before fixing the acceptance threshold or starting broad convergence work.
+
+## Maximum-order arithmetic and radial-rule sensitivity — 2026-10-04
+
+A focused probe tested the separate direct Rayleigh-disk-to-modal implementation at the maximum public order, 512, on the demanding 30 mm gap outer shell (`r=54.7 mm`, `r/d≈0.994545`). It evaluated 37 polar angles from 5° through 185° at a fixed radius. The calculation is an independent implementation of the same ideal piston/rigid-sphere model, not an independent physical model or measurement.
+
+At a matched radial Gauss-Legendre rule of 128, changing Decimal working precision from 300 to 600 digits changed the sampled pressure by at most `1.196e-287` and the vector particle velocity and pressure gradient by `4.858e-179`, each normalized by the maximum P600 field norm over the 37-point grid. This indicates that arithmetic precision is not visibly limiting these particular order-512 observables at these points. It is a paired finite-grid comparison; common constants, formula errors and unsampled errors cancel and are not bounded.
+
+At P300 and order 512, radial rules 128, 256 and 512 were compared directly using the retained complex field samples. The maximum differences normalized by the maximum field norm at the higher rule were:
+
+| Radial rules | Pressure | Particle velocity | Pressure gradient |
+|---|---:|---:|---:|
+| 128 vs 256 | `1.770e-205` | `1.350e-205` | `1.350e-205` |
+| 256 vs 512 | `6.380e-292` | `4.811e-292` | `4.811e-292` |
+
+These unusually small paired differences show stability of the reported finite-grid calculation under those rule changes; they are not rigorous quadrature-error bounds. The metric is derived from the same direct formulation and shares its constants and other numerical choices. A separate coefficient-resolution screen also uses a unit-scale assumption and is not an observable-error bound.
+
+The existing P300 order extension at this same 30 mm outer shell reports that order 512 versus finite order 1200 differs by up to `3.46e-8` in pressure and `1.14e-6` in velocity/pressure-gradient norm. This is still a finite-sum difference rather than a bound on the infinite-series remainder, but it is many orders larger than the observed precision and radial-rule changes above. The result therefore points to modal truncation as the dominant *observed* sensitivity in this one sampled shell; it does not prove a complete error budget or imply that the public order-512 cap passes or fails an unselected tolerance.
+
+A P600/order1600 extension attempt at the same shell exceeded its 300-second wall-time cap before producing a result. Its script, empty captures and failure note are retained. An early P600/order512 report also retained a stale order list and a first report assembly referenced the wrong filename; those attempts are retained with explicit failure labels and are not used. The corrected P300/P600 and three-rule comparisons store their sample arrays and have separate report-generation scripts.
+
+Local ignored evidence for this probe is under `results/diagnostics/` at source revision `82e020e57e835a0a5555c3d5c6b0c646e8ff8d61`, ENV-1.0. The P300/P600 report is `NUM03-P300-P600-MAX-ORDER512-ARITHMETIC-COMPARISON-20261004-01.json` (SHA-256 `8c6ba28496b40f7a53aff7c6a32d4bfac60b20a4c230fee4a208d8b6fab6f408`); its comparison script SHA-256 is `cd5c78e887b36c9c6d4af5ed4308b6b5ef2946ca4d30ced064ef0261590910be`. The radial-rule report is `NUM03-P300-RADIAL-128-256-512-MAX-ORDER512-COMPARISON-20261004-01.json` (SHA-256 `c5ab3722c5c0df9f5a8bf0518502780339df236a555409f443c618b741b6c84f`); its comparison script SHA-256 is `a0dc9c25e61f152c9a6781b5b2ef22c527a5c75911bd91083288a20f04601bd5`. Their reports bind the per-rule/per-precision input JSON and diagnostic-script checksums. The high-order timeout note has SHA-256 `3a63bf23098d092f381dbec148d4209ac4b8feb8132b226ef090be70ecd4f9a9`.
+
+This bounded result does not characterize every gap, radial shell, angular direction, high-order tail, or solver resource context. Extend the same precision and radial-rule checks across the frozen domain and investigate the modal remainder before freezing the B-07 field acceptance budget. No P4 PASS, experimental validation, force, acceleration or gravity-equivalence result follows from this probe.
