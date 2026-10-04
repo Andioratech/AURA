@@ -1,29 +1,30 @@
-# Next Main Task — NUM-03 Full Shell/Gap and Run-Path Verification
+# Next Main Task — NUM-03 Public Run-Path Integration
 
-**Prepared:** 2026-10-04 · **State:** NUM-W01, NUM-01 and NUM-02 DONE; NUM-03 ACTIVE · **Validated source revision:** `0c0c725` (GitHub Quality [37179378195](https://github.com/Andioratech/AURA/actions/runs/37179378195) passed)
+**Prepared:** 2026-10-04 · **State:** NUM-W01, NUM-01 and NUM-02 DONE; NUM-03 ACTIVE · **Validated source revision:** `7b0923d` (GitHub Quality [37180838930](https://github.com/Andioratech/AURA/actions/runs/37180838930) passed)
 
-## Completed diagnostic step
+## Completed discrete-grid verification
 
-The direct Decimal Rayleigh-disk-to-modal implementation matches the public evaluator at the same orders 18–500 over 37 angles and three radial shells at each gap 0.1, 10, 20 and 30 mm. With source radial rule128, maximum normalized absolute same-order differences over all 444 points are `1.5e-13` in pressure and `5.3e-13` in velocity/pressure gradient. This is finite-order cross-formulation agreement, not convergence. Earlier one-point source-only potential checks agree with direct Rayleigh disk quadrature to about `7e-14` for orders 300–500; that disk quadrature's own radial/azimuth refinement difference is `5.2e-10`.
+The direct Decimal Rayleigh-disk-to-modal implementation overlaps the public evaluator at matched orders18–500 over 37 angles, three radial shells and gaps0.1/10/20/30 mm (444 locations per order). Maximum normalized absolute differences are about `1.5e-13` pressure and `5.3e-13` velocity/pressure gradient. A separate order512 comparison over all 444 points also agrees near the same numerical scale. These are mathematical cross-formulation checks for finite sums, not validation against a physical reference.
 
-At the demanding 30 mm gap and `0.99H` outer shell, `r=54.7 mm`, `d=55 mm`, and `r/d≈0.9945`. Direct Decimal arithmetic at 300 digits with radial source rule256 was extended through order1600 at 37 polar angles. Normalized maximum differences against finite order1600 for orders 512/800/1000/1200/1400 are, respectively:
+At 300 Decimal digits, a direct order1200 calculation compared with order512 over the full sampled grid gives the following outer-shell differences. Velocity/gradient use the norm of both nonzero axisymmetric Cartesian components and are normalized by the order1200 grid maximum:
 
-| Order | Pressure | Velocity | Pressure gradient |
-|---:|---:|---:|---:|
-| 512 | `3.457e-8` | `6.724e-7` | `6.724e-7` |
-| 800 | `7.236e-12` | `2.260e-10` | `2.260e-10` |
-| 1000 | `3.099e-13` | `6.799e-12` | `6.799e-12` |
-| 1200 | `9.326e-16` | `9.047e-14` | `9.047e-14` |
-| 1400 | `1.554e-16` | `3.685e-16` | `2.531e-16` |
+| Gap | Outer-shell `r/d` | Pressure | Velocity | Pressure gradient |
+|---:|---:|---:|---:|---:|
+| 0.1 mm | `0.999960` | `0` | `<1e-18` | `<1e-18` |
+| 10 mm | `0.997143` | `4.67e-13` | `1.96e-11` | `1.96e-11` |
+| 20 mm | `0.995556` | `4.97e-10` | `1.21e-8` | `1.21e-8` |
+| 30 mm | `0.994545` | `3.46e-8` | `1.14e-6` | `1.14e-6` |
 
-Source radial rules128, 256 and512 give the same reported metrics through order1600. The 200-digit and 300-digit calculations also agree at their common tested orders through800. These finite-grid differences are not rigorous error/tail bounds, and no production truncation tolerance has been set. The public field evaluator still caps order at512, so do not infer production-domain resolution from the high-order diagnostic.
+At the 30 mm outer shell, direct order1200 differs from order1600 by `9.33e-16` pressure and about `9.05e-14` in velocity/gradient; source radial rules128/256/512 agree at displayed precision through order1600. These finite-grid comparisons are not rigorous tail/error bounds, and no field tolerance has been set. The public evaluator remains capped at512; do not claim the complete declared field domain has passed.
 
-NUM-02's solver-free workload estimator was applied to 4 gaps ×111 points, quadrature order256, maximum Bessel argument25.1, chunk size64, and baseline RSS deliberately set to zero. Hypothetical RAM estimates are 1,005,568 bytes at order512, 1,268,096 at800, 1,450,112 at1000, 1,631,744 at1200 and 1,994,496 at1600; estimated disk remains 946,176 bytes. All reports remain `INDETERMINATE` with `wall_time_s=null` because no exact-revision production runtime calibration exists. These resource values follow NUM-02's linear workspace inventory and are not measurements from a production solver run. Diagnostic scripts and JSON outputs, including invalid report-generation attempts, are preserved in ignored `results/diagnostics/`; checksums and failure explanations are in the [coupled-kernel review](../reviews/NUM-03-coupled-kernel-review.md).
+NUM-02 was evaluated for a hypothetical workload of 4 gaps ×111 points, quadrature order256, maximum Bessel argument25.1, chunk size64 and baseline RSS zero. Hypothetical RAM is `1,005,568 B` at order512, `1,450,112 B` at1000, and `1,994,496 B` at1600; disk is `946,176 B`. Every report remains `INDETERMINATE`, with no wall-time estimate, because there is no matching exact-revision production calibration. These values are estimator outputs, not production solver measurements.
+
+The order-extension and all-gap artifacts, hashes and preserved invalid attempts are documented in the [NUM-03 coupled-kernel review](../reviews/NUM-03-coupled-kernel-review.md); the generated files remain ignored in `results/diagnostics/`.
 
 ## Immediate next work
 
-Complete shell/gap verification across the declared `0.1–30 mm` interval, explicitly checking the three radial shells and adequate angular sampling at the reviewed candidate order. Keep matched-order public overlap separate from order-sensitivity analysis. Then integrate the tested field calculation with the public NUM-02 preflight, bounded chunk lifecycle, immutable run manifest, and diagnostic-only run policy. Preserve every failed or rejected run. Do not run a production workload without a matching exact-source-revision ENV-1.0 calibration.
+Integrate the coupled Hasegawa evaluator into the public run lifecycle. Use the frozen air scenario and exact dimensions to create a Hasegawa run request; bind it to NUM-02 workload preflight, reject before field allocation when preflight is incomplete or resources exceed caps, evaluate one bounded point chunk at a time, and produce immutable configuration/code/environment/seed/output provenance with checksums. Add a diagnostic-only policy that preserves failed runs and never reports field software verification as model validation. Exercise the missing-calibration refusal path; do not execute a production workload while the exact clean revision lacks ENV-1.0 runtime calibration.
 
-Before changing the public order cap or narrowing `a<=r<d`, review a stated field-accuracy tolerance and how it applies to pressure, particle velocity and pressure gradient over the entire requested domain. If resolution or conservative resources cannot be established, preserve that finding and assess NUM-01's documented independent-solver fallback.
+Keep `max_order` explicit and retain the current public cap512 during this integration. Before changing the cap or declaring P4 acceptance, review a field-accuracy tolerance for pressure, velocity and pressure gradient across the full domain. If the integration reveals that the public model or resource contract needs a change, preserve the evidence and consult the documented NUM-01 fallback. No force, dynamics, acceleration, control or gravity-equivalence work belongs to NUM-03.
 
-Stay within the selected air field domain: 50 mm sphere, 25.23 kHz centered source, and `a<=r<d`. No force, dynamics, acceleration, control or gravity-equivalence work belongs to this step. See [NUM-03](../work-items/NUM-03.md), the [coupled-kernel review](../reviews/NUM-03-coupled-kernel-review.md), [NUM-02](../work-items/NUM-02.md), and the [P4 plan](../planning/phases/P04-numerical-field.md).
+See [NUM-03](../work-items/NUM-03.md), the [coupled-kernel review](../reviews/NUM-03-coupled-kernel-review.md), [NUM-02](../work-items/NUM-02.md), and the [P4 plan](../planning/phases/P04-numerical-field.md).
