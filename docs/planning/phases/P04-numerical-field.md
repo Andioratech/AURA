@@ -272,3 +272,8 @@ For n=20, the independently derived global M4 bound is tighter at 86 of the 300 
 ## NUM-03 n=21 coefficient bounds — 2026-10-05
 
 An exact-rational global source-coefficient Simpson bound covers all 300 discrete gaps; the 128-cell interval method was compared at four representative gaps only. The global bound is tighter at three of the four comparison points. The five-point interval replay matches across Python 3.12.14/3.13.5. This does not give a full-grid combined bound, field result, tolerance or physical validation. NUM-03 remains ACTIVE/INDETERMINATE and NUM-04 BLOCKED. Next, screen n=22 at four representative gaps.
+
+
+## NUM-03 n=22 sampled-gap coefficient bounds — 2026-10-05
+
+The exact-rational global triangle bound covers all 300 discrete P1.3 gaps for mode 22; its N=8192 coefficient-only remainder ranges from 5.4396e-6 m^2 at 0.1 mm to 1.3891e-12 m^2 at 30 mm. Four 128-cell interval checks are all wider than their same-gap global bounds, with global/interval ratios from 4.54e-7 to 0.00311. Five selected interval points replayed identically across CPython 3.12.14 and 3.13.5. The all-row formula/display audit passed after correcting and retaining harness errors. This is one coefficient, at discrete gaps only; no field propagation, total uncertainty, tolerance, or physical validation follows. NUM-03 remains ACTIVE/INDETERMINATE and NUM-04 BLOCKED. Next, screen n=23 at four representative gaps.
