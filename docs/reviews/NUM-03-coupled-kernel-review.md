@@ -526,3 +526,11 @@ Mode 12 has now been enclosed at all 300 P1.3 discrete gaps. An independent exac
 The first four-gap attempt lacked an inverse-k cache entry for `k^-13`. That setup failure is preserved. The correction expanded only the cache to `k^-16`; it retained the equation, gap, partition and outward-rounding definitions. The resulting four-point checks passed, motivating the full 300-gap run.
 
 The n=12 certificate is still isolated to one source coefficient and 300 discrete gaps. Together with n=8–11 it does not form an all-mode bound or field-error budget, and the increasing high-mode remainders caution against extrapolation. No P4 gate changes. Next is a four-gap n=13 screen against exact global comparators; continue only if its computed remainder and comparator tightening remain useful.
+
+## Mode-13 sampled-gap extension — 2026-10-05
+
+Mode 13 passed the same 300-gap coefficient-only procedure as n=8–12: exact gap sequence, same-gap exact global containment, Simpson factor, upward displays and five-gap cross-version replay. Its global/interval tightening ranges from 184.58× to 1004.21×. The N=8192 coefficient remainder upper bound increases to `4.0807e-17 m^2` at the minimum gap and `4.8541e-22 m^2` at 30.0 mm.
+
+The interval sweep itself completed. The generated comparator required two preserved setup corrections before it checked the immutable full sweep: first the expected sample set remained four gaps, then the input path changed accidentally along with the attempt number. The third comparator attempt verified all 300 exact gap values and passed. These are harness errors, not scientific failures, and none changed the interval output.
+
+This one-mode enclosure does not close the modal sum or field error. The increasing remainder bound is useful planning evidence only and has no tolerance attached. Keep P4 indeterminate and NUM-04 blocked. Next, measure n=14 at the four selected gaps before committing to another 300-gap sweep.
