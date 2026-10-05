@@ -550,3 +550,9 @@ Mode 15 passed the 300-gap interval/global containment audit, exact Simpson-fact
 Mode 16 passed its 300-gap exact containment and formula audits and five-point cross-version replay. Its exact global-to-interval tightening factor ranges from 167.90× to 924.50×. The N=8192 coefficient-only Simpson remainder is `2.6938e-14 m^2` at 0.1 mm and `5.6807e-20 m^2` at 30.0 mm. The sweep took about 10 minutes on one core with roughly 17 MB RSS in this environment.
 
 This demonstrates computational feasibility only for this mode and this diagnostic. The increasing bound has no accepted tolerance or field implication. NUM-03 remains ACTIVE/INDETERMINATE; NUM-04 remains BLOCKED. Next, screen mode 17 at four selected gaps and reconsider further full sweeps against their cost and magnitude.
+
+## Mode-17 sampled-gap coefficient remainder — 2026-10-05
+
+Mode 17 passed its 300-gap exact interval/global containment audit, Simpson-factor and upward-display checks, and five-sample cross-version replay. The global-to-interval tightening is 164.18–894.95×. Its N=8192 coefficient-only remainder is `2.5566e-13 m^2` at 0.1 mm and `2.9710e-19 m^2` at 30 mm. Runtime was about 10.5 minutes on one core with 17–18 MB RSS.
+
+This result does not provide a field error or tolerance decision. NUM-03 remains ACTIVE/INDETERMINATE and NUM-04 BLOCKED. Next, screen n=18 at four representative gaps and review the rising resource cost.
