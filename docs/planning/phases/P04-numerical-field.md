@@ -472,3 +472,8 @@ By DEC-008, pause sequential mode-only coefficient screens after accepted n=65 e
 ## NUM-03 reference-plan configuration audit — 2026-10-05
 
 The order-overlap artifact family ends at 30.0 mm and uses `rho=1.204 kg/m^3`; it does not match the NUM-01 air contract. Separately, the 0.1/10/20/29.9-mm cross-quadrature artifacts use `rho=1.18 kg/m^3` and share a 37-angle, three-radius candidate point pattern. They do not supply three matched modal orders across those gaps. The plan proposes public-solver orders 256/384/512, with any reference-only tail above512 treated separately. Existing timing calibration reaches only `kr=12.38`; the candidate outer shell is about `kr=25.0162`. DEC-008 therefore requires a bounded worst-case calibration and resource estimate before a multi-gap matrix. No existing numbers were modified or combined. NUM-03 remains ACTIVE/INDETERMINATE; P4 remains unpassed.
+
+
+## NUM-03 resource checkpoint — 2026-10-05
+
+The outer-shell runtime calibration now covers the candidate maximum argument on exact clean source `fccdff840e73f11ecbd9b43f80bfdf1a3dd377ab` and ENV-1.0. The 48-sample record supports per-run NUM-02 estimates for public-solver orders 256/384/512 on the candidate four-gap grid; each is below the inherited caps. The serial sum is 317.55 s, beyond a single 300-s session, and high-precision reference resources are not yet estimated. Therefore the reference matrix remains unstarted; NUM-03 is ACTIVE / INDETERMINATE, P4 is not passed, and NUM-04 remains BLOCKED. See the [qualification plan](../../research/NUM-03-reference-qualification-plan.md) and [NUM-03 task](../../work-items/NUM-03.md).
