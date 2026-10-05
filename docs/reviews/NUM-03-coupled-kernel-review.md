@@ -985,4 +985,9 @@ An exact-rational global triangle M4 majorant was calculated for mode 65 at all 
 
 The global JSON/script SHA-256 values are `6417ed7cc879ba01776269bd4a653041ebd3d8fe993aef138b3525aafa83a44f` / `ec031a20f00a238b1e796ad0055b5e0444446c893dfb148b0f1a70be2acbbc83`. Four-gap interval JSON/script: `4fef418a43ecd124e039817fbc82edb50b0caab46d9caa86c536b3271e044ba2` / `ed2e25a866a00e3fc30c2c0139971a9aaf3c4b58a2200aa711375c6d7cfdf464`. Comparator JSON/script: `4e8d672d12221f28a74d9117a055a41d7ddd1dabd687bf90e240b0c6ae7646fa` / `9296505d22d6db1e6757c78c9c53d085db0fdd01d7c59547154ebde3e0117b0b`. Five-point cross-version JSON SHA-256: `8f1a2041d0145c9af218317e1df77858bb3b0322a9f5d831dfd73d3e8337c9b7`; exact all-row audit JSON SHA-256: `a3b40797fa61b6d90616a2508581b2b15cb1d5ba3a41510cff2d8b6541bcb54f`. Raw diagnostics remain ignored under `results/diagnostics/`.
 
-The evidence covers this coefficient at 300 discrete gaps only. It does not cover intermediate gaps, other modes, field-observable propagation, complete arithmetic/reference uncertainty, a tolerance, or physical behavior. NUM-03 remains ACTIVE/INDETERMINATE and NUM-04 BLOCKED. Next screen n=66 at four representative gaps; growth in upper bounds is not actual error growth.
+The evidence covers this coefficient at 300 discrete gaps only. It does not cover intermediate gaps, other modes, field-observable propagation, complete arithmetic/reference uncertainty, a tolerance, or physical behavior. NUM-03 remains ACTIVE/INDETERMINATE and NUM-04 BLOCKED. Further mode-only screening is paused by DEC-008; review the proposed field-reference qualification plan before the next calculation.
+
+
+## Owner-directed route update — 2026-10-05
+
+DEC-008 pauses the sequential mode-only screens after n=65 and redirects the next task to review of the proposed [NUM-03 reference-qualification plan](../research/NUM-03-reference-qualification-plan.md). The local n=66 global-only result is not an accepted package; its interval run was interrupted before output. No field-observable convergence, total uncertainty or P4 pass follows from those mode-specific coefficient bounds.

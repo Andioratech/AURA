@@ -462,3 +462,8 @@ The exact-rational global triangle bound covers mode 64 at all 300 discrete P1.3
 ## NUM-03 n=65 sampled-gap coefficient bounds — 2026-10-05
 
 The exact-rational global triangle bound covers mode 65 at all 300 discrete P1.3 gaps; its N=8192 coefficient-only upper bound ranges from 7.10399516545257345321407531425e50 m^2 at 0.1 mm to 4.11912416258234820010840358135e30 m^2 at 30.0 mm. Four 128-cell interval comparisons are much wider than their matching global bounds (global/interval M4 ratio 2.49e-115–1.71e-110). Five selected interval points replayed byte-identically across CPython 3.12.14 and 3.13.5; exact gap, Simpson-factor and upward-display audits passed for all 300 global rows. A post-publication review corrected stale mode-60/n=61 comparator metadata; the exact n=65 comparisons were unchanged, and the strengthened audit now checks the corrected labels and values. This remains one source coefficient only: no actual-error, field-propagation, total-uncertainty, tolerance or physical conclusion follows. NUM-03 remains ACTIVE/INDETERMINATE and NUM-04 BLOCKED. Next, screen n=66 at four representative gaps.
+
+
+## Owner-directed NUM-03 route update — 2026-10-05
+
+By DEC-008, pause sequential mode-only coefficient screens after accepted n=65 evidence. The local n=66 global sweep passed an exact audit of its 300 discrete coordinates, Simpson factors and outward displays, but is not an accepted package; its four-gap interval run was interrupted without output and remains preserved locally. The next task is to review and complete the proposed field-reference qualification protocol before further computation. This task-order change does not pass P4 or change NUM-03's ACTIVE/INDETERMINATE status.
