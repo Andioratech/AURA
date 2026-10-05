@@ -544,3 +544,9 @@ This does not bound the total field sum or establish a numerical/physical pass. 
 ## Mode-15 sampled-gap coefficient remainder — 2026-10-05
 
 Mode 15 passed the 300-gap interval/global containment audit, exact Simpson-factor and outward-decimal checks, and five-point cross-version replay. Global/interval tightening is 172.44–955.62×. The N=8192 coefficient-only Simpson remainder is `2.9601e-15 m^2` at 0.1 mm and `1.1202e-20 m^2` at 30.0 mm. This remains an isolated coefficient calculation with no modal field error or selected accuracy criterion. NUM-03 remains ACTIVE/INDETERMINATE and NUM-04 BLOCKED. Next, screen n=16 at four selected gaps before another full sweep.
+
+## Mode-16 sampled-gap coefficient remainder — 2026-10-05
+
+Mode 16 passed its 300-gap exact containment and formula audits and five-point cross-version replay. Its exact global-to-interval tightening factor ranges from 167.90× to 924.50×. The N=8192 coefficient-only Simpson remainder is `2.6938e-14 m^2` at 0.1 mm and `5.6807e-20 m^2` at 30.0 mm. The sweep took about 10 minutes on one core with roughly 17 MB RSS in this environment.
+
+This demonstrates computational feasibility only for this mode and this diagnostic. The increasing bound has no accepted tolerance or field implication. NUM-03 remains ACTIVE/INDETERMINATE; NUM-04 remains BLOCKED. Next, screen mode 17 at four selected gaps and reconsider further full sweeps against their cost and magnitude.
