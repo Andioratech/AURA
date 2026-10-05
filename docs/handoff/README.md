@@ -1,5 +1,7 @@
 # Project Continuity — Start Here
 
+**Updated:** 2026-10-05. The latest bounded task is the 300-gap mode-8 source-coefficient Simpson-remainder enclosure; see [current state](CURRENT-STATE.md), [next task](NEXT-TASK.md), and the NUM-03 protocol/review linked there. This result remains coefficient-only and changes no science gate.
+
 **Purpose:** Resume AURA from repository evidence without depending on a particular assistant, model or chat history.
 
 This is a navigation and continuity layer. [D00](../D00-document-control.md) controls scientific precedence; [the work board](../planning/10-work-board.md) controls task status, with the linked reviews as evidence. This folder does not replace either. Maintained project text is English; explain results and decisions to the owner in plain Spanish.

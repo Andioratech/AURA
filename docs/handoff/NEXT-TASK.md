@@ -1,6 +1,8 @@
 # Next Main Task — Qualify NUM-03 Reference Uncertainty
 
-**Prepared:** 2026-10-05 · **State:** NUM-W01, NUM-01 and NUM-02 DONE; NUM-03 ACTIVE · **Current published source revision:** `5e664da01c31aa1dc6e1fed825bff546241f4fac` (GitHub Quality [37248035894](https://github.com/Andioratech/AURA/actions/runs/37248035894) passed) · **Targeted diagnostic revision:** same · **Local diagnostic environment:** ENV-1.0 / CPython 3.12.14
+**Authoritative continuation update — 2026-10-05:** The former “assess width/runtime for a 300-gap mode-8 sweep” task is complete. All 300 discrete gaps were enclosed and checked against same-gap exact-rational global majorants; all records passed exact containment, exact Simpson-factor validation and outward-decimal checks. A five-gap subset replayed byte-identically across CPython 3.13.5 and 3.12.14. The interval method is coarser than earlier rational checkpoints but tightens its comparator by 166.08–308.32×. Next: evaluate mode 9 at H=0.1 mm with an independently derived exact global comparator. If useful and tractable, extend only a small mode/gap matrix before deciding on field propagation. Do not interpolate across gaps or claim field-error coverage. Keep NUM-03 ACTIVE/INDETERMINATE, NUM-04 BLOCKED, and preserve the current solver cap/domain and all failed evidence.
+
+**Prepared:** 2026-10-05 · **State:** NUM-W01, NUM-01 and NUM-02 DONE; NUM-03 ACTIVE · **Current published source revision at the earlier snapshot:** `5e664da01c31aa1dc6e1fed825bff546241f4fac` (GitHub Quality [37248035894](https://github.com/Andioratech/AURA/actions/runs/37248035894) passed) · **Targeted diagnostic revision at the earlier snapshot:** same · **Local diagnostic environment:** ENV-1.0 / CPython 3.12.14
 
 ## Current implementation and bounded run
 
