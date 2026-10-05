@@ -1,6 +1,6 @@
 # Project Continuity — Start Here
 
-**Updated:** 2026-10-05. The latest operational result is that the admission correction is published and exact-context NUM-03 resource calibration/preflight now covers all 12 candidate request combinations. The next task is field-reference uncertainty analysis; the public solver matrix remains unrun and no science gate changed. Earlier mode-bound results remain coefficient-only. See [current state](CURRENT-STATE.md), [next task](NEXT-TASK.md), and the NUM-03 protocol/review linked there.
+**Updated:** 2026-10-05. The latest operational result is a deterministic coordinate-provenance audit: 12 of 444 points used a theta-180° x-coordinate generated with truncated π. A corrected local-only input proposal aligns all 12 request manifests to the canonical reference generator and passes parsing/admission with unchanged preflight workload dimensions. The field-output effect remains unevaluated. Continue reference/quadrature uncertainty analysis; do not run the public matrix while the plan is DRAFT and DEC-008's condition remains unmet. No science gate changed. See [current state](CURRENT-STATE.md), [next task](NEXT-TASK.md), and the NUM-03 protocol/review linked there.
 
 **Purpose:** Resume AURA from repository evidence without depending on a particular assistant, model or chat history.
 
