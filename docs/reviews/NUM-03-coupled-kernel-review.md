@@ -540,3 +540,7 @@ This one-mode enclosure does not close the modal sum or field error. The increas
 Mode 14 passed the full 300-gap coefficient bound audit and five-point cross-version replay. Exact same-gap global comparators contain every interval M4 bound; the global/interval ratio is 177.95–986.85×. Its N=8192 coefficient-only remainder runs from `3.3976e-16 m^2` at 0.1 mm to `2.2807e-21 m^2` at 30.0 mm. The increasing magnitude reflects this derivative certificate under the declared model; no accuracy threshold is inferred.
 
 This does not bound the total field sum or establish a numerical/physical pass. NUM-03 remains ACTIVE/INDETERMINATE; NUM-04 stays BLOCKED. Next screen n=15 at four selected gaps to judge the increasing compute and remainder cost.
+
+## Mode-15 sampled-gap coefficient remainder — 2026-10-05
+
+Mode 15 passed the 300-gap interval/global containment audit, exact Simpson-factor and outward-decimal checks, and five-point cross-version replay. Global/interval tightening is 172.44–955.62×. The N=8192 coefficient-only Simpson remainder is `2.9601e-15 m^2` at 0.1 mm and `1.1202e-20 m^2` at 30.0 mm. This remains an isolated coefficient calculation with no modal field error or selected accuracy criterion. NUM-03 remains ACTIVE/INDETERMINATE and NUM-04 BLOCKED. Next, screen n=16 at four selected gaps before another full sweep.
