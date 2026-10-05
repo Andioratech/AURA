@@ -130,7 +130,12 @@ def admit(scenario: Scenario, request: dict) -> dict:
         if any(not low <= coordinate <= high for coordinate, low, high in zip(row, origin, upper)):
             _invalid("FIELD_DOMAIN", f"/coordinates_m/{index}", "Sample lies outside the declared Scenario domain.")
         r = math.hypot(row[0], row[1], row[2] - distance)
-        if row[2] <= 0 or not radius <= r < distance:
+        surface_roundoff = 8 * math.ulp(float(radius))
+        if not math.isfinite(r) or r < radius - surface_roundoff:
+            _invalid("FIELD_DOMAIN", f"/coordinates_m/{index}", "Sample must lie on or outside the sphere.")
+        if abs(r - radius) <= surface_roundoff:
+            r = float(radius)
+        if row[2] <= 0 or r >= distance:
             _invalid("FIELD_DOMAIN", f"/coordinates_m/{index}", "Sample is outside the piston/sphere expansion shell.")
     return {
         "config": config, "source": source, "body": body, "distance_m": distance,

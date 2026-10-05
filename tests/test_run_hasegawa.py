@@ -153,6 +153,18 @@ def test_driver_admission_rejects_changed_frozen_medium_and_points(case):
         admit(Scenario(changed_domain), request)
 
 
+def test_driver_admission_accepts_binary64_roundoff_at_exact_sphere_surface(case):
+    _, _, _, scenario, request, _ = case
+    surface_request = copy.deepcopy(request)
+    surface_request["coordinates_m"] = [[0.006470476127563019, 0.0, 0.049248145657226704]]
+    assert admit(Scenario(scenario), surface_request)["radius_m"] == 0.025
+
+    interior_request = copy.deepcopy(request)
+    interior_request["coordinates_m"] = [[0.0, 0.0, 0.0251 + 0.025 - 1e-12]]
+    with pytest.raises(InvalidInputError, match="on or outside the sphere"):
+        admit(Scenario(scenario), interior_request)
+
+
 def test_cli_reports_missing_calibration_as_indeterminate(case, clean_environment, tmp_path, capsys):
     scenario, experiment, output, *_ = case
     result = main([
