@@ -467,3 +467,8 @@ The exact-rational global triangle bound covers mode 65 at all 300 discrete P1.3
 ## Owner-directed NUM-03 route update — 2026-10-05
 
 By DEC-008, pause sequential mode-only coefficient screens after accepted n=65 evidence. The local n=66 global sweep passed an exact audit of its 300 discrete coordinates, Simpson factors and outward displays, but is not an accepted package; its four-gap interval run was interrupted without output and remains preserved locally. The next task is to review and complete the proposed field-reference qualification protocol before further computation. This task-order change does not pass P4 or change NUM-03's ACTIVE/INDETERMINATE status.
+
+
+## NUM-03 reference-plan configuration audit — 2026-10-05
+
+The order-overlap artifact family ends at 30.0 mm and uses `rho=1.204 kg/m^3`; a separate 29.9-mm cross-quadrature artifact uses `rho=1.18 kg/m^3`, the density in the NUM-01 air contract. These artifacts are not a matched refinement matrix. DEC-008 and the corrected reference-qualification plan now require artifact-by-artifact configuration reconciliation and a frozen NUM-01-compatible sample/configuration before calculation. No existing numbers were modified or combined. NUM-03 remains ACTIVE/INDETERMINATE; P4 remains unpassed.

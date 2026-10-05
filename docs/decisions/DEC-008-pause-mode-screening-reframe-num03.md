@@ -18,4 +18,4 @@ DEC-007 requires a benchmark-specific field reference, an uncertainty method, a 
 
 ## Next action
 
-Prepare and review [the NUM-03 reference-qualification plan](../research/NUM-03-reference-qualification-plan.md). Execution must wait until the sample provenance, refinement configuration, uncertainty interpretation, resource estimate, and stop rule are reviewable under DEC-007 and D06.
+Prepare and review [the NUM-03 reference-qualification plan](../research/NUM-03-reference-qualification-plan.md). An artifact audit found that candidate records are not yet one comparable four-gap matrix: the order-overlap family uses a 30.0-mm endpoint and `rho=1.204 kg/m^3`, while a separate 29.9-mm cross-quadrature record uses `rho=1.18 kg/m^3`, the density fixed by the NUM-01 air contract. Preserve both as distinct historical evidence; do not pool or silently normalize them. Execution must wait until the sample provenance, a NUM-01-compatible matched configuration, refinement levels, uncertainty interpretation, resource estimate, and stop rule are reviewable under DEC-007 and D06.
