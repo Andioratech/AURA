@@ -277,3 +277,13 @@ An exact-rational global source-coefficient Simpson bound covers all 300 discret
 ## NUM-03 n=22 sampled-gap coefficient bounds — 2026-10-05
 
 The exact-rational global triangle bound covers all 300 discrete P1.3 gaps for mode 22; its N=8192 coefficient-only remainder ranges from 5.4396e-6 m^2 at 0.1 mm to 1.3891e-12 m^2 at 30 mm. Four 128-cell interval checks are all wider than their same-gap global bounds, with global/interval ratios from 4.54e-7 to 0.00311. Five selected interval points replayed identically across CPython 3.12.14 and 3.13.5. The all-row formula/display audit passed after correcting and retaining harness errors. This is one coefficient, at discrete gaps only; no field propagation, total uncertainty, tolerance, or physical validation follows. NUM-03 remains ACTIVE/INDETERMINATE and NUM-04 BLOCKED. Next, screen n=23 at four representative gaps.
+
+
+## NUM-03 n=23 sampled-gap coefficient bounds — 2026-10-05
+
+The exact-rational global triangle bound covers mode 23 at all 300 discrete P1.3 gaps; the N=8192 coefficient-only remainder ranges from 6.4324e-5 m^2 at 0.1 mm to 8.4578e-12 m^2 at 30 mm. Four 128-cell interval checks are all wider than their same-gap global upper bounds. Five selected interval points replayed byte-identically across CPython 3.12.14 and 3.13.5, and the all-row exact formula/display audit passed. This remains one source coefficient with no interpolation, field propagation, total uncertainty, tolerance, or physical result. NUM-03 remains ACTIVE/INDETERMINATE and NUM-04 BLOCKED. Next, screen n=24 at four representative gaps.
+
+
+## NUM-03 n=24 sampled-gap coefficient bounds — 2026-10-05
+
+The exact-rational global triangle bound covers mode 24 at all 300 discrete P1.3 gaps; the N=8192 coefficient-only remainder ranges from 7.8813e-4 m^2 at 0.1 mm to 5.3002e-11 m^2 at 30 mm. Four 128-cell interval checks are all wider than their same-gap global upper bounds. Five selected interval points replayed identically across CPython 3.12.14 and 3.13.5; the exact formula/display audit passed after correcting and preserving a stale-mode assertion in the audit harness. This remains one source coefficient only, with no field propagation, total uncertainty, tolerance or physical validation. NUM-03 remains ACTIVE/INDETERMINATE and NUM-04 BLOCKED. Next, screen n=25 at four representative gaps.
