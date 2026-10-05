@@ -418,3 +418,8 @@ The exact-rational global triangle bound covers mode 54 at all 300 discrete P1.3
 ## NUM-03 n=55 sampled-gap coefficient bounds — 2026-10-05
 
 The exact-rational global triangle bound covers mode 55 at all 300 discrete P1.3 gaps; its N=8192 coefficient-only upper bound ranges from 2.34228717387175587780385618755e36 m^2 at 0.1 mm to 26633150120938749038.8759390271 m^2 at 30 mm. Four 128-cell interval comparisons are much wider than their matching global bounds (global/interval ratio 5.95e-89–3.14e-84). Five selected interval points replayed byte-identically across CPython 3.12.14 and 3.13.5; exact gap, Simpson-factor and upward-display audits passed for all 300 global rows. This remains one source coefficient only: no actual-error, field-propagation, total-uncertainty, tolerance or physical conclusion follows. NUM-03 remains ACTIVE/INDETERMINATE and NUM-04 BLOCKED. Next, screen n=56 at four representative gaps.
+
+
+## NUM-03 n=56 sampled-gap coefficient bounds — 2026-10-05
+
+The exact-rational global triangle bound covers mode 56 at all 300 discrete P1.3 gaps; its N=8192 coefficient-only upper bound ranges from 6.11997634842692645167743053830e37 m^2 at 0.1 mm to 327256851052929069463.374598739 m^2 at 30 mm. Four 128-cell interval comparisons are much wider than their matching global bounds (global/interval ratio 1.37e-91–7.45e-87). Five selected interval points replayed byte-identically across CPython 3.12.14 and 3.13.5; exact gap, Simpson-factor and upward-display audits passed for all 300 global rows. This remains one source coefficient only: no actual-error, field-propagation, total-uncertainty, tolerance or physical conclusion follows. NUM-03 remains ACTIVE/INDETERMINATE and NUM-04 BLOCKED. Next, screen n=57 at four representative gaps.
