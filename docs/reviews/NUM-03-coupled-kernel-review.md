@@ -534,3 +534,9 @@ Mode 13 passed the same 300-gap coefficient-only procedure as n=8–12: exact ga
 The interval sweep itself completed. The generated comparator required two preserved setup corrections before it checked the immutable full sweep: first the expected sample set remained four gaps, then the input path changed accidentally along with the attempt number. The third comparator attempt verified all 300 exact gap values and passed. These are harness errors, not scientific failures, and none changed the interval output.
 
 This one-mode enclosure does not close the modal sum or field error. The increasing remainder bound is useful planning evidence only and has no tolerance attached. Keep P4 indeterminate and NUM-04 blocked. Next, measure n=14 at the four selected gaps before committing to another 300-gap sweep.
+
+## Mode-14 sampled-gap coefficient remainder — 2026-10-05
+
+Mode 14 passed the full 300-gap coefficient bound audit and five-point cross-version replay. Exact same-gap global comparators contain every interval M4 bound; the global/interval ratio is 177.95–986.85×. Its N=8192 coefficient-only remainder runs from `3.3976e-16 m^2` at 0.1 mm to `2.2807e-21 m^2` at 30.0 mm. The increasing magnitude reflects this derivative certificate under the declared model; no accuracy threshold is inferred.
+
+This does not bound the total field sum or establish a numerical/physical pass. NUM-03 remains ACTIVE/INDETERMINATE; NUM-04 stays BLOCKED. Next screen n=15 at four selected gaps to judge the increasing compute and remainder cost.
