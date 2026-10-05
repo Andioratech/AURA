@@ -48,6 +48,12 @@ Before execution, the protocol must specify:
 - If reference behavior is reproducible and its uncertainty is characterized, report that result for owner review. It does not by itself pass P4; a separate benchmark-specific field-accuracy requirement and comparison protocol remain necessary.
 - If this reference route cannot support the required uncertainty within its resource cap, follow DEC-007 and reassess the NUM-01 fallback comparison. Preserve all failed and inconclusive outputs.
 
+## Exact-context resource qualification follow-up — 2026-10-05
+
+The prior pilot at `fccdff840e73f11ecbd9b43f80bfdf1a3dd377ab` and its `kr=25.016215925297676` dimension are historical and do not match the admitted source-integration endpoint for the proposed requests. The admission correction is published at clean revision `1682dcbf15f1ba2e79511563639c68f9301c4d50`. Four per-gap ENV-1.0 calibrations now bind exact admitted Bessel dimensions at 0.1, 10, 20 and 29.9 mm (`12.378996060932124`, `16.6774235774195`, `21.12031967148223`, and `25.567073592698655`); each uses 48 samples and the declared 3.0 safety factor. The 12 per-gap/order workload preflights (orders 256/384/512) all match the corresponding request and calibration hashes and return `BUDGETS_WITHIN_CAPS`, with `execution_authorized: false`. The largest individual estimate is 32.7052 s, 59,047,280 bytes RAM and 235,520 bytes disk. The immutable local audit is `results/num03-runtime-calibration/1682dcbf15f1ba2e79511563639c68f9301c4d50/per-gap-resource-qualification-audit.json`, SHA-256 `b4c39a9b1290bc5a77b6e3bffa46525ae4cd9ee279a7bbe4c1a3f4006c77c121`.
+
+This closes the exact-context resource-preflight prerequisite only. It does not authorize the field matrix or establish convergence, accuracy or numerical-reference uncertainty. The plan remains DRAFT until the finite quadrature evidence, modal-tail scope, binary64 coordinate rounding and benchmark-use requirement have been assessed together. DEC-008's execution condition still applies.
+
 ## Deliverable
 
 A reviewable reference-qualification report with immutable inputs/configuration, exact scope, per-observable refinement tables, uncertainty components and their status (bound, estimate, or unresolved), resource evidence, preserved failures, and a clear recommendation. NUM-03 stays ACTIVE/INDETERMINATE until its separate gate conditions are met.

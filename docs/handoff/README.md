@@ -1,6 +1,6 @@
 # Project Continuity — Start Here
 
-**Updated:** 2026-10-05. The latest bounded result is the 300-gap source-coefficient Simpson-remainder enclosure for modes 8–19 plus the combined n=20 and global n=21–65 coefficient bounds; n=32 also has full 300-gap interval enclosures; see [current state](CURRENT-STATE.md), [next task](NEXT-TASK.md), and the NUM-03 protocol/review linked there. This result remains coefficient-only and changes no science gate.
+**Updated:** 2026-10-05. The latest operational result is that the admission correction is published and exact-context NUM-03 resource calibration/preflight now covers all 12 candidate request combinations. The next task is field-reference uncertainty analysis; the public solver matrix remains unrun and no science gate changed. Earlier mode-bound results remain coefficient-only. See [current state](CURRENT-STATE.md), [next task](NEXT-TASK.md), and the NUM-03 protocol/review linked there.
 
 **Purpose:** Resume AURA from repository evidence without depending on a particular assistant, model or chat history.
 

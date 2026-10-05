@@ -1,6 +1,6 @@
 # NUM-02 — Air-Series Resource Preflight Review
 
-**Date:** 2026-10-03 · **Scope:** Software-contract review only · **Status:** PASS for estimator implementation; production runtime calibration NOT AVAILABLE
+**Date:** 2026-10-03 · **Scope:** Software-contract review; later resource-only calibration follow-up · **Status:** PASS for estimator implementation; bounded exact-context runtime profiles available for the candidate NUM-03 request dimensions
 
 ## Result
 
@@ -20,4 +20,4 @@ The estimator uses the NUM-01 single-order recurrence count, eight complex and t
 
 ## Boundary and next dependency
 
-There is no NUM-03 backend to time, so no production calibration exists and wall-time readiness remains INDETERMINATE. The estimator cannot establish convergence, series stability, pressure/velocity/gradient accuracy, force, motion or experimental validity. A future bounded diagnostic calibration must have its own immutable identity and explicit wall-time cap; it cannot be represented as a production budget PASS. NUM-03 solver/core construction is a separate milestone and must receive the requested plain-language checkpoint before implementation.
+The field backend exists, and a later resource-only follow-up produced four exact-context per-gap calibrations on clean source revision `1682dcbf15f1ba2e79511563639c68f9301c4d50`, with all 12 proposed order/gap preflights passing their caps. See the [NUM-03 resource audit](NUM-03-coupled-kernel-review.md#num-03-per-gap-resource-calibration-and-preflight-audit--2026-10-05). These profiles characterize only the measured software workload and do not establish convergence, series stability, pressure/velocity/gradient accuracy, force, motion or experimental validity. They do not authorize execution. NUM-03's reference uncertainty and decision protocol remain open.
