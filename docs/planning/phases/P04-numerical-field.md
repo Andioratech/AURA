@@ -312,3 +312,8 @@ The exact-rational global triangle bound covers mode 28 at all 300 discrete P1.3
 ## NUM-03 n=29 sampled-gap coefficient bounds — 2026-10-05
 
 The exact-rational global triangle bound covers mode 29 at all 300 discrete P1.3 gaps; the N=8192 coefficient-only remainder ranges from 356.7267 m^2 at 0.1 mm to 7.7206e-7 m^2 at 30 mm. Four interval enclosures are far wider than their matching global upper bounds. Five selected interval points replayed byte-identically across CPython 3.12.14 and 3.13.5; the exact 300-row audit passed. The growing upper bound is not an observed error trend. No field propagation, total uncertainty, tolerance, or physical validation is established. NUM-03 remains ACTIVE/INDETERMINATE and NUM-04 BLOCKED. Next, screen n=30 at four representative gaps.
+
+
+## NUM-03 n=30 sampled-gap coefficient bounds — 2026-10-05
+
+The exact-rational global triangle bound covers mode 30 at all 300 discrete P1.3 gaps; the N=8192 coefficient-only remainder ranges from 5290.0478 m^2 at 0.1 mm to 5.6778e-6 m^2 at 30 mm. Four interval enclosures are far wider than the matching global bounds. Five selected interval points replayed byte-identically across CPython 3.12.14 and 3.13.5; the exact 300-row audit passed. This is one source coefficient only: no field propagation, total uncertainty, tolerance or physical validation is established. NUM-03 remains ACTIVE/INDETERMINATE and NUM-04 BLOCKED. Next, screen n=31 at four representative gaps.
