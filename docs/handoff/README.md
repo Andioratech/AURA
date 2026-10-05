@@ -1,6 +1,6 @@
 # Project Continuity — Start Here
 
-**Updated:** 2026-10-05. The latest bounded result is the 300-gap source-coefficient Simpson-remainder enclosure for modes 8–19 plus the combined n=20 and global n=21–30 coefficient bounds; see [current state](CURRENT-STATE.md), [next task](NEXT-TASK.md), and the NUM-03 protocol/review linked there. This result remains coefficient-only and changes no science gate.
+**Updated:** 2026-10-05. The latest bounded result is the 300-gap source-coefficient Simpson-remainder enclosure for modes 8–19 plus the combined n=20 and global n=21–31 coefficient bounds; see [current state](CURRENT-STATE.md), [next task](NEXT-TASK.md), and the NUM-03 protocol/review linked there. This result remains coefficient-only and changes no science gate.
 
 **Purpose:** Resume AURA from repository evidence without depending on a particular assistant, model or chat history.
 
