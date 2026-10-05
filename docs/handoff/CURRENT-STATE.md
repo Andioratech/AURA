@@ -170,3 +170,8 @@ An exact-rational generator for the scaled Legendre polynomial and finite spheri
 ## Generalized mode-four Simpson derivative bound — 2026-10-05
 
 Exact-rational Legendre/Hankel generation reproduces the previous mode 0–3 derivative envelopes, then gives `max|q_4^(4)| <= 7.70703297557186288460453604418` at `H=0.1 mm`, a mode-4/mode-3 majorant ratio `3.82588791962098598952512611046`, and an 8192-panel coefficient remainder `9.50725051225023756999818289873e-22 m^2`. Metadata SHA-256 `84e5d9eaba09730e8280539f480aa35383cff16fb39bbd040946c773e90a4523`; output SHA-256 `9a5730347ffb0ff1f3462b17c579337176840c9ac09c3590ec170b0aa46dd74b`. Two first n=4 setup/report failures are preserved; corrected attempt 03 reproduces all lower-order comparators and byte-identical output. This is still coefficient-only and one gap; low-mode growth gives no mode-512 conclusion or field-error validation. NUM-03 stays INDETERMINATE, NUM-04 BLOCKED.
+
+
+## Generalized mode-five Simpson derivative bound — 2026-10-05
+
+The exact-rational generator reproduces mode 0–4 comparators, then gives `max|q_5^(4)| <= 32.8404627176476196310205401841` at `H=0.1 mm`, a mode-5/mode-4 majorant ratio `4.26110317962028090000812872657`, and an 8192-panel coefficient remainder `4.05113753871960316573658123989e-21 m^2`. Metadata SHA-256 `fbe2ca1f4363973c3f513a13776adbc7f1772fe712e54e7da725d6eec3f47ec6`; output SHA-256 `43ed63fc83d0030cbb2225b46e04fab5c42e13aa8e53badbda4ef8f853a403df`. The initial report used a stale stdout key after producing JSON; corrected attempt 02 reproduces and is outward-checked. This source-coefficient bound is at one gap and does not define the higher-order or field error. NUM-03 remains INDETERMINATE, NUM-04 BLOCKED.

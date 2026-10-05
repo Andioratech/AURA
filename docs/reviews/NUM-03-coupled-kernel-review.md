@@ -445,3 +445,10 @@ The first generic recurrence attempt omitted `-D` in the Legendre scaling and fa
 The generalized exact-Fraction Legendre/Hankel generator reproduces prior `n=0…3` majorants exactly, then yields `max|q_4^(4)| <= 7.70703297557186288460453604418` at `H=0.1 mm`. Its mode-4/mode-3 ratio is `3.82588791962098598952512611046`; the `N=8192` source-coefficient Simpson remainder bound is `9.50725051225023756999818289873e-22 m^2`. Every decimal display rounds upward versus its exact fraction and JSON/stdout match byte-for-byte. Metadata SHA-256 `84e5d9eaba09730e8280539f480aa35383cff16fb39bbd040946c773e90a4523`; output SHA-256 `9a5730347ffb0ff1f3462b17c579337176840c9ac09c3590ec170b0aa46dd74b`.
 
 Two invalid n=4 runs are retained: a missing mode-three comparator caused an assertion setup failure; then report assembly used stale key names after writing JSON. Correct attempt 03 includes comparators through mode 3 and reproduces. Successive low-mode majorant ratios have grown to about 3.83, but this is not evidence for mode 512. Results remain coefficient-only, one-gap bounds.
+
+
+### Generalized mode-five derivative-majorant prototype — 2026-10-05
+
+The exact-rational Legendre/Hankel generator reproduces modes 0–4, then gives `max|q_5^(4)| <= 32.8404627176476196310205401841` at `H=0.1 mm`. The n5/n4 majorant ratio is `4.26110317962028090000812872657`; the N=8192 coefficient Simpson remainder upper bound is `4.05113753871960316573658123989e-21 m^2`. Upward decimal displays were checked against exact fractions, and JSON/stdout re-run byte-for-byte. Metadata SHA-256 `fbe2ca1f4363973c3f513a13776adbc7f1772fe712e54e7da725d6eec3f47ec6`; output SHA-256 `43ed63fc83d0030cbb2225b46e04fab5c42e13aa8e53badbda4ef8f853a403df`.
+
+The first run passed lower-mode comparisons and wrote JSON, but a stale stdout key caused report-assembly failure; the failure is retained locally and corrected attempt 02 is the validated output. The increasing low-order ratios show that this triangle-inequality route may become loose; they do not establish its behavior at mode 512. Still only one source coefficient at one gap, with no field propagation.
