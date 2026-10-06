@@ -1,6 +1,35 @@
 # NUM-03 BEM Kernel Foundation
 
+
+**NUM-03 mirror-mode remainder bound — 2026-10-07:** For a centered monopole and the fixed sphere case (`a=25 mm`, `gap=0.1 mm`, `f=25,230 Hz`, `c=346 m/s`), the exact image Green expansion tail after order `N` is bounded by `B_N=[1/(12D)] exp(z+x²/(2(2N+5))) q^(N+1)/(1-q)`, with `D=2(a+gap)`, `q=a/D`, `x=k_upper a`, `z=k_upper D`, and `k_upper=(44/7)f/c`. The derivation uses DLMF §§10.53.1, 10.49(i), 10.60(i), and the real-angle Legendre bound. Rational inputs and outward-rounded Decimal evaluation give `B_48=9.09943933485362e-5 m^-1`, `B_64=1.11397254106508e-9 m^-1`, and `B_80=1.44903668349673e-14 m^-1`. At order 80, the independently evaluated binary64 series differs from the exact image Green value by `2.91e-15 m^-1` at 120° and `2.93e-15 m^-1` at 135°. The analytic bound is uniform over real surface angles for this configuration and every nonnegative cutoff; it does not bound floating-point evaluation, quadrature, a matrix solve, other parameter values, or physical behavior. Focused test: 2 passed. Local-only record `NUM03-BEM-MIRROR-TAIL-BOUND-20261007-01`, SHA-256 `cfb893fddc06e1f084fa0d26c65e98e50eeb25a52499c64be17cc5505cbadef2`. No solver matrix or core was started.
+
 **Prepared:** 2026-10-05 · **State:** kernel component implemented; boundary-integral solver not implemented or qualified
+
+## Mirror-monopole modal-tail bound — 2026-10-07
+
+For the image source a distance `D=2(a+gap)` from the real sphere center, with `D>a`, the outgoing addition theorem gives modal terms
+
+`T_n = i k (2n+1) j_n(ka) h_n^(1)(kD) P_n(cos(gamma)) / (4 pi)`.
+
+The power series in [DLMF 10.53.1](https://dlmf.nist.gov/10.53#E1) and `(2n+2m+1)!! >= (2n+1)!!(2n+3)^m` imply, for positive real `x`,
+
+`|j_n(x)| <= x^n exp(x^2/[2(2n+3)])/(2n+1)!!`.
+
+The terminating spherical-Hankel polynomial in [DLMF §10.49(i)](https://dlmf.nist.gov/10.49#i) has leading magnitude `(2n-1)!!/z^(n+1)` after its outer `1/z`. Reading its terms backward from order `m=n`, the ratio of term `m-1` to term `m` is `2 z m/[(n+m)(n-m+1)]`; for `m=n-l+1` this is no greater than `z/l`. Thus the absolute polynomial sum is no greater than `exp(z)`, and
+
+`|h_n^(1)(z)| <= (2n-1)!! exp(z)/z^(n+1)`.
+
+For real `gamma`, [DLMF 18.14.1](https://dlmf.nist.gov/18.14#E1) with Jacobi parameters `alpha=beta=0` gives `|P_n(cos(gamma))|<=1`. Substitution and cancellation of the double factorials yield
+
+`|T_n| <= [1/(4 pi D)] q^n exp(z+x^2/[2(2n+3)])`, where `q=a/D`, `x=ka`, and `z=kD`.
+
+For the tail after `N`, use `2n+3>=2N+5`, sum the geometric series, and bound `pi` by `3<pi<22/7`. With `k_upper=(44/7)f/c`, a computable upper bound is
+
+`B_N = [1/(12D)] exp(z_upper+x_upper^2/[2(2N+5)]) q^(N+1)/(1-q)`,
+
+`x_upper=k_upper*a`, `z_upper=k_upper*D`. The arithmetic implementation evaluates rational configuration constants with `Fraction`, converts with 80-digit `Decimal` ceiling rounding, moves the correctly-rounded Decimal exponential to its next upper neighbor, then multiplies under ceiling rounding. At the frozen case `a=25 mm`, `gap=0.1 mm`, `f=25,230 Hz`, `c=346 m/s`, it returns `B_48=9.09943933485362e-5`, `B_64=1.11397254106508e-9`, and `B_80=1.44903668349673e-14 m^-1`.
+
+The bound applies to the exact analytic addition-theorem tail and is uniform in real observation angle over this sphere, for every integer cutoff `N>=0`; it assumes a centered monopole and the stated geometry/frequency. At `N=80`, binary64 summation and the direct Green evaluation differ by `2.914203267236168e-15 m^-1` at 120° and `2.931072891608563e-15 m^-1` at 135°. Those observed discrepancies audit the implemented series against the exact image value but are not an arithmetic error certificate. This result does not bound quadrature, the BEM kernel, a matrix solve, other parameter values, or physical behavior. Local record SHA-256: `cfb893fddc06e1f084fa0d26c65e98e50eeb25a52499c64be17cc5505cbadef2`.
 
 ## NUM-03 off-equator direct CBIE panel comparison — 2026-10-06
 

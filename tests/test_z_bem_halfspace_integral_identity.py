@@ -1,5 +1,7 @@
 import cmath
 import math
+from decimal import ROUND_CEILING, Decimal, localcontext
+from fractions import Fraction
 from itertools import pairwise
 
 import pytest
@@ -24,6 +26,55 @@ def _sphere_data(theta, radius, center_height, source, wave_number):
     )
     normal_derivative = normal_rz[0] * gradient[0] + normal_rz[1] * gradient[2]
     return field, normal_rz, pressure, normal_derivative
+
+
+def _mirror_mode_remainder_bound(cutoff_order):
+    """Bound the exact image Green-series tail uniformly over real angles.
+
+    This certificate is scoped to a=25 mm, gap=0.1 mm, f=25,230 Hz,
+    c=346 m/s and a center monopole. It uses pi<22/7 for the wave-number
+    upper bounds and pi>3 for the prefactor. Decimal operations round upward.
+    """
+    if type(cutoff_order) is not int or cutoff_order < 0:
+        raise ValueError("Expected a nonnegative integer cutoff order.")
+
+    frequency = Fraction(25_230)
+    sound_speed = Fraction(346)
+    radius = Fraction(25, 1_000)
+    gap = Fraction(1, 10_000)
+    center_distance = 2 * (radius + gap)
+    if center_distance <= radius:
+        raise ValueError("The source must lie strictly inside the expansion sphere.")
+
+    # k < k_upper follows from pi < 22/7. q=a/D is exact and less than one.
+    k_upper = 2 * Fraction(22, 7) * frequency / sound_speed
+    x_upper = k_upper * radius
+    z_upper = k_upper * center_distance
+    ratio = radius / center_distance
+    exponent = z_upper + x_upper**2 / (2 * (2 * cutoff_order + 5))
+
+    def decimal_upper(value):
+        with localcontext() as context:
+            context.prec = 80
+            context.rounding = ROUND_CEILING
+            return Decimal(value.numerator) / Decimal(value.denominator)
+
+    with localcontext() as context:
+        context.prec = 80
+        context.rounding = ROUND_CEILING
+        # Decimal.exp is correctly rounded to nearest; next_plus gives a
+        # strict decimal upper neighbor before the outward-rounded products.
+        exponential_upper = decimal_upper(exponent).exp().next_plus()
+        geometric_tail_upper = decimal_upper(ratio ** (cutoff_order + 1))
+        geometric_sum_upper = decimal_upper(1 / (1 - ratio))
+        # Since pi>3, 1/(4*pi*D) < 1/(12*D).
+        prefactor_upper = decimal_upper(1 / (12 * center_distance))
+        return (
+            exponential_upper
+            * geometric_tail_upper
+            * geometric_sum_upper
+            * prefactor_upper
+        )
 
 
 def _image_ring_integrals(
@@ -963,7 +1014,7 @@ def test_mirror_monopole_regular_modes_cancel_exact_image_cbie(field_theta_degre
         4.0 * math.pi * image_distance
     )
 
-    cutoff_orders = (8, 16, 24, 32, 48)
+    cutoff_orders = (8, 16, 24, 32, 48, 64, 80)
     max_order = cutoff_orders[-1]
     legendre = [1.0, math.cos(field_theta)]
     for order in range(2, max_order + 1):
@@ -1027,12 +1078,16 @@ def test_mirror_monopole_regular_modes_cancel_exact_image_cbie(field_theta_degre
         order: abs(partial_sum(regular_terms, order) - exact_image_pressure)
         for order in cutoff_orders
     }
+    remainder_bound = _mirror_mode_remainder_bound(80)
     direct_responses = {
         order: partial_sum(direct_cbie_terms, order)
         for order in cutoff_orders
     }
     assert errors[48] < errors[32]
     assert errors[48] < 1e-12
+    assert errors[80] < 2.0 * float(remainder_bound)
+    assert _mirror_mode_remainder_bound(64) > remainder_bound
+    assert _mirror_mode_remainder_bound(48) > _mirror_mode_remainder_bound(64)
     # The independently integrated image contribution is -G_image at this point.
     assert abs(direct_responses[48] - exact_image_pressure) < 1e-12
     image_cbie_contribution = -exact_image_pressure
