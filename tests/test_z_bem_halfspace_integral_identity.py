@@ -485,3 +485,147 @@ def test_neumann_half_space_hbie_identity_on_equatorial_sphere_point():
         values = [result[residual_index] for result in meridian_residuals]
         assert abs(values[2] - values[1]) < abs(values[1] - values[0]), values
         assert values[2] < threshold, values
+
+
+def test_neumann_half_space_hbie_identity_off_equator_with_constant_pv_restoration():
+    """Check off-equator HBIE after restoring only its constant Cauchy density."""
+    from aura.fields._bem_singular import integrate_cauchy_principal_value_panel
+    from aura.fields.numerical import gauss_legendre_rule
+
+    radius = 0.025
+    gap = 0.0001
+    wave_number = 2.0 * math.pi * 25_230.0 / 346.0
+    center_height = radius + gap
+    field_theta = math.radians(135.0)
+    field = (
+        radius * math.sin(field_theta), 0.0,
+        center_height + radius * math.cos(field_theta),
+    )
+    field_normal = (-math.sin(field_theta), -math.cos(field_theta))
+    source_point = (0.0, 0.0, center_height)
+    _, field_gradient, _ = neumann_half_space_green(
+        field, source_point, wave_number_rad_m=wave_number
+    )
+    field_q = field_normal[0] * field_gradient[0] + field_normal[1] * field_gradient[2]
+    field_ps = (
+        math.cos(field_theta) * field_gradient[0]
+        - math.sin(field_theta) * field_gradient[2]
+    )
+    log_scale = 8.0 * radius
+    singular_arclength = radius * field_theta
+
+    def source_data(theta):
+        sine, cosine = math.sin(theta), math.cos(theta)
+        point = (radius * sine, 0.0, center_height + radius * cosine)
+        normal = (-sine, -cosine)
+        pressure, gradient, _ = neumann_half_space_green(
+            point, source_point, wave_number_rad_m=wave_number
+        )
+        q = normal[0] * gradient[0] + normal[1] * gradient[2]
+        ps = cosine * gradient[0] - sine * gradient[2]
+        return point, normal, pressure, q, ps
+
+    def hbie(meridian_order, azimuth_samples):
+        nodes, weights = gauss_legendre_rule(meridian_order)
+        direct_hypersingular = []
+        image_hypersingular = []
+        direct_adjoint = []
+        image_adjoint = []
+        for lower, upper in ((0.0, field_theta), (field_theta, math.pi)):
+            midpoint = 0.5 * (lower + upper)
+            half_width = 0.5 * (upper - lower)
+            for node, weight in zip(nodes, weights, strict=True):
+                theta = midpoint + half_width * node
+                point, normal, pressure, q, ps = source_data(theta)
+                source_radius, source_height = point[0], point[2]
+                offset = theta - field_theta
+                logarithm = math.log(log_scale / abs(radius * offset))
+                surface_weight = half_width * weight * radius * source_radius
+                direct_maue, image_maue = integrate_neumann_ring_burton_miller_terms_zero_mode(
+                    field[0], field[2], field_normal, source_radius, source_height,
+                    normal, pressure_pa=pressure,
+                    pressure_tangent_derivative_pa_m=ps,
+                    wave_number_rad_m=wave_number,
+                    azimuth_samples=azimuth_samples,
+                )
+                direct_field_gradient, _ = integrate_helmholtz_ring_green_gradient_zero_mode(
+                    field[0], field[2], source_radius, source_height,
+                    wave_number_rad_m=wave_number,
+                    azimuth_samples=azimuth_samples,
+                )
+                direct_field_normal = (
+                    field_normal[0] * direct_field_gradient[0]
+                    + field_normal[1] * direct_field_gradient[1]
+                )
+                image_field_normal = _image_ring_field_normal_integral(
+                    field[0], field[2], field_normal, source_radius, source_height,
+                    wave_number, 2 * azimuth_samples,
+                )
+                direct_hypersingular.append(
+                    surface_weight * direct_maue
+                    - half_width * weight * field_ps / (2.0 * math.pi * offset)
+                    - half_width * weight * radius * wave_number**2 * pressure
+                    * logarithm / (2.0 * math.pi)
+                )
+                image_hypersingular.append(surface_weight * image_maue)
+                direct_adjoint.append(
+                    surface_weight * q * direct_field_normal
+                    - half_width * weight * q * logarithm / (4.0 * math.pi)
+                )
+                image_adjoint.append(surface_weight * q * image_field_normal)
+
+        cauchy = integrate_cauchy_principal_value_panel(
+            lambda _: field_ps,
+            0.0, math.pi, field_theta, order=min(meridian_order, 256),
+        )
+        hypersingular_log = integrate_logarithmic_panel(
+            lambda arclength: wave_number**2
+            * source_data(arclength / radius)[2] / (2.0 * math.pi),
+            0.0, math.pi * radius, singular_arclength,
+            log_scale=log_scale, order=min(meridian_order, 256),
+        )
+        adjoint_log = integrate_logarithmic_panel(
+            lambda arclength: source_data(arclength / radius)[3]
+            / (4.0 * math.pi * radius),
+            0.0, math.pi * radius, singular_arclength,
+            log_scale=log_scale, order=min(meridian_order, 256),
+        )
+
+        def compensated(values):
+            return complex(
+                math.fsum(value.real for value in values),
+                math.fsum(value.imag for value in values),
+            )
+
+        components = (
+            0.5 * field_q, compensated(direct_hypersingular), cauchy,
+            hypersingular_log, compensated(image_hypersingular),
+            -compensated(direct_adjoint), -adjoint_log, -compensated(image_adjoint),
+        )
+        result = sum(components)
+        return result
+
+    # This local limit independently checks the singular coefficient and sign.
+    local_ratios = []
+    for delta in (math.radians(0.025), math.radians(0.0125), math.radians(0.00625)):
+        theta = field_theta + delta
+        point, normal, pressure, _, ps = source_data(theta)
+        direct, _ = integrate_neumann_ring_burton_miller_terms_zero_mode(
+            field[0], field[2], field_normal, point[0], point[2], normal,
+            pressure_pa=pressure, pressure_tangent_derivative_pa_m=ps,
+            wave_number_rad_m=wave_number, azimuth_samples=8192,
+        )
+        local_ratios.append(
+            delta * radius * point[0] * direct / (field_ps / (2.0 * math.pi))
+        )
+    assert abs(local_ratios[-1] - 1.0) < abs(local_ratios[0] - 1.0), local_ratios
+    assert abs(local_ratios[-1] - 1.0) < 0.03, local_ratios
+    expected_constant_pv = field_ps * math.log((math.pi - field_theta) / field_theta) / (2.0 * math.pi)
+    assert integrate_cauchy_principal_value_panel(
+        lambda _: field_ps, 0.0, math.pi, field_theta, order=32
+    ) == expected_constant_pv
+
+    errors = [abs(hbie(order, 1024)) / abs(field_q) for order in (128, 256, 512)]
+    assert errors[1] < errors[0], errors
+    assert errors[2] < errors[1], errors
+    assert math.isclose(errors[2], 6.351118263974117e-7, rel_tol=0.02, abs_tol=0.0)
