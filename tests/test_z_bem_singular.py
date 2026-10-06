@@ -4,7 +4,11 @@ import math
 import pytest
 
 from aura.errors import InvalidInputError
-from aura.fields._bem_axisymmetric import integrate_neumann_ring_burton_miller_terms_zero_mode
+from aura.fields._bem_axisymmetric import (
+    integrate_helmholtz_ring_green_gradient_zero_mode,
+    integrate_helmholtz_ring_green_zero_mode,
+    integrate_neumann_ring_burton_miller_terms_zero_mode,
+)
 from aura.fields._bem_singular import (
     integrate_cauchy_principal_value_panel,
     integrate_logarithmic_panel,
@@ -254,6 +258,130 @@ def test_singular_panel_subtraction_matches_exact_sphere_hypersingular_modes(
     assert abs(intermediate - exact) < abs(coarse - exact) / 2.0
     assert abs(refined - exact) < abs(intermediate - exact) / 3.0
     assert refined == pytest.approx(exact, rel=2e-4, abs=2e-5)
+
+
+@pytest.mark.parametrize("degree", [0, 1])
+@pytest.mark.parametrize("field_theta", [math.radians(120.0), math.radians(135.0)])
+def test_cbie_layer_panel_subtraction_matches_exact_sphere_modes(degree, field_theta):
+    """Check direct single/double layers after explicit logarithmic subtraction."""
+    from aura.fields.numerical import gauss_legendre_rule
+
+    radius = 0.017
+    kr = 2.3
+    wave_number = kr / radius
+    center_height = 2.0 * radius
+    field = (
+        radius * math.sin(field_theta), 0.0,
+        center_height + radius * math.cos(field_theta),
+    )
+    field_mode = 1.0 if degree == 0 else math.cos(field_theta)
+    singular_arclength = radius * field_theta
+    log_scale = 8.0 * radius
+
+    def mode(theta):
+        return 1.0 if degree == 0 else math.cos(theta)
+
+    def integrate_layers(meridian_order):
+        nodes, weights = gauss_legendre_rule(meridian_order)
+        single_remainder = []
+        double_remainder = []
+        for lower, upper in ((0.0, field_theta), (field_theta, math.pi)):
+            midpoint = 0.5 * (lower + upper)
+            half_width = 0.5 * (upper - lower)
+            for node, weight in zip(nodes, weights, strict=True):
+                theta = midpoint + half_width * node
+                sine, cosine = math.sin(theta), math.cos(theta)
+                source_radius = radius * sine
+                source_height = center_height + radius * cosine
+                source_normal = (-sine, -cosine)
+                density = mode(theta)
+                offset = theta - field_theta
+                logarithm = math.log(log_scale / abs(radius * offset))
+                _, source_gradient = integrate_helmholtz_ring_green_gradient_zero_mode(
+                    field[0], field[2], source_radius, source_height,
+                    wave_number_rad_m=wave_number, azimuth_samples=1_024,
+                )
+                normal_terms = tuple(
+                    component * normal
+                    for component, normal in zip(source_gradient, source_normal, strict=True)
+                )
+                source_normal_derivative = complex(
+                    math.fsum(value.real for value in normal_terms),
+                    math.fsum(value.imag for value in normal_terms),
+                )
+                green = integrate_helmholtz_ring_green_zero_mode(
+                    field[0], field[2], source_radius, source_height,
+                    wave_number_rad_m=wave_number, azimuth_samples=1_024,
+                )
+                surface_weight = half_width * weight * radius * source_radius
+                single_remainder.append(
+                    surface_weight * density * green
+                    - half_width * weight * radius * density * logarithm / (2.0 * math.pi)
+                )
+                double_remainder.append(
+                    surface_weight * density * source_normal_derivative
+                    - half_width * weight * density * logarithm / (4.0 * math.pi)
+                )
+
+        single_log = integrate_logarithmic_panel(
+            lambda arclength: mode(arclength / radius) / (2.0 * math.pi),
+            0.0, math.pi * radius, singular_arclength,
+            log_scale=log_scale, order=meridian_order,
+        )
+        double_log = integrate_logarithmic_panel(
+            lambda arclength: mode(arclength / radius) / (4.0 * math.pi * radius),
+            0.0, math.pi * radius, singular_arclength,
+            log_scale=log_scale, order=meridian_order,
+        )
+        return (
+            math.fsum(value.real for value in single_remainder)
+            + 1j * math.fsum(value.imag for value in single_remainder)
+            + single_log,
+            math.fsum(value.real for value in double_remainder)
+            + 1j * math.fsum(value.imag for value in double_remainder)
+            + double_log,
+        )
+
+    j0 = math.sin(kr) / kr
+    j1 = math.sin(kr) / kr**2 - math.cos(kr) / kr
+    j_values = (j0, j1)
+    h0 = -1j * cmath.exp(1j * kr) / kr
+    h1 = -cmath.exp(1j * kr) * (kr + 1j) / kr**2
+    h_values = (h0, h1)
+    h_derivatives = (-h1, h0 - 2.0 * h1 / kr)
+    exact_single = 1j * wave_number * radius**2 * j_values[degree] * h_values[degree]
+    # AURA's source normal points into the sphere, opposite to Kreuzer's Eq. 5.
+    exact_double = -(0.5 + 1j * wave_number**2 * radius**2 * h_derivatives[degree] * j_values[degree])
+    exact = (field_mode * exact_single, field_mode * exact_double)
+
+    coarse = integrate_layers(16)
+    intermediate = integrate_layers(32)
+    refined = integrate_layers(64)
+    for actual, expected, previous, earlier in zip(
+        refined, exact, intermediate, coarse, strict=True
+    ):
+        assert abs(actual - expected) < abs(previous - expected)
+        assert abs(actual - expected) < abs(earlier - expected) / 2.0
+        assert actual == pytest.approx(expected, rel=3e-4, abs=3e-5)
+
+    outgoing_trace = h_values[degree] * field_mode
+    outgoing_radial_derivative = wave_number * h_derivatives[degree]
+
+    def cbie_residual(layers):
+        single_layer, double_layer = layers
+        # AURA's normal points into the sphere, opposite to the reference normal.
+        source_normal_derivative = -outgoing_radial_derivative
+        return (
+            0.5 * outgoing_trace
+            + h_values[degree] * double_layer
+            - source_normal_derivative * single_layer
+        )
+
+    residuals = tuple(cbie_residual(layers) for layers in (coarse, intermediate, refined))
+    residual_scale = max(abs(outgoing_trace), 1e-30)
+    assert abs(residuals[1]) < abs(residuals[0])
+    assert abs(residuals[2]) < abs(residuals[1])
+    assert abs(residuals[2]) / residual_scale < 5e-5
 
 
 @pytest.mark.parametrize("degree", [0, 1])
