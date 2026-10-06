@@ -1,5 +1,9 @@
 # NUM-03 Interim Review — First Coupled Hasegawa Kernel
 
+## Off-equator coupled identity regression — 2026-10-06
+
+At `theta=120°` and `135°`, the exact-source half-space sphere control now computes matched CBIE, HBIE and `R_CBIE+(i/k)R_HBIE` residuals using direct/image azimuth counts 1,024/2,048 and meridian orders 128/256/512. Finest normalized `(CBIE, HBIE, combined)` residuals are `(4.93785e-7, 2.94369e-7, 8.19984e-7)` at 120° and `(1.32259e-7, 6.35112e-7, 4.90509e-7)` at 135°. The HBIE sequences decrease; CBIE varies slightly nonmonotonically and the 120° combined residual rises at the finest order. This is finite-grid identity regression evidence only. An initial strict-monotonic screen failure and complete values are preserved locally (record SHA-256 `e637c55647a2c1d37b43f99162c2a2857785fcd4f2df5e5c1504babe9673188b`). Next independently compare the off-equator image contribution at both points and refine its azimuth integral; no matrix allocation or solver-core construction. The run uses the same direct and image source data for all three residuals. The independent image-contribution and azimuth-refinement check remains open; this result does not qualify the continuous operator, panels, matrix, solver, piston coupling or AURA field.
+
 **Date:** 2026-10-03 · **Disposition:** Focused kernel checks PASS; NUM-03 remains ACTIVE and no pilot is accepted
 
 ## Curved-sphere half-space HBIE and Burton–Miller identity — 2026-10-06

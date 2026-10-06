@@ -2,6 +2,10 @@
 
 **Prepared:** 2026-10-05 · **State:** kernel component implemented; boundary-integral solver not implemented or qualified
 
+## Off-equator identity regression — 2026-10-06
+
+At `theta=120°` and `135°`, the exact-source half-space sphere control now computes matched CBIE, HBIE and `R_CBIE+(i/k)R_HBIE` residuals using direct/image azimuth counts 1,024/2,048 and meridian orders 128/256/512. Finest normalized `(CBIE, HBIE, combined)` residuals are `(4.93785e-7, 2.94369e-7, 8.19984e-7)` at 120° and `(1.32259e-7, 6.35112e-7, 4.90509e-7)` at 135°. The HBIE sequences decrease; CBIE varies slightly nonmonotonically and the 120° combined residual rises at the finest order. This is finite-grid identity regression evidence only. An initial strict-monotonic screen failure and complete values are preserved locally (record SHA-256 `e637c55647a2c1d37b43f99162c2a2857785fcd4f2df5e5c1504babe9673188b`). Next independently compare the off-equator image contribution at both points and refine its azimuth integral; no matrix allocation or solver-core construction. At each meridian node the direct and image layer terms are accumulated separately; the same geometry, pressure and normal data feed CBIE and HBIE before applying the literature-supported coupling factor. This confirms only these two finite quadratures for an exact manufactured field. The separate image route still requires an independent azimuth-refinement comparison at these angles.
+
 ## Mathematical contract
 
 Use the time dependence `exp(-i omega t)`, so an outgoing free-space Helmholtz Green function is

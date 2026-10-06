@@ -487,8 +487,7 @@ def test_neumann_half_space_hbie_identity_on_equatorial_sphere_point():
         assert values[2] < threshold, values
 
 
-def test_neumann_half_space_hbie_identity_off_equator_with_constant_pv_restoration():
-    """Check off-equator HBIE after restoring only its constant Cauchy density."""
+def _off_equator_hbie_residuals(field_theta_degrees):
     from aura.fields._bem_singular import integrate_cauchy_principal_value_panel
     from aura.fields.numerical import gauss_legendre_rule
 
@@ -496,7 +495,7 @@ def test_neumann_half_space_hbie_identity_off_equator_with_constant_pv_restorati
     gap = 0.0001
     wave_number = 2.0 * math.pi * 25_230.0 / 346.0
     center_height = radius + gap
-    field_theta = math.radians(135.0)
+    field_theta = math.radians(field_theta_degrees)
     field = (
         radius * math.sin(field_theta), 0.0,
         center_height + radius * math.cos(field_theta),
@@ -525,12 +524,16 @@ def test_neumann_half_space_hbie_identity_off_equator_with_constant_pv_restorati
         ps = cosine * gradient[0] - sine * gradient[2]
         return point, normal, pressure, q, ps
 
-    def hbie(meridian_order, azimuth_samples):
+    def evaluate_identities(meridian_order, azimuth_samples):
         nodes, weights = gauss_legendre_rule(meridian_order)
         direct_hypersingular = []
         image_hypersingular = []
         direct_adjoint = []
         image_adjoint = []
+        direct_double_layer = []
+        image_double_layer = []
+        direct_single_layer = []
+        image_single_layer = []
         for lower, upper in ((0.0, field_theta), (field_theta, math.pi)):
             midpoint = 0.5 * (lower + upper)
             half_width = 0.5 * (upper - lower)
@@ -561,6 +564,26 @@ def test_neumann_half_space_hbie_identity_off_equator_with_constant_pv_restorati
                     field[0], field[2], field_normal, source_radius, source_height,
                     wave_number, 2 * azimuth_samples,
                 )
+                _, direct_source_gradient = integrate_helmholtz_ring_green_gradient_zero_mode(
+                    field[0], field[2], source_radius, source_height,
+                    wave_number_rad_m=wave_number,
+                    azimuth_samples=azimuth_samples,
+                )
+                direct_green = integrate_helmholtz_ring_green_zero_mode(
+                    field[0], field[2], source_radius, source_height,
+                    wave_number_rad_m=wave_number,
+                    azimuth_samples=azimuth_samples,
+                )
+                direct_source_normal = sum(
+                    component * normal_component
+                    for component, normal_component in zip(
+                        direct_source_gradient, normal, strict=True
+                    )
+                )
+                image_green, image_source_normal = _image_ring_integrals(
+                    field[0], field[2], field_normal, source_radius, source_height,
+                    normal, wave_number, 2 * azimuth_samples,
+                )
                 direct_hypersingular.append(
                     surface_weight * direct_maue
                     - half_width * weight * field_ps / (2.0 * math.pi * offset)
@@ -573,6 +596,16 @@ def test_neumann_half_space_hbie_identity_off_equator_with_constant_pv_restorati
                     - half_width * weight * q * logarithm / (4.0 * math.pi)
                 )
                 image_adjoint.append(surface_weight * q * image_field_normal)
+                direct_double_layer.append(
+                    surface_weight * pressure * direct_source_normal
+                    - half_width * weight * pressure * logarithm / (4.0 * math.pi)
+                )
+                image_double_layer.append(surface_weight * pressure * image_source_normal)
+                direct_single_layer.append(
+                    surface_weight * q * direct_green
+                    - half_width * weight * radius * q * logarithm / (2.0 * math.pi)
+                )
+                image_single_layer.append(surface_weight * q * image_green)
 
         cauchy = integrate_cauchy_principal_value_panel(
             lambda _: field_ps,
@@ -590,6 +623,18 @@ def test_neumann_half_space_hbie_identity_off_equator_with_constant_pv_restorati
             0.0, math.pi * radius, singular_arclength,
             log_scale=log_scale, order=min(meridian_order, 256),
         )
+        double_layer_log = integrate_logarithmic_panel(
+            lambda arclength: source_data(arclength / radius)[2]
+            / (4.0 * math.pi * radius),
+            0.0, math.pi * radius, singular_arclength,
+            log_scale=log_scale, order=min(meridian_order, 256),
+        )
+        single_layer_log = integrate_logarithmic_panel(
+            lambda arclength: source_data(arclength / radius)[3]
+            / (2.0 * math.pi),
+            0.0, math.pi * radius, singular_arclength,
+            log_scale=log_scale, order=min(meridian_order, 256),
+        )
 
         def compensated(values):
             return complex(
@@ -597,13 +642,23 @@ def test_neumann_half_space_hbie_identity_off_equator_with_constant_pv_restorati
                 math.fsum(value.imag for value in values),
             )
 
+        cbie = (
+            0.5 * source_data(field_theta)[2]
+            + compensated(direct_double_layer)
+            + double_layer_log
+            + compensated(image_double_layer)
+            - compensated(direct_single_layer)
+            - single_layer_log
+            - compensated(image_single_layer)
+        )
         components = (
             0.5 * field_q, compensated(direct_hypersingular), cauchy,
             hypersingular_log, compensated(image_hypersingular),
             -compensated(direct_adjoint), -adjoint_log, -compensated(image_adjoint),
         )
         result = sum(components)
-        return result
+        burton_miller = cbie + (1j / wave_number) * result
+        return cbie, result, burton_miller
 
     # This local limit independently checks the singular coefficient and sign.
     local_ratios = []
@@ -625,7 +680,37 @@ def test_neumann_half_space_hbie_identity_off_equator_with_constant_pv_restorati
         lambda _: field_ps, 0.0, math.pi, field_theta, order=32
     ) == expected_constant_pv
 
-    errors = [abs(hbie(order, 1024)) / abs(field_q) for order in (128, 256, 512)]
-    assert errors[1] < errors[0], errors
-    assert errors[2] < errors[1], errors
-    assert math.isclose(errors[2], 6.351118263974117e-7, rel_tol=0.02, abs_tol=0.0)
+    values = [evaluate_identities(order, 1024) for order in (128, 256, 512)]
+    cbie_scale = abs(source_data(field_theta)[2])
+    residuals = [
+        (
+            abs(cbie) / cbie_scale,
+            abs(hbie_value) / abs(field_q),
+            abs(burton_miller) / cbie_scale,
+        )
+        for cbie, hbie_value, burton_miller in values
+    ]
+    hbie_errors = [row[1] for row in residuals]
+    assert hbie_errors[1] < hbie_errors[0], hbie_errors
+    assert hbie_errors[2] < hbie_errors[1], hbie_errors
+    return residuals
+
+
+def test_neumann_half_space_hbie_identity_off_equator_at_135_degrees():
+    """Check off-equator CBIE, HBIE and combined identities at 135 degrees."""
+    residuals = _off_equator_hbie_residuals(135.0)
+    expected = (1.3225926047676166e-7, 6.351118263974117e-7, 4.905087137967346e-7)
+    assert all(
+        math.isclose(actual, reference, rel_tol=0.02, abs_tol=0.0)
+        for actual, reference in zip(residuals[-1], expected, strict=True)
+    ), residuals
+
+
+def test_neumann_half_space_hbie_identity_off_equator_at_120_degrees():
+    """Check off-equator CBIE, HBIE and combined identities at 120 degrees."""
+    residuals = _off_equator_hbie_residuals(120.0)
+    expected = (4.937849786500923e-7, 2.9436860283636453e-7, 8.199839373582927e-7)
+    assert all(
+        math.isclose(actual, reference, rel_tol=0.02, abs_tol=0.0)
+        for actual, reference in zip(residuals[-1], expected, strict=True)
+    ), residuals
