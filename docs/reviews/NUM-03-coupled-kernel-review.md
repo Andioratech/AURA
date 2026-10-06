@@ -2,6 +2,12 @@
 
 **Date:** 2026-10-03 · **Disposition:** Focused kernel checks PASS; NUM-03 remains ACTIVE and no pilot is accepted
 
+## Curved-sphere half-space CBIE identity — 2026-10-06
+
+The complete direct-plus-image conventional boundary integral identity was checked against the exact Neumann half-space Green field of a point source at the center of a `25 mm` sphere with `0.1 mm` clearance. At a `175°` collocation point, fixed direct/image azimuth counts 512/1,024 and meridian Gauss orders 64/128/256 produced normalized residuals `3.589649739667196e-4`, `7.028082037136498e-6`, and `1.779059292679779e-6`. The original nonconvergent attempt is preserved locally; it subtracted and restored the logarithmic term under inconsistent surface and meridian measures. Matching those measures resolves that numerical defect without changing the equation.
+
+Disposition: this one-point curved-sphere CBIE identity check passes its prescribed refinement trend and final `4e-6` residual criterion. It is finite-grid verification only; azimuth error is not refined, and the image route shares the pointwise free-space Green kernel. It does not verify HBIE jumps in the half-space, the Burton–Miller coupling, a panelized operator, matrix assembly, solution, piston coupling, or P4. Continue the half-space HBIE/Burton–Miller sphere control before any matrix. NUM-03 remains ACTIVE / INDETERMINATE.
+
 ## Maue azimuth contraction continuation — 2026-10-06
 
 The direct Maue ring now analytically contracts its static Laplace term using the exact scalar ring integral, cosine-weighted Green moment and height derivative; the dynamic residual is midpoint-integrated. The moment/derivative agree with an independent 32,768-point angular sum for the tested separated ring. A 1,024-point near-diagonal split result passes a `2e-11` relative test tolerance against an independently coded 32,768-point full Helmholtz-kernel midpoint sum at `H=0.1 mm`, `175°/175.1°`, with prescribed complex pressure and meridional derivative. Forty focused BEM tests pass. Local sphere offsets also support the leading Cauchy and logarithmic singularities. These are finite-grid/asymptotic checks, not error bounds, meridian-panel validation, half-space image identity, full solve or P4 acceptance. Next implement the documented product-integration subtraction and test against exact sphere modes plus an independent panel integral before any matrix.

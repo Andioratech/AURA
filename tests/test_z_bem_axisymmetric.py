@@ -578,6 +578,126 @@ def test_maue_static_split_matches_independent_full_kernel_near_diagonal():
     assert direct == pytest.approx(reference, rel=2e-11, abs=2e-4)
 
 
+@pytest.mark.parametrize(
+    ("gap", "field_angle_degrees", "degree"),
+    [
+        (0.0001, 175.0, 0),
+        (0.0001, 179.0, 1),
+        (0.0100, 170.0, 0),
+        (0.0299, 179.0, 1),
+    ],
+)
+def test_combined_direct_image_maue_ring_matches_independent_full_kernel(
+    gap, field_angle_degrees, degree
+):
+    """Check the separated direct-Maue plus reflected-H kernel at sphere rings."""
+    sphere_radius = 0.025
+    wave_number = 2.0 * math.pi * 25_230.0 / 346.0
+    field_theta = math.radians(field_angle_degrees)
+    source_theta = field_theta + math.radians(0.1)
+    field_radius = sphere_radius * math.sin(field_theta)
+    field_height = gap + sphere_radius * (1.0 + math.cos(field_theta))
+    source_radius = sphere_radius * math.sin(source_theta)
+    source_height = gap + sphere_radius * (1.0 + math.cos(source_theta))
+    field_normal_rz = (-math.sin(field_theta), -math.cos(field_theta))
+    source_normal_rz = (-math.sin(source_theta), -math.cos(source_theta))
+    pressure = 1.0 if degree == 0 else math.cos(source_theta)
+    pressure_tangent_derivative = (
+        0.0 if degree == 0 else -math.sin(source_theta) / sphere_radius
+    )
+
+    direct, image = integrate_neumann_ring_burton_miller_terms_zero_mode(
+        field_radius,
+        field_height,
+        field_normal_rz,
+        source_radius,
+        source_height,
+        source_normal_rz,
+        pressure_pa=pressure,
+        pressure_tangent_derivative_pa_m=pressure_tangent_derivative,
+        wave_number_rad_m=wave_number,
+        azimuth_samples=1_024,
+    )
+
+    field = (field_radius, 0.0, field_height)
+    field_normal = (field_normal_rz[0], 0.0, field_normal_rz[1])
+    sample_count = 32_768
+    angle_weight = 2.0 * math.pi / sample_count
+    direct_terms = []
+    image_terms = []
+    for index in range(sample_count):
+        angle = 2.0 * math.pi * (index + 0.5) / sample_count
+        cosine, sine = math.cos(angle), math.sin(angle)
+        source_normal = (
+            source_normal_rz[0] * cosine,
+            source_normal_rz[0] * sine,
+            source_normal_rz[1],
+        )
+        source_tangent = (
+            -source_normal_rz[1] * cosine,
+            -source_normal_rz[1] * sine,
+            source_normal_rz[0],
+        )
+        source = (source_radius * cosine, source_radius * sine, source_height)
+        displacement = tuple(a - b for a, b in zip(field, source, strict=True))
+        distance = math.hypot(*displacement)
+        green = cmath.exp(1j * wave_number * distance) / (4.0 * math.pi * distance)
+        gradient_factor = green * (1j * wave_number - 1.0 / distance) / distance
+        green_gradient = tuple(gradient_factor * value for value in displacement)
+        pressure_gradient = tuple(
+            pressure_tangent_derivative * value for value in source_tangent
+        )
+        field_cross_gradient = (
+            field_normal[1] * green_gradient[2] - field_normal[2] * green_gradient[1],
+            field_normal[2] * green_gradient[0] - field_normal[0] * green_gradient[2],
+            field_normal[0] * green_gradient[1] - field_normal[1] * green_gradient[0],
+        )
+        source_cross_pressure = (
+            source_normal[1] * pressure_gradient[2] - source_normal[2] * pressure_gradient[1],
+            source_normal[2] * pressure_gradient[0] - source_normal[0] * pressure_gradient[2],
+            source_normal[0] * pressure_gradient[1] - source_normal[1] * pressure_gradient[0],
+        )
+        normal_dot = math.fsum(
+            a * b for a, b in zip(field_normal, source_normal, strict=True)
+        )
+        direct_terms.append(
+            angle_weight
+            * (
+                wave_number**2 * normal_dot * pressure * green
+                + sum(a * b for a, b in zip(
+                    field_cross_gradient, source_cross_pressure, strict=True
+                ))
+            )
+        )
+
+        image_normal = (source_normal[0], source_normal[1], -source_normal[2])
+        image_terms.append(
+            angle_weight
+            * pressure
+            * _free_space_mixed_normal_derivative(
+                field,
+                (source[0], source[1], -source[2]),
+                field_normal,
+                image_normal,
+                wave_number,
+            )
+        )
+
+    direct_reference = complex(
+        math.fsum(term.real for term in direct_terms),
+        math.fsum(term.imag for term in direct_terms),
+    )
+    image_reference = complex(
+        math.fsum(term.real for term in image_terms),
+        math.fsum(term.imag for term in image_terms),
+    )
+    assert direct == pytest.approx(direct_reference, rel=3e-10, abs=3e-4)
+    assert image == pytest.approx(image_reference, rel=3e-10, abs=3e-4)
+    assert direct + image == pytest.approx(
+        direct_reference + image_reference, rel=3e-10, abs=6e-4
+    )
+
+
 def test_maue_tangential_ring_term_has_expected_local_cauchy_singularity():
     sphere_radius = 0.025
     field_theta = math.radians(175.0)
