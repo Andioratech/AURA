@@ -720,6 +720,73 @@ def _off_equator_hbie_residuals(
     return residuals
 
 
+@pytest.mark.parametrize("field_theta_degrees", [120.0, 135.0])
+def test_off_equator_direct_cauchy_and_log_singular_coefficients(field_theta_degrees):
+    """Check local direct Maue singular coefficients at two collocation angles."""
+    radius = 0.025
+    center_height = radius + 0.0001
+    wave_number = 2.0 * math.pi * 25_230.0 / 346.0
+    field_theta = math.radians(field_theta_degrees)
+    field = (
+        radius * math.sin(field_theta), 0.0,
+        center_height + radius * math.cos(field_theta),
+    )
+    field_normal = (-math.sin(field_theta), -math.cos(field_theta))
+    source_point = (0.0, 0.0, center_height)
+    _, field_gradient, _ = neumann_half_space_green(
+        field, source_point, wave_number_rad_m=wave_number
+    )
+    field_tangent_derivative = (
+        math.cos(field_theta) * field_gradient[0]
+        - math.sin(field_theta) * field_gradient[2]
+    )
+
+    regularized = []
+    predicted_log_coefficients = []
+    cauchy_ratios = []
+    offsets = (1.0e-3, 1.0e-4, 1.0e-5)
+    for offset in offsets:
+        theta = field_theta + offset
+        source_radius = radius * math.sin(theta)
+        source_height = center_height + radius * math.cos(theta)
+        source_normal = (-math.sin(theta), -math.cos(theta))
+        source = (source_radius, 0.0, source_height)
+        pressure, source_gradient, _ = neumann_half_space_green(
+            source, source_point, wave_number_rad_m=wave_number
+        )
+        source_tangent_derivative = (
+            math.cos(theta) * source_gradient[0]
+            - math.sin(theta) * source_gradient[2]
+        )
+        direct, _ = integrate_neumann_ring_burton_miller_terms_zero_mode(
+            field[0], field[2], field_normal,
+            source_radius, source_height, source_normal,
+            pressure_pa=pressure,
+            pressure_tangent_derivative_pa_m=source_tangent_derivative,
+            wave_number_rad_m=wave_number,
+            azimuth_samples=8_192,
+        )
+        weighted_direct = radius * source_radius * direct
+        cauchy_ratios.append(
+            weighted_direct * offset / (field_tangent_derivative / (2.0 * math.pi))
+        )
+        regularized.append(
+            weighted_direct - field_tangent_derivative / (2.0 * math.pi * offset)
+        )
+        predicted_log_coefficients.append(radius * wave_number**2 * pressure / (2.0 * math.pi))
+
+    assert abs(cauchy_ratios[-1] - 1.0) < abs(cauchy_ratios[0] - 1.0), cauchy_ratios
+    assert abs(cauchy_ratios[-1] - 1.0) < 0.01, cauchy_ratios
+    # Differencing across logarithmic scales removes the finite remainder
+    # constant; the raw remainder/log ratio would therefore be biased.
+    empirical_log_coefficient = (
+        regularized[2] - regularized[1]
+    ) / math.log(offsets[1] / offsets[2])
+    assert empirical_log_coefficient == pytest.approx(
+        predicted_log_coefficients[2], rel=0.04, abs=1e-7
+    )
+
+
 def _free_space_mixed_normal_hessian(field, source, field_normal, source_normal, wave_number):
     displacement = tuple(x - y for x, y in zip(field, source, strict=True))
     distance = math.sqrt(math.fsum(value * value for value in displacement))
