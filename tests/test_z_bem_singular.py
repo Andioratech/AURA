@@ -157,11 +157,17 @@ def test_logarithmic_panel_integrates_a_continuous_density_kink_at_a_panel_join(
 
 
 @pytest.mark.parametrize("degree", [0, 1])
-def test_singular_panel_subtraction_matches_exact_sphere_hypersingular_modes(degree):
+@pytest.mark.parametrize(
+    "field_theta",
+    [1.1, math.radians(120.0), math.radians(135.0)],
+    ids=["existing-angle", "120-deg", "135-deg"],
+)
+def test_singular_panel_subtraction_matches_exact_sphere_hypersingular_modes(
+    degree, field_theta
+):
     radius = 0.017
     kr = 2.3
     wave_number = kr / radius
-    field_theta = 1.1
     clearance = radius
     field_radius = radius * math.sin(field_theta)
     field_height = clearance + radius * (1.0 + math.cos(field_theta))
@@ -236,6 +242,7 @@ def test_singular_panel_subtraction_matches_exact_sphere_hypersingular_modes(deg
     h1 = -cmath.exp(1j * kr) * (kr + 1j) / (kr * kr)
     h0_prime = -h1
     h1_prime = h0 - 2.0 * h1 / kr
+    # Kreuzer (2024), Eq. 6, for G=exp(i*k*r)/(4*pi*r); DOI 10.1016/j.enganabound.2024.105883.
     hypersingular_eigenvalue = 1j * wave_number**3 * radius**2 * (
         j0_prime * h0_prime if degree == 0 else j1_prime * h1_prime
     )
