@@ -1,6 +1,8 @@
 import math
 from itertools import pairwise
 
+import pytest
+
 from aura.fields._bem_axisymmetric import (
     integrate_helmholtz_ring_green_gradient_zero_mode,
     integrate_helmholtz_ring_green_zero_mode,
@@ -487,7 +489,9 @@ def test_neumann_half_space_hbie_identity_on_equatorial_sphere_point():
         assert values[2] < threshold, values
 
 
-def _off_equator_hbie_residuals(field_theta_degrees):
+def _off_equator_hbie_residuals(
+    field_theta_degrees, *, meridian_orders=(128, 256, 512), direct_azimuth_samples=1_024
+):
     from aura.fields._bem_singular import integrate_cauchy_principal_value_panel
     from aura.fields.numerical import gauss_legendre_rule
 
@@ -642,23 +646,29 @@ def _off_equator_hbie_residuals(field_theta_degrees):
                 math.fsum(value.imag for value in values),
             )
 
-        cbie = (
+        cbie_direct = (
             0.5 * source_data(field_theta)[2]
             + compensated(direct_double_layer)
             + double_layer_log
-            + compensated(image_double_layer)
             - compensated(direct_single_layer)
             - single_layer_log
-            - compensated(image_single_layer)
         )
-        components = (
-            0.5 * field_q, compensated(direct_hypersingular), cauchy,
-            hypersingular_log, compensated(image_hypersingular),
-            -compensated(direct_adjoint), -adjoint_log, -compensated(image_adjoint),
+        cbie_image = compensated(image_double_layer) - compensated(image_single_layer)
+        hbie_direct = (
+            0.5 * field_q + compensated(direct_hypersingular) + cauchy
+            + hypersingular_log - compensated(direct_adjoint) - adjoint_log
         )
-        result = sum(components)
-        burton_miller = cbie + (1j / wave_number) * result
-        return cbie, result, burton_miller
+        hbie_image = compensated(image_hypersingular) - compensated(image_adjoint)
+        cbie = cbie_direct + cbie_image
+        hbie = hbie_direct + hbie_image
+        burton_miller_direct = cbie_direct + (1j / wave_number) * hbie_direct
+        burton_miller_image = cbie_image + (1j / wave_number) * hbie_image
+        burton_miller = burton_miller_direct + burton_miller_image
+        return (
+            cbie, hbie, burton_miller,
+            cbie_direct, cbie_image, hbie_direct, hbie_image,
+            burton_miller_direct, burton_miller_image,
+        )
 
     # This local limit independently checks the singular coefficient and sign.
     local_ratios = []
@@ -680,19 +690,32 @@ def _off_equator_hbie_residuals(field_theta_degrees):
         lambda _: field_ps, 0.0, math.pi, field_theta, order=32
     ) == expected_constant_pv
 
-    values = [evaluate_identities(order, 1024) for order in (128, 256, 512)]
+    values = [
+        evaluate_identities(order, direct_azimuth_samples)
+        for order in meridian_orders
+    ]
     cbie_scale = abs(source_data(field_theta)[2])
     residuals = [
         (
             abs(cbie) / cbie_scale,
             abs(hbie_value) / abs(field_q),
             abs(burton_miller) / cbie_scale,
+            abs(cbie_direct) / cbie_scale,
+            abs(cbie_image) / cbie_scale,
+            abs(hbie_direct) / abs(field_q),
+            abs(hbie_image) / abs(field_q),
+            abs(burton_miller_direct) / cbie_scale,
+            abs(burton_miller_image) / cbie_scale,
         )
-        for cbie, hbie_value, burton_miller in values
+        for (
+            cbie, hbie_value, burton_miller,
+            cbie_direct, cbie_image, hbie_direct, hbie_image,
+            burton_miller_direct, burton_miller_image,
+        ) in values
     ]
-    hbie_errors = [row[1] for row in residuals]
-    assert hbie_errors[1] < hbie_errors[0], hbie_errors
-    assert hbie_errors[2] < hbie_errors[1], hbie_errors
+    if len(residuals) > 1:
+        hbie_errors = [row[1] for row in residuals]
+        assert all(right < left for left, right in pairwise(hbie_errors)), hbie_errors
     return residuals
 
 
@@ -702,7 +725,7 @@ def test_neumann_half_space_hbie_identity_off_equator_at_135_degrees():
     expected = (1.3225926047676166e-7, 6.351118263974117e-7, 4.905087137967346e-7)
     assert all(
         math.isclose(actual, reference, rel_tol=0.02, abs_tol=0.0)
-        for actual, reference in zip(residuals[-1], expected, strict=True)
+        for actual, reference in zip(residuals[-1][:3], expected, strict=True)
     ), residuals
 
 
@@ -712,5 +735,101 @@ def test_neumann_half_space_hbie_identity_off_equator_at_120_degrees():
     expected = (4.937849786500923e-7, 2.9436860283636453e-7, 8.199839373582927e-7)
     assert all(
         math.isclose(actual, reference, rel_tol=0.02, abs_tol=0.0)
-        for actual, reference in zip(residuals[-1], expected, strict=True)
+        for actual, reference in zip(residuals[-1][:3], expected, strict=True)
     ), residuals
+
+
+@pytest.mark.parametrize(
+    ("angle", "expected_rows"),
+    [
+        (
+            120.0,
+            (
+                (3.949694760669292e-6, 2.784420993735613e-6, 7.26738223859542e-6,
+                 0.7017765978528487, 0.7017800768620652, 0.001320229313641898,
+                 0.0013184259620687045, 0.7001600352317204, 0.7001658510963493),
+                (4.93668826798954e-7, 5.376307466214797e-7, 5.999158568324642e-7,
+                 0.7017796421507524, 0.7017800768620652, 0.0013179583527429988,
+                 0.0013184259620687149, 0.7001659725677319, 0.7001658510963494),
+                (6.175718068748198e-8, 7.519597408584152e-7, 8.712751864582464e-7,
+                 0.7017800226086855, 0.7017800768620652, 0.0013176747317994995,
+                 0.0013184259620687216, 0.7001667145728278, 0.7001658510963494),
+                (7.776364042696666e-9, 7.867038301300109e-7, 9.579631353146122e-7,
+                 0.7017800701634108, 0.7017800768620652, 0.0013176392688596496,
+                 0.0013184259620687235, 0.7001668073370176, 0.7001658510963494),
+                (1.0671904444316003e-9, 7.908166954354412e-7, 9.68750796797366e-7,
+                 0.7017800761080029, 0.7017800768620652, 0.0013176351455070833,
+                 0.0013184259620687194, 0.7001668185538669, 0.7001658510963494),
+            ),
+        ),
+        (
+            135.0,
+            (
+                (1.0555062268712306e-6, 3.488894600416531e-6, 3.0335306145697924e-6,
+                 0.4342840011181034, 0.4342830672668493, 0.2175413889648748,
+                 0.21754443764854314, 0.3112201223543772, 0.3112173752612869),
+                (1.3212997321447874e-7, 1.933042821456014e-6, 1.2175761653207521e-6,
+                 0.4342831844675028, 0.4342830672668493, 0.21754251624053425,
+                 0.21754443764854314, 0.3112185896207854, 0.3112173752612869),
+                (1.674909291668482e-8, 1.7807064009625795e-6, 1.0246370992182288e-6,
+                 0.4342830824084701, 0.4342830672668493, 0.21754265713520807,
+                 0.21754443764854317, 0.3112183980625059, 0.3112173752612869),
+                (2.4231901699930135e-9, 1.7629679355230936e-6, 1.0020941454721342e-6,
+                 0.43428306965176894, 0.4342830672668492, 0.21754267468320826,
+                 0.21754443764854314, 0.31121837415451375, 0.31121737526128684),
+                (8.91584219934213e-10, 1.7603346455588231e-6, 9.990576688036097e-7,
+                 0.43428306805738, 0.4342830672668493, 0.21754267731390264,
+                 0.21754443764854314, 0.3112183709193409, 0.3112173752612869),
+            ),
+        ),
+    ],
+)
+def test_neumann_half_space_burton_miller_identity_off_equator_azimuth_refinement(
+    angle, expected_rows
+):
+    """Check azimuth sensitivity and separate direct/image contributions."""
+    actual_rows = [
+        _off_equator_hbie_residuals(
+            angle, meridian_orders=(256,), direct_azimuth_samples=count
+        )[0]
+        for count in (512, 1_024, 2_048, 4_096, 8_192)
+    ]
+    for actual, expected in zip(actual_rows, expected_rows, strict=True):
+        assert all(
+            math.isclose(value, reference, rel_tol=0.02, abs_tol=0.0)
+            for value, reference in zip(actual, expected, strict=True)
+        ), actual_rows
+
+
+@pytest.mark.parametrize(
+    ("angle", "expected"),
+    [
+        (
+            120.0,
+            (
+                7.892578351213587e-9, 1.9156403853840462e-7, 2.283896164792989e-7,
+                0.7017800700635318, 0.7017800768620654, 0.0013182344427522738,
+                0.0013184259620688244, 0.7001660785299482, 0.7001658510963497,
+            ),
+        ),
+        (
+            135.0,
+            (
+                2.540759470737439e-9, 4.4020041011362665e-7, 2.5208797122025877e-7,
+                0.4342830697562411, 0.4342830672668493, 0.21754399746011588,
+                0.21754443764854306, 0.31121762669014175, 0.311217375261287,
+            ),
+        ),
+    ],
+)
+def test_neumann_half_space_burton_miller_identity_off_equator_meridian_refinement(
+    angle, expected
+):
+    """Check meridian refinement at fixed, high direct/image azimuth counts."""
+    row = _off_equator_hbie_residuals(
+        angle, meridian_orders=(512,), direct_azimuth_samples=4_096
+    )[0]
+    assert all(
+        math.isclose(actual, reference, rel_tol=0.02, abs_tol=0.0)
+        for actual, reference in zip(row, expected, strict=True)
+    ), row
