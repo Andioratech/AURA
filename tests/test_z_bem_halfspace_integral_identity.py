@@ -814,7 +814,7 @@ def _complex_dot(left, right):
 def test_off_equator_image_boundary_operators_match_independent_full_surface_integral(
     field_theta_degrees,
 ):
-    """Compare ring-reduced image layers with pointwise full-surface quadrature."""
+    """Compare image layers with surface quadrature and the exact image-source CBIE."""
     from aura.fields.numerical import gauss_legendre_rule
 
     radius = 0.025
@@ -916,11 +916,127 @@ def test_off_equator_image_boundary_operators_match_independent_full_surface_int
 
     ring_cbie_image = ring_values[0] - ring_values[1]
     surface_cbie_image = surface_values[0] - surface_values[1]
+    image_source = (0.0, 0.0, -center_height)
+    image_distance = math.sqrt(
+        math.fsum((coordinate - source) ** 2
+                  for coordinate, source in zip(field, image_source, strict=True))
+    )
+    exact_image_source_pressure = cmath.exp(1j * wave_number * image_distance) / (
+        4.0 * math.pi * image_distance
+    )
+    assert ring_cbie_image == pytest.approx(
+        -exact_image_source_pressure, rel=2e-8, abs=1e-5
+    )
+    assert surface_cbie_image == pytest.approx(
+        -exact_image_source_pressure, rel=2e-8, abs=1e-5
+    )
     ring_hbie_image = ring_values[2] - ring_values[3]
     surface_hbie_image = surface_values[2] - surface_values[3]
     ring_bm_image = ring_cbie_image + (1j / wave_number) * ring_hbie_image
     surface_bm_image = surface_cbie_image + (1j / wave_number) * surface_hbie_image
     assert ring_bm_image == pytest.approx(surface_bm_image, rel=2e-8, abs=1e-5)
+
+
+@pytest.mark.parametrize("field_theta_degrees", [120.0, 135.0])
+def test_mirror_monopole_regular_modes_cancel_exact_image_cbie(field_theta_degrees):
+    """Check the image addition theorem and direct-CBIE response mode by mode."""
+    from aura.fields.numerical import spherical_bessel_jy
+
+    radius = 0.025
+    gap = 0.0001
+    center_height = radius + gap
+    mirror_distance = 2.0 * center_height
+    wave_number = 2.0 * math.pi * 25_230.0 / 346.0
+    field_theta = math.radians(field_theta_degrees)
+    field = (
+        radius * math.sin(field_theta), 0.0,
+        center_height + radius * math.cos(field_theta),
+    )
+    image_source = (0.0, 0.0, -center_height)
+    image_distance = math.sqrt(
+        math.fsum(
+            (coordinate - source) ** 2
+            for coordinate, source in zip(field, image_source, strict=True)
+        )
+    )
+    exact_image_pressure = cmath.exp(1j * wave_number * image_distance) / (
+        4.0 * math.pi * image_distance
+    )
+
+    cutoff_orders = (8, 16, 24, 32, 48)
+    max_order = cutoff_orders[-1]
+    legendre = [1.0, math.cos(field_theta)]
+    for order in range(2, max_order + 1):
+        legendre.append(
+            ((2 * order - 1) * math.cos(field_theta) * legendre[-1]
+             - (order - 1) * legendre[-2]) / order
+        )
+
+    regular_terms = []
+    direct_cbie_terms = []
+    for order in range(max_order + 1):
+        j_surface, _, j_surface_prime, _ = spherical_bessel_jy(
+            order, wave_number * radius
+        )
+        j_mirror, y_mirror, _, _ = spherical_bessel_jy(
+            order, wave_number * mirror_distance
+        )
+        j_outgoing, y_outgoing, j_outgoing_prime, y_outgoing_prime = spherical_bessel_jy(
+            order, wave_number * radius
+        )
+        h_mirror = complex(j_mirror, y_mirror)
+        h_outgoing = complex(j_outgoing, y_outgoing)
+        h_outgoing_prime = complex(j_outgoing_prime, y_outgoing_prime)
+        # DLMF 10.60.1-2 combine into the outgoing Green expansion; the
+        # mirror-source direction gives P_n(-cos(theta))=(-1)^n P_n(cos(theta)).
+        angular_mode = (-1.0) ** order * legendre[order]
+        coefficient = (
+            1j * wave_number * (2 * order + 1) * h_mirror / (4.0 * math.pi)
+        )
+        trace = coefficient * j_surface * angular_mode
+        source_normal_derivative = -coefficient * wave_number * j_surface_prime * angular_mode
+        # Kreuzer (2024), Eqs. (4)-(5), for G=exp(i*k*r)/(4*pi*r);
+        # AURA's inward source normal reverses the double-layer eigenvalue.
+        single_layer_eigenvalue = (
+            1j * wave_number * radius**2 * j_surface * h_outgoing
+        )
+        double_layer_eigenvalue_aura = -(
+            0.5
+            + 1j * wave_number**2 * radius**2 * h_outgoing_prime * j_surface
+        )
+        direct_cbie_response = (
+            0.5 * trace
+            + double_layer_eigenvalue_aura * trace
+            - single_layer_eigenvalue * source_normal_derivative
+        )
+        regular_terms.append(trace)
+        direct_cbie_terms.append(direct_cbie_response)
+
+    assert max(
+        abs(response - trace)
+        for response, trace in zip(direct_cbie_terms, regular_terms, strict=True)
+    ) < 5e-13
+
+    def partial_sum(terms, order):
+        return complex(
+            math.fsum(value.real for value in terms[: order + 1]),
+            math.fsum(value.imag for value in terms[: order + 1]),
+        )
+
+    errors = {
+        order: abs(partial_sum(regular_terms, order) - exact_image_pressure)
+        for order in cutoff_orders
+    }
+    direct_responses = {
+        order: partial_sum(direct_cbie_terms, order)
+        for order in cutoff_orders
+    }
+    assert errors[48] < errors[32]
+    assert errors[48] < 1e-12
+    # The independently integrated image contribution is -G_image at this point.
+    assert abs(direct_responses[48] - exact_image_pressure) < 1e-12
+    image_cbie_contribution = -exact_image_pressure
+    assert abs(direct_responses[48] + image_cbie_contribution) < 1e-12
 
 
 def test_neumann_half_space_hbie_identity_off_equator_at_135_degrees():
