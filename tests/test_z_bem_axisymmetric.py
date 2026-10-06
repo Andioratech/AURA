@@ -791,7 +791,7 @@ def test_burton_miller_ring_image_term_matches_independent_scalar_angular_sum():
 
 @pytest.mark.parametrize("degree", [0, 1])
 @pytest.mark.parametrize("gap", [0.0001, 0.010, 0.020, 0.0299])
-@pytest.mark.parametrize("field_angle_degrees", [150.0, 170.0, 175.0, 179.0])
+@pytest.mark.parametrize("field_angle_degrees", [120.0, 135.0, 150.0, 170.0, 175.0, 179.0])
 def test_positive_gap_image_surface_integral_matches_independent_2d_quadrature(
     degree, gap, field_angle_degrees
 ):
@@ -884,6 +884,15 @@ def test_positive_gap_image_surface_integral_matches_independent_2d_quadrature(
         lower_order = direct_surface_split(128, 2_048)
         independent = direct_surface_split(256, 2_048)
         reduced = axisymmetric_surface(512, 1_024)
+    elif gap == 0.0001 and field_angle_degrees in (120.0, 135.0):
+        lower_order = axisymmetric_surface(64, 256)
+        intermediate_order = axisymmetric_surface(64, 512)
+        independent = direct_surface_split(64, 2_048)
+        reduced = axisymmetric_surface(64, 1_024)
+        # The independent route agrees to roundoff here, so strict monotonic
+        # error reduction is not resolvable. Check successive azimuth stability.
+        assert abs(intermediate_order - lower_order) < 1e-12
+        assert abs(reduced - intermediate_order) < 1e-12
     else:
         lower_order = direct_surface_split(32, 256)
         independent = direct_surface_split(64, 512)
