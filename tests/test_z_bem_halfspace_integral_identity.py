@@ -1,3 +1,4 @@
+import cmath
 import math
 from itertools import pairwise
 
@@ -717,6 +718,142 @@ def _off_equator_hbie_residuals(
         hbie_errors = [row[1] for row in residuals]
         assert all(right < left for left, right in pairwise(hbie_errors)), hbie_errors
     return residuals
+
+
+def _free_space_mixed_normal_hessian(field, source, field_normal, source_normal, wave_number):
+    displacement = tuple(x - y for x, y in zip(field, source, strict=True))
+    distance = math.sqrt(math.fsum(value * value for value in displacement))
+    phase = cmath.exp(1j * wave_number * distance)
+    coefficient = phase * complex(-1.0, wave_number * distance) / (4.0 * math.pi * distance**3)
+    radial_derivative_over_distance = phase * (
+        -wave_number**2 / distance**3
+        - 3.0 * complex(-1.0, wave_number * distance) / distance**5
+    ) / (4.0 * math.pi)
+    normal_dot = math.fsum(a * b for a, b in zip(field_normal, source_normal, strict=True))
+    field_projection = math.fsum(a * b for a, b in zip(field_normal, displacement, strict=True))
+    source_projection = math.fsum(a * b for a, b in zip(source_normal, displacement, strict=True))
+    return -coefficient * normal_dot - radial_derivative_over_distance * field_projection * source_projection
+
+
+def _complex_dot(left, right):
+    products = [a * b for a, b in zip(left, right, strict=True)]
+    return complex(
+        math.fsum(value.real for value in products),
+        math.fsum(value.imag for value in products),
+    )
+
+
+@pytest.mark.parametrize("field_theta_degrees", [120.0, 135.0])
+def test_off_equator_image_boundary_operators_match_independent_full_surface_integral(
+    field_theta_degrees,
+):
+    """Compare ring-reduced image layers with pointwise full-surface quadrature."""
+    from aura.fields.numerical import gauss_legendre_rule
+
+    radius = 0.025
+    gap = 0.0001
+    wave_number = 2.0 * math.pi * 25_230.0 / 346.0
+    center_height = radius + gap
+    field_theta = math.radians(field_theta_degrees)
+    field = (
+        radius * math.sin(field_theta), 0.0,
+        center_height + radius * math.cos(field_theta),
+    )
+    field_normal = (-math.sin(field_theta), 0.0, -math.cos(field_theta))
+    source_point = (0.0, 0.0, center_height)
+    nodes, weights = gauss_legendre_rule(64)
+
+    ring_terms = [[], [], [], []]
+    surface_terms = [[], [], [], []]
+    ring_azimuth = 1_024
+    surface_azimuth = 4_096
+    image_azimuth_step = 2.0 * math.pi / surface_azimuth
+    for node, weight in zip(nodes, weights, strict=True):
+        theta = 0.5 * math.pi * (node + 1.0)
+        point, normal_rz, pressure, normal_derivative = _sphere_data(
+            theta, radius, center_height, source_point, wave_number
+        )
+        _, gradient, _ = neumann_half_space_green(
+            point, source_point, wave_number_rad_m=wave_number
+        )
+        tangent_derivative = math.cos(theta) * gradient[0] - math.sin(theta) * gradient[2]
+        source_radius, source_height = point[0], point[2]
+        ring_weight = 0.5 * math.pi * weight * radius * source_radius
+        _, image_maue = integrate_neumann_ring_burton_miller_terms_zero_mode(
+            field[0], field[2], (field_normal[0], field_normal[2]),
+            source_radius, source_height, normal_rz,
+            pressure_pa=pressure,
+            pressure_tangent_derivative_pa_m=tangent_derivative,
+            wave_number_rad_m=wave_number,
+            azimuth_samples=ring_azimuth,
+        )
+        image_green, image_source_normal = _image_ring_integrals(
+            field[0], field[2], (field_normal[0], field_normal[2]),
+            source_radius, source_height, normal_rz,
+            wave_number, 2 * ring_azimuth,
+        )
+        image_field_normal = _image_ring_field_normal_integral(
+            field[0], field[2], (field_normal[0], field_normal[2]),
+            source_radius, source_height, wave_number, 2 * ring_azimuth,
+        )
+        ring_terms[0].append(ring_weight * pressure * image_source_normal)
+        ring_terms[1].append(ring_weight * normal_derivative * image_green)
+        # The Burton–Miller ring helper already applies the pressure density.
+        ring_terms[2].append(ring_weight * image_maue)
+        ring_terms[3].append(ring_weight * normal_derivative * image_field_normal)
+
+        source_sine = math.sin(theta)
+        surface_weight = 0.5 * math.pi * weight * radius**2 * source_sine
+        for index in range(surface_azimuth):
+            phi = (index + 0.5) * image_azimuth_step
+            cosine_phi, sine_phi = math.cos(phi), math.sin(phi)
+            image_point = (
+                source_radius * cosine_phi,
+                source_radius * sine_phi,
+                -source_height,
+            )
+            image_normal = (
+                normal_rz[0] * cosine_phi,
+                normal_rz[0] * sine_phi,
+                -normal_rz[1],
+            )
+            green, field_gradient = _free_space_term(field, image_point, wave_number)
+            field_derivative = _complex_dot(field_normal, field_gradient)
+            source_derivative = -_complex_dot(image_normal, field_gradient)
+            mixed_normal = _free_space_mixed_normal_hessian(
+                field, image_point, field_normal, image_normal, wave_number
+            )
+            angular_weight = surface_weight * image_azimuth_step
+            surface_terms[0].append(angular_weight * pressure * source_derivative)
+            surface_terms[1].append(angular_weight * normal_derivative * green)
+            surface_terms[2].append(angular_weight * pressure * mixed_normal)
+            surface_terms[3].append(angular_weight * normal_derivative * field_derivative)
+
+    def compensated(terms):
+        return complex(
+            math.fsum(term.real for term in terms),
+            math.fsum(term.imag for term in terms),
+        )
+
+    ring_values = tuple(compensated(terms) for terms in ring_terms)
+    surface_values = tuple(compensated(terms) for terms in surface_terms)
+    for label, ring_value, surface_value in zip(
+        ("image double layer", "image single layer", "image hypersingular", "image adjoint"),
+        ring_values,
+        surface_values,
+        strict=True,
+    ):
+        assert ring_value == pytest.approx(surface_value, rel=2e-8, abs=1e-5), (
+            label, ring_values, surface_values
+        )
+
+    ring_cbie_image = ring_values[0] - ring_values[1]
+    surface_cbie_image = surface_values[0] - surface_values[1]
+    ring_hbie_image = ring_values[2] - ring_values[3]
+    surface_hbie_image = surface_values[2] - surface_values[3]
+    ring_bm_image = ring_cbie_image + (1j / wave_number) * ring_hbie_image
+    surface_bm_image = surface_cbie_image + (1j / wave_number) * surface_hbie_image
+    assert ring_bm_image == pytest.approx(surface_bm_image, rel=2e-8, abs=1e-5)
 
 
 def test_neumann_half_space_hbie_identity_off_equator_at_135_degrees():
