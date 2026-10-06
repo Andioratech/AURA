@@ -2,6 +2,12 @@
 
 **Date:** 2026-10-03 · **Disposition:** Focused kernel checks PASS; NUM-03 remains ACTIVE and no pilot is accepted
 
+## Curved-sphere half-space HBIE and combined-equation probe — 2026-10-06
+
+The exact-source half-space sphere control was extended to the smooth-boundary HBIE at the equator (`a=25 mm`, `H=0.1 mm`, `f=25,230 Hz`, `c=346 m/s`). With fixed azimuth counts direct/image 256/512, 512/1,024 and 1,024/2,048, meridian order 64 gives normalized HBIE residuals `4.176413711003013e-5`, `5.215199350203988e-6` and `6.515629977193627e-7`. At azimuth 1,024/2,048, meridian orders 32/64/128 give `6.474229501235519e-7`, `6.515629977193627e-7` and `6.516813162118517e-7`. The singular direct Maue and adjoint logarithmic terms are treated separately; the image remains a distinct smooth but near-singular contribution. This is one finite-grid identity check, not an error bound or general panel validation.
+
+The subsequent exploratory same-point combination `R_CBIE+(i/k)R_HBIE` decreases to `1.218636270320214e-6` with azimuth refinement and plateaus at `1.2187226631080113e-6` between meridian orders 64 and 128. The transient `1e-6` screen was not an approved criterion. The Burton–Miller result is inconclusive, and the exact harness source was not retained; preserve its outputs and replay limitation in the local diagnostic record. Do not construct a matrix until this combined test is retained, replayable and its signs and coefficient are audited against Wu et al. (2015), Eqs. (8), (11), and (14).
+
 ## Curved-sphere half-space CBIE identity — 2026-10-06
 
 The complete direct-plus-image conventional boundary integral identity was checked against the exact Neumann half-space Green field of a point source at the center of a `25 mm` sphere with `0.1 mm` clearance. At a `175°` collocation point, fixed direct/image azimuth counts 512/1,024 and meridian Gauss orders 64/128/256 produced normalized residuals `3.589649739667196e-4`, `7.028082037136498e-6`, and `1.779059292679779e-6`. The original nonconvergent attempt is preserved locally; it subtracted and restored the logarithmic term under inconsistent surface and meridian measures. Matching those measures resolves that numerical defect without changing the equation.

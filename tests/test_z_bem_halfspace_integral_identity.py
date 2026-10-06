@@ -4,6 +4,7 @@ from itertools import pairwise
 from aura.fields._bem_axisymmetric import (
     integrate_helmholtz_ring_green_gradient_zero_mode,
     integrate_helmholtz_ring_green_zero_mode,
+    integrate_neumann_ring_burton_miller_terms_zero_mode,
 )
 from aura.fields._bem_green import _free_space_term, neumann_half_space_green
 from aura.fields._bem_singular import integrate_logarithmic_panel
@@ -61,6 +62,38 @@ def _image_ring_integrals(
         math.fsum(term.imag for term in normal_terms),
     )
     return green_integral, normal_integral
+
+
+def _image_ring_field_normal_integral(
+    field_radius,
+    field_height,
+    field_normal_rz,
+    source_radius,
+    source_height,
+    wave_number,
+    samples,
+):
+    """Return the independent azimuth integral of image dG/dn_field."""
+    field = (field_radius, 0.0, field_height)
+    field_normal = (field_normal_rz[0], 0.0, field_normal_rz[1])
+    step = 2.0 * math.pi / samples
+    real_terms = []
+    imag_terms = []
+    for index in range(samples):
+        angle = (index + 0.5) * step
+        source_image = (
+            source_radius * math.cos(angle),
+            source_radius * math.sin(angle),
+            -source_height,
+        )
+        _, gradient = _free_space_term(field, source_image, wave_number)
+        derivative = sum(
+            component * normal
+            for component, normal in zip(gradient, field_normal, strict=True)
+        )
+        real_terms.append(step * derivative.real)
+        imag_terms.append(step * derivative.imag)
+    return complex(math.fsum(real_terms), math.fsum(imag_terms))
 
 
 def test_neumann_half_space_green_identity_on_curved_sphere_with_log_product_integration():
@@ -217,3 +250,145 @@ def test_neumann_half_space_green_identity_on_curved_sphere_with_log_product_int
     assert residuals[1] < residuals[0] / 20.0, residuals
     assert residuals[2] < residuals[1] / 2.0, residuals
     assert residuals[2] < 4e-6, f"Normalized residuals at orders 64/128/256: {residuals!r}"
+
+
+def test_neumann_half_space_hbie_identity_on_equatorial_sphere_point():
+    """Check direct Maue plus image H against K' and the smooth-sphere jump."""
+    radius = 0.025
+    gap = 0.0001
+    wave_number = 2.0 * math.pi * 25_230.0 / 346.0
+    center_height = radius + gap
+    field_theta = 0.5 * math.pi
+    field = (radius, 0.0, center_height)
+    field_normal_rz = (-1.0, 0.0)
+    source_point = (0.0, 0.0, center_height)
+    _, field_gradient, _ = neumann_half_space_green(
+        field, source_point, wave_number_rad_m=wave_number
+    )
+    field_normal_derivative = -field_gradient[0]
+    log_scale = 8.0 * radius
+    singular_arclength = radius * field_theta
+
+    def source_data(theta):
+        sine, cosine = math.sin(theta), math.cos(theta)
+        point = (radius * sine, 0.0, center_height + radius * cosine)
+        normal_rz = (-sine, -cosine)
+        pressure, gradient, _ = neumann_half_space_green(
+            point, source_point, wave_number_rad_m=wave_number
+        )
+        normal_derivative = normal_rz[0] * gradient[0] + normal_rz[1] * gradient[2]
+        tangent_derivative = cosine * gradient[0] - sine * gradient[2]
+        return point, normal_rz, pressure, normal_derivative, tangent_derivative
+
+    def residual(meridian_order, azimuth_samples):
+        from aura.fields.numerical import gauss_legendre_rule
+
+        nodes, weights = gauss_legendre_rule(meridian_order)
+        direct_hypersingular = []
+        direct_adjoint = []
+        image_hypersingular = []
+        image_adjoint = []
+        for lower, upper in ((0.0, field_theta), (field_theta, math.pi)):
+            midpoint = 0.5 * (lower + upper)
+            half_width = 0.5 * (upper - lower)
+            for node, weight in zip(nodes, weights, strict=True):
+                theta = midpoint + half_width * node
+                point, normal, pressure, normal_derivative, tangent_derivative = source_data(theta)
+                source_radius, source_height = point[0], point[2]
+                logarithm = math.log(
+                    log_scale / abs(radius * theta - singular_arclength)
+                )
+                surface_weight = half_width * weight * radius * source_radius
+                direct_maue, image_maue = integrate_neumann_ring_burton_miller_terms_zero_mode(
+                    field[0],
+                    field[2],
+                    field_normal_rz,
+                    source_radius,
+                    source_height,
+                    normal,
+                    pressure_pa=pressure,
+                    pressure_tangent_derivative_pa_m=tangent_derivative,
+                    wave_number_rad_m=wave_number,
+                    azimuth_samples=azimuth_samples,
+                )
+                direct_field_gradient, _ = integrate_helmholtz_ring_green_gradient_zero_mode(
+                    field[0],
+                    field[2],
+                    source_radius,
+                    source_height,
+                    wave_number_rad_m=wave_number,
+                    azimuth_samples=azimuth_samples,
+                )
+                direct_field_normal = -direct_field_gradient[0]
+                image_field_normal = _image_ring_field_normal_integral(
+                    field[0],
+                    field[2],
+                    field_normal_rz,
+                    source_radius,
+                    source_height,
+                    wave_number,
+                    2 * azimuth_samples,
+                )
+
+                # Subtract and restore the same logarithm under ds=a*dtheta.
+                direct_hypersingular.append(
+                    surface_weight * direct_maue
+                    - half_width
+                    * weight
+                    * radius
+                    * wave_number**2
+                    * pressure
+                    * logarithm
+                    / (2.0 * math.pi)
+                )
+                direct_adjoint.append(
+                    surface_weight * normal_derivative * direct_field_normal
+                    - half_width * weight * normal_derivative * logarithm / (4.0 * math.pi)
+                )
+                image_hypersingular.append(surface_weight * image_maue)
+                image_adjoint.append(
+                    surface_weight * normal_derivative * image_field_normal
+                )
+
+        hypersingular_log = integrate_logarithmic_panel(
+            lambda arclength: wave_number**2
+            * source_data(arclength / radius)[2]
+            / (2.0 * math.pi),
+            0.0,
+            math.pi * radius,
+            singular_arclength,
+            log_scale=log_scale,
+            order=meridian_order,
+        )
+        adjoint_log = integrate_logarithmic_panel(
+            lambda arclength: source_data(arclength / radius)[3]
+            / (4.0 * math.pi * radius),
+            0.0,
+            math.pi * radius,
+            singular_arclength,
+            log_scale=log_scale,
+            order=meridian_order,
+        )
+        hypersingular = (
+            sum(direct_hypersingular)
+            + hypersingular_log
+            + sum(image_hypersingular)
+        )
+        adjoint = sum(direct_adjoint) + adjoint_log + sum(image_adjoint)
+        hbie = 0.5 * field_normal_derivative + hypersingular - adjoint
+        return hbie
+
+    azimuth_residuals = [
+        abs(residual(64, count)) / abs(field_normal_derivative)
+        for count in (256, 512, 1_024)
+    ]
+    assert azimuth_residuals[1] < azimuth_residuals[0] / 4.0, azimuth_residuals
+    assert azimuth_residuals[2] < azimuth_residuals[1] / 4.0, azimuth_residuals
+    meridian_residuals = [
+        abs(residual(order, 1_024)) / abs(field_normal_derivative)
+        for order in (32, 64, 128)
+    ]
+    assert abs(meridian_residuals[2] - meridian_residuals[1]) < abs(
+        meridian_residuals[1] - meridian_residuals[0]
+    ), meridian_residuals
+    assert meridian_residuals[2] < 1e-6, meridian_residuals
