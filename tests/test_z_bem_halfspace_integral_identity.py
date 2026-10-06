@@ -7,7 +7,9 @@ from aura.fields._bem_axisymmetric import (
     integrate_neumann_ring_burton_miller_terms_zero_mode,
 )
 from aura.fields._bem_green import _free_space_term, neumann_half_space_green
-from aura.fields._bem_singular import integrate_logarithmic_panel
+from aura.fields._bem_singular import (
+    integrate_logarithmic_panel,
+)
 
 
 def _sphere_data(theta, radius, center_height, source, wave_number):
@@ -253,7 +255,7 @@ def test_neumann_half_space_green_identity_on_curved_sphere_with_log_product_int
 
 
 def test_neumann_half_space_hbie_identity_on_equatorial_sphere_point():
-    """Check direct Maue plus image H against K' and the smooth-sphere jump."""
+    """Check half-space H and Burton–Miller identities at the equator."""
     radius = 0.025
     gap = 0.0001
     wave_number = 2.0 * math.pi * 25_230.0 / 346.0
@@ -288,6 +290,12 @@ def test_neumann_half_space_hbie_identity_on_equatorial_sphere_point():
         direct_adjoint = []
         image_hypersingular = []
         image_adjoint = []
+        direct_double_layer = []
+        direct_single_layer = []
+        image_double_layer = []
+        image_single_layer = []
+        # The equatorial split uses equal panels, so the leading constant-density
+        # Cauchy term cancels pairwise; this special symmetry does not cover other points.
         for lower, upper in ((0.0, field_theta), (field_theta, math.pi)):
             midpoint = 0.5 * (lower + upper)
             half_width = 0.5 * (upper - lower)
@@ -311,7 +319,7 @@ def test_neumann_half_space_hbie_identity_on_equatorial_sphere_point():
                     wave_number_rad_m=wave_number,
                     azimuth_samples=azimuth_samples,
                 )
-                direct_field_gradient, _ = integrate_helmholtz_ring_green_gradient_zero_mode(
+                direct_field_gradient, direct_source_gradient = integrate_helmholtz_ring_green_gradient_zero_mode(
                     field[0],
                     field[2],
                     source_radius,
@@ -320,6 +328,30 @@ def test_neumann_half_space_hbie_identity_on_equatorial_sphere_point():
                     azimuth_samples=azimuth_samples,
                 )
                 direct_field_normal = -direct_field_gradient[0]
+                direct_green = integrate_helmholtz_ring_green_zero_mode(
+                    field[0],
+                    field[2],
+                    source_radius,
+                    source_height,
+                    wave_number_rad_m=wave_number,
+                    azimuth_samples=azimuth_samples,
+                )
+                direct_source_normal = sum(
+                    component * normal_component
+                    for component, normal_component in zip(
+                        direct_source_gradient, normal, strict=True
+                    )
+                )
+                image_green, image_source_normal = _image_ring_integrals(
+                    field[0],
+                    field[2],
+                    field_normal_rz,
+                    source_radius,
+                    source_height,
+                    normal,
+                    wave_number,
+                    2 * azimuth_samples,
+                )
                 image_field_normal = _image_ring_field_normal_integral(
                     field[0],
                     field[2],
@@ -349,6 +381,25 @@ def test_neumann_half_space_hbie_identity_on_equatorial_sphere_point():
                 image_adjoint.append(
                     surface_weight * normal_derivative * image_field_normal
                 )
+                direct_double_layer.append(
+                    surface_weight * pressure * direct_source_normal
+                    - half_width * weight * pressure * logarithm / (4.0 * math.pi)
+                )
+                direct_single_layer.append(
+                    surface_weight * normal_derivative * direct_green
+                    - half_width
+                    * weight
+                    * radius
+                    * normal_derivative
+                    * logarithm
+                    / (2.0 * math.pi)
+                )
+                image_double_layer.append(
+                    surface_weight * pressure * image_source_normal
+                )
+                image_single_layer.append(
+                    surface_weight * normal_derivative * image_green
+                )
 
         hypersingular_log = integrate_logarithmic_panel(
             lambda arclength: wave_number**2
@@ -369,6 +420,24 @@ def test_neumann_half_space_hbie_identity_on_equatorial_sphere_point():
             log_scale=log_scale,
             order=meridian_order,
         )
+        double_layer_log = integrate_logarithmic_panel(
+            lambda arclength: source_data(arclength / radius)[2]
+            / (4.0 * math.pi * radius),
+            0.0,
+            math.pi * radius,
+            singular_arclength,
+            log_scale=log_scale,
+            order=meridian_order,
+        )
+        single_layer_log = integrate_logarithmic_panel(
+            lambda arclength: source_data(arclength / radius)[3]
+            / (2.0 * math.pi),
+            0.0,
+            math.pi * radius,
+            singular_arclength,
+            log_scale=log_scale,
+            order=meridian_order,
+        )
         hypersingular = (
             sum(direct_hypersingular)
             + hypersingular_log
@@ -376,19 +445,43 @@ def test_neumann_half_space_hbie_identity_on_equatorial_sphere_point():
         )
         adjoint = sum(direct_adjoint) + adjoint_log + sum(image_adjoint)
         hbie = 0.5 * field_normal_derivative + hypersingular - adjoint
-        return hbie
+        cbie = (
+            0.5 * source_data(field_theta)[2]
+            + sum(direct_double_layer)
+            + double_layer_log
+            + sum(image_double_layer)
+            - sum(direct_single_layer)
+            - single_layer_log
+            - sum(image_single_layer)
+        )
+        # With residuals as left minus right, Wu et al. Eq. (14) is C + beta*H.
+        burton_miller = cbie + (1j / wave_number) * hbie
+        return cbie, hbie, burton_miller
 
+    azimuth_results = [residual(64, count) for count in (256, 512, 1_024)]
     azimuth_residuals = [
-        abs(residual(64, count)) / abs(field_normal_derivative)
-        for count in (256, 512, 1_024)
+        (
+            abs(result[0]) / abs(source_data(field_theta)[2]),
+            abs(result[1]) / abs(field_normal_derivative),
+            abs(result[2]) / abs(source_data(field_theta)[2]),
+        )
+        for result in azimuth_results
     ]
-    assert azimuth_residuals[1] < azimuth_residuals[0] / 4.0, azimuth_residuals
-    assert azimuth_residuals[2] < azimuth_residuals[1] / 4.0, azimuth_residuals
+    for residual_index, threshold in ((0, 4e-6), (1, 1e-6), (2, 4e-6)):
+        values = [result[residual_index] for result in azimuth_residuals]
+        assert values[1] < values[0] / 4.0, values
+        assert values[2] < values[1] / 4.0, values
+        assert values[2] < threshold, values
+    meridian_results = [residual(order, 1_024) for order in (32, 64, 128)]
     meridian_residuals = [
-        abs(residual(order, 1_024)) / abs(field_normal_derivative)
-        for order in (32, 64, 128)
+        (
+            abs(result[0]) / abs(source_data(field_theta)[2]),
+            abs(result[1]) / abs(field_normal_derivative),
+            abs(result[2]) / abs(source_data(field_theta)[2]),
+        )
+        for result in meridian_results
     ]
-    assert abs(meridian_residuals[2] - meridian_residuals[1]) < abs(
-        meridian_residuals[1] - meridian_residuals[0]
-    ), meridian_residuals
-    assert meridian_residuals[2] < 1e-6, meridian_residuals
+    for residual_index, threshold in ((0, 1e-6), (1, 1e-6), (2, 4e-6)):
+        values = [result[residual_index] for result in meridian_residuals]
+        assert abs(values[2] - values[1]) < abs(values[1] - values[0]), values
+        assert values[2] < threshold, values
