@@ -31,4 +31,6 @@ The evidence is scoped to one exact sphere, one centered monopole boundary trace
 
 **Completed follow-up:** the combined direct-plus-image action is recorded in [the review](NUM03-BEM-exact-sphere-combined-cbie.md).
 
-**Next bounded task:** isolate direct/image azimuth-quadrature sensitivity in the completed combined CBIE action at fixed meridian order. Keep all components separate, use at least three ring-sample levels, and treat differences as finite sensitivity evidence only. Do not allocate a matrix or solve.
+**Completed follow-up:** the combined-action azimuth sensitivity is recorded in [the review](NUM03-BEM-exact-sphere-cbie-azimuth-sensitivity.md).
+
+**Next bounded task:** extend direct azimuth counts at fixed meridian order and image count; preserve layer values and nonmonotone outcomes. Do not allocate a matrix or solve.

@@ -35,7 +35,9 @@ This is a manufactured identity check for one ideal sphere, one centered-monopol
 
 NUM-03 remains ACTIVE/INDETERMINATE, its qualification plan remains DRAFT, and BEM matrix allocation remains unauthorized. Hasegawa remains the selected P4 backend; BEM remains a candidate reference route.
 
-**Next bounded task:** hold geometry and meridian order fixed and refine direct and image azimuth counts at 120°, 135°, 175° and 179°. Record layer contributions, residuals, repeat checksums, timings and any nonmonotone or failed outcome. Use this only as finite quadrature sensitivity evidence; do not set a universal tolerance or allocate a matrix.
+**Completed follow-up:** direct/image factorial azimuth sensitivity is recorded in [the review](NUM03-BEM-exact-sphere-cbie-azimuth-sensitivity.md). It found residual nonmonotonicity at 120°/135° and much smaller image-layer changes for the tested counts.
+
+**Next bounded task:** refine direct azimuth counts to 1,024/2,048/4,096 at fixed meridian order 256 and image count 2,048, across the same four angles. Treat results as finite sensitivity evidence; do not set a universal tolerance or allocate a matrix.
 
 
 The first full local suite run failed two preflight import-isolation tests because this new test imported the harness at collection time. The test now loads the harness only inside its own test function, after preflight tests execute. The focused preflight/BEM rerun passed 31 tests, and the subsequent exact-tree full run passed all 1,830 tests. This test-order failure is retained here; no production behavior or tolerance was changed.
