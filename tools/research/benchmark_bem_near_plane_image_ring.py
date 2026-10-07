@@ -35,6 +35,7 @@ FIELD_SOURCE_ANGLES_DEGREES = ((175.0, 175.1), (175.0, 175.0), (179.0, 179.1))
 CANDIDATE_AZIMUTH_COUNTS = (16, 32, 64, 128, 256, 512)
 SPLIT_MULTIPLES = (2.0, 4.0, 6.0, 8.0)
 REFERENCE_AZIMUTH_COUNTS = (65_536, 131_072)
+GAUSS_REFERENCE_CASES = ((16, 8), (32, 8), (64, 8), (128, 8))
 REPEATS = 3
 DEFAULT_WALL_TIME_CAP_SECONDS = 120.0
 
@@ -226,6 +227,79 @@ def independent_midpoint_reference(samples: int, case: dict) -> complex:
     return complex(math.fsum(real_terms), math.fsum(imag_terms))
 
 
+def gauss_legendre_rule(order: int) -> tuple[tuple[float, float], ...]:
+    """Generate a Gauss-Legendre rule by Newton iteration on Legendre roots."""
+    if type(order) is not int or order < 1:
+        raise ValueError("Gauss-Legendre order must be a positive integer.")
+    roots = [0.0] * order
+    weights = [0.0] * order
+    for index in range((order + 1) // 2):
+        root = math.cos(math.pi * (index + 0.75) / (order + 0.5))
+        for _ in range(64):
+            previous, current = 1.0, root
+            for degree in range(2, order + 1):
+                previous, current = current, (
+                    (2 * degree - 1) * root * current - (degree - 1) * previous
+                ) / degree
+            derivative = order * (root * current - previous) / (root * root - 1.0)
+            update = current / derivative
+            root -= update
+            if abs(update) <= 2.0 * math.ulp(root):
+                break
+        else:
+            raise ArithmeticError("Gauss-Legendre root iteration did not converge.")
+        previous, current = 1.0, root
+        for degree in range(2, order + 1):
+            previous, current = current, (
+                (2 * degree - 1) * root * current - (degree - 1) * previous
+            ) / degree
+        derivative = order * (root * current - previous) / (root * root - 1.0)
+        weight = 2.0 / ((1.0 - root * root) * derivative * derivative)
+        if order % 2 and index == order // 2:
+            root = 0.0
+        roots[index], roots[order - 1 - index] = -root, root
+        weights[index] = weights[order - 1 - index] = weight
+    return tuple(zip(roots, weights, strict=True))
+
+
+def composite_gauss_legendre_reference(
+    panel_count: int, order_per_panel: int, case: dict
+) -> complex:
+    """Integrate the pointwise kernel with composite Gauss-Legendre panels."""
+    if type(panel_count) is not int or panel_count < 1:
+        raise ValueError("Gauss-Legendre panel count must be a positive integer.")
+    rule = gauss_legendre_rule(order_per_panel)
+    panel_width = 2.0 * math.pi / panel_count
+    field = (case["field_radius_m"], 0.0, case["field_height_m"])
+    real_terms = []
+    imag_terms = []
+    for panel in range(panel_count):
+        midpoint = -math.pi + (panel + 0.5) * panel_width
+        for node, weight in rule:
+            angle = midpoint + 0.5 * panel_width * node
+            cosine, sine = math.cos(angle), math.sin(angle)
+            image_point = (
+                case["source_radius_m"] * cosine,
+                case["source_radius_m"] * sine,
+                -case["source_height_m"],
+            )
+            image_normal = (
+                case["source_normal_rz"][0] * cosine,
+                case["source_normal_rz"][0] * sine,
+                -case["source_normal_rz"][1],
+            )
+            value = _free_space_mixed_normal_derivative(
+                field,
+                image_point,
+                case["field_normal"],
+                image_normal,
+                WAVE_NUMBER_RAD_M,
+            ) * (0.5 * panel_width * weight)
+            real_terms.append(value.real)
+            imag_terms.append(value.imag)
+    return complex(math.fsum(real_terms), math.fsum(imag_terms))
+
+
 def encode_value(value: complex) -> str:
     if not math.isfinite(value.real) or not math.isfinite(value.imag):
         raise ArithmeticError("Image ring quadrature returned a non-finite result.")
@@ -233,6 +307,7 @@ def encode_value(value: complex) -> str:
 
 
 def measure_case(case: dict, *, reference_counts=REFERENCE_AZIMUTH_COUNTS,
+                 gauss_reference_cases=GAUSS_REFERENCE_CASES,
                  candidate_counts=CANDIDATE_AZIMUTH_COUNTS, split_multiples=SPLIT_MULTIPLES,
                  repeats=REPEATS, wall_time_cap_seconds=DEFAULT_WALL_TIME_CAP_SECONDS) -> dict:
     references = []
@@ -249,6 +324,22 @@ def measure_case(case: dict, *, reference_counts=REFERENCE_AZIMUTH_COUNTS,
     high_reference = reference_values[-1]
     lower_reference = reference_values[-2]
     reference_delta = abs(high_reference - lower_reference)
+    gauss_references = []
+    gauss_values = []
+    for panels, order in gauss_reference_cases:
+        start = time.perf_counter()
+        value = composite_gauss_legendre_reference(panels, order, case)
+        elapsed = time.perf_counter() - start
+        if elapsed > wall_time_cap_seconds:
+            raise TimeoutError(f"Gauss-Legendre {panels}x{order} reference exceeded its wall-time cap.")
+        gauss_references.append({
+            "panels": panels,
+            "order_per_panel": order,
+            "value": encode_value(value),
+            "wall_time_s": elapsed,
+        })
+        gauss_values.append(value)
+    high_gauss_reference = gauss_values[-1]
     results = []
     for count in candidate_counts:
         candidates = [{"rule": "midpoint", "split_multiple": None}]
@@ -280,6 +371,11 @@ def measure_case(case: dict, *, reference_counts=REFERENCE_AZIMUTH_COUNTS,
                 "relative_difference_from_high_reference": (
                     abs(value - high_reference) / abs(high_reference) if high_reference else None
                 ),
+                "absolute_difference_from_high_gauss_reference": abs(value - high_gauss_reference),
+                "relative_difference_from_high_gauss_reference": (
+                    abs(value - high_gauss_reference) / abs(high_gauss_reference)
+                    if high_gauss_reference else None
+                ),
                 "repeat_wall_times_s": repeat_times,
                 "median_repeat_wall_time_s": statistics.median(repeat_times),
                 "repeat_checksum": hashlib.sha256("\n".join(repeat_values).encode("ascii")).hexdigest(),
@@ -296,6 +392,12 @@ def measure_case(case: dict, *, reference_counts=REFERENCE_AZIMUTH_COUNTS,
         "reference_pair_absolute_difference": reference_delta,
         "reference_pair_relative_difference": (
             reference_delta / abs(high_reference) if high_reference else None
+        ),
+        "reference_gauss_legendre": gauss_references,
+        "midpoint_gauss_reference_absolute_difference": abs(high_reference - high_gauss_reference),
+        "midpoint_gauss_reference_relative_difference": (
+            abs(high_reference - high_gauss_reference) / abs(high_gauss_reference)
+            if high_gauss_reference else None
         ),
         "candidate_results": results,
     }
@@ -318,7 +420,7 @@ def main(argv: list[str] | None = None) -> int:
         parser.error("--wall-time-cap-seconds must be finite and positive")
 
     record = {
-        "contract": "BEM-NEAR-PLANE-IMAGE-RING-QUALIFICATION-1.1",
+        "contract": "BEM-NEAR-PLANE-IMAGE-RING-QUALIFICATION-1.2",
         "status": "RUNNING",
         "created_utc": datetime.now(UTC).isoformat(),
         "source_revision": None,
@@ -348,6 +450,7 @@ def main(argv: list[str] | None = None) -> int:
             "candidate_azimuth_counts_per_interval": CANDIDATE_AZIMUTH_COUNTS,
             "split_multiples": SPLIT_MULTIPLES,
             "reference_azimuth_counts": REFERENCE_AZIMUTH_COUNTS,
+            "gauss_reference_panels_order": GAUSS_REFERENCE_CASES,
             "repeats_per_candidate": REPEATS,
             "wall_time_cap_seconds_per_reference_or_repeat": args.wall_time_cap_seconds,
         },
@@ -355,8 +458,9 @@ def main(argv: list[str] | None = None) -> int:
             "Pointwise image mixed-normal ring integrals for three exploratory angle pairs and the most "
             "angularly localized self/distinct ring pairs from candidate GL4 meshes at N=16/32/64. "
             "The candidate uses the existing periodic midpoint and gap-scaled split rules; the comparison "
-            "uses a full-period uniform midpoint sum at two larger sample counts with the pointwise kernel. "
-            "This is finite-case quadrature sensitivity evidence, not an error bound, a surface integral, "
+            "uses both a full-period uniform midpoint sum and composite Gauss-Legendre pointwise sums. "
+            "The two routes share the same pointwise kernel and geometry, so this is cross-quadrature "
+            "sensitivity evidence, not an error bound, a surface integral, "
             "an assembled operator, solver runtime, field acceptance, or physical validation."
         ),
         "cases": [],
