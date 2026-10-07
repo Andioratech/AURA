@@ -18,6 +18,7 @@ from pathlib import Path
 from aura.fields._bem_axisymmetric import (
     integrate_helmholtz_ring_green_gradient_zero_mode,
     integrate_helmholtz_ring_green_zero_mode,
+    integrate_neumann_ring_burton_miller_terms_zero_mode,
 )
 from aura.fields._bem_mesh import estimate_bem_dense_workspace, sphere_meridian_quadrature
 
@@ -129,6 +130,10 @@ def run_level(panels: int, order_per_panel: int, wall_time_cap_seconds: float) -
         pair_count = 0
         wall_start, cpu_start = time.perf_counter(), time.process_time()
         for target_index, (field_radius, field_height, _) in enumerate(meridian):
+            field_normal = (
+                -field_radius / SPHERE_RADIUS_M,
+                -(field_height - SPHERE_CENTER_HEIGHT_M) / SPHERE_RADIUS_M,
+            )
             for source_index, (source_radius, source_height, surface_weight) in enumerate(meridian):
                 if source_index == target_index:
                     continue
@@ -148,12 +153,30 @@ def run_level(panels: int, order_per_panel: int, wall_time_cap_seconds: float) -
                     wave_number_rad_m=WAVE_NUMBER_RAD_M,
                     azimuth_samples=AZIMUTH_SAMPLES,
                 )
+                source_normal = (
+                    -source_radius / SPHERE_RADIUS_M,
+                    -(source_height - SPHERE_CENTER_HEIGHT_M) / SPHERE_RADIUS_M,
+                )
+                maue_direct, image_mixed_normal = integrate_neumann_ring_burton_miller_terms_zero_mode(
+                    field_radius,
+                    field_height,
+                    field_normal,
+                    source_radius,
+                    source_height,
+                    source_normal,
+                    pressure_pa=1.0 + 0.0j,
+                    pressure_tangent_derivative_pa_m=0.0 + 0.0j,
+                    wave_number_rad_m=WAVE_NUMBER_RAD_M,
+                    azimuth_samples=AZIMUTH_SAMPLES,
+                )
                 for value in (
                     scalar,
                     field_gradient[0] * surface_weight,
                     field_gradient[1] * surface_weight,
                     source_gradient[0] * surface_weight,
                     source_gradient[1] * surface_weight,
+                    maue_direct * surface_weight,
+                    image_mixed_normal * surface_weight,
                 ):
                     digest_value(digest, value)
                 pair_count += 1
@@ -182,7 +205,11 @@ def run_level(panels: int, order_per_panel: int, wall_time_cap_seconds: float) -
         "meridian_pair_count": expected_pairs,
         "singular_diagonal_pairs_skipped": node_count,
         "azimuth_samples_per_ring_pair": AZIMUTH_SAMPLES,
-        "ring_kernel_families": ["single_layer_scalar", "field_and_source_first_gradients"],
+        "ring_kernel_families": [
+            "single_layer_scalar",
+            "field_and_source_first_gradients",
+            "separated_ring_maue_direct_and_image_mixed_normal",
+        ],
         "repeat_records": repeats,
         "median_wall_time_s": statistics.median(wall_values),
         "maximum_wall_time_s": max(wall_values),
@@ -211,7 +238,7 @@ def main(argv: list[str] | None = None) -> int:
         parser.error("--wall-time-cap-seconds must be finite and positive")
 
     record = {
-        "contract": "BEM-MATRIX-FREE-RING-CALIBRATION-1.0",
+        "contract": "BEM-MATRIX-FREE-RING-CALIBRATION-1.1",
         "status": "RUNNING",
         "created_utc": datetime.now(UTC).isoformat(),
         "source_revision": None,
@@ -232,6 +259,9 @@ def main(argv: list[str] | None = None) -> int:
             "sphere_center_height_m": SPHERE_CENTER_HEIGHT_M,
             "size_parameter_ka": SIZE_PARAMETER_KA,
             "wave_number_rad_m": WAVE_NUMBER_RAD_M,
+            "pressure_pa": 1.0,
+            "pressure_tangent_derivative_pa_m": 0.0,
+            "image_quadrature": "midpoint",
             "azimuth_samples": AZIMUTH_SAMPLES,
             "levels": [
                 {"panels": panels, "order_per_panel": order}
@@ -242,10 +272,12 @@ def main(argv: list[str] | None = None) -> int:
             "ram_cap_bytes": RAM_CAP_BYTES,
         },
         "scope": (
-            "Direct free-space single-layer scalar and field/source first-gradient ring kernels "
-            "for off-diagonal exact-sphere meridian pairs only. The singular diagonal, Maue and "
-            "other hypersingular terms, image kernels, matrix assembly, linear solve and field "
-            "accuracy are excluded. This timing does not authorize solver execution."
+            "Direct free-space single-layer scalar and field/source first-gradient ring kernels, "
+            "plus the separated-ring direct Maue and smooth image mixed-normal outputs from the "
+            "existing Burton-Miller ring routine, for off-diagonal exact-sphere meridian pairs. "
+            "The singular diagonal/product integral, near-plane image case, matrix assembly, "
+            "linear solve and field accuracy are excluded. This timing does not authorize "
+            "solver execution."
         ),
         "levels": [],
     }
