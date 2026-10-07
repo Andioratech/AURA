@@ -93,3 +93,37 @@ def test_candidate_mesh_diagonal_sweep_covers_every_gl4_node():
             * (1.0 + math.cos(case["mesh_pair"]["source_theta_rad"]))
             for case in mesh_cases
         )
+
+
+def test_candidate_mesh_neighbor_sweep_covers_both_orientations():
+    cases = BENCHMARK.candidate_mesh_neighbor_pairs()
+    expected_count = sum(
+        2 * sum(node_count - offset for offset in BENCHMARK.MESH_NEIGHBOR_OFFSETS)
+        for node_count in (16, 32, 64)
+    )
+
+    assert len(cases) == expected_count == 430
+    pairs = {
+        (
+            case["mesh_pair"]["node_count"],
+            case["mesh_pair"]["field_node_index"],
+            case["mesh_pair"]["source_node_index"],
+        )
+        for case in cases
+    }
+    for case in cases:
+        pair = case["mesh_pair"]
+        assert pair["selection"] == "ordered_meridian_neighbor_pair"
+        assert abs(pair["field_node_index"] - pair["source_node_index"]) == pair[
+            "neighbor_offset_nodes"
+        ]
+        assert pair["field_theta_rad"] != pair["source_theta_rad"]
+        assert case["field_radius_m"] == BENCHMARK.SPHERE_RADIUS_M * math.sin(
+            pair["field_theta_rad"]
+        )
+        reverse = (
+            pair["node_count"],
+            pair["source_node_index"],
+            pair["field_node_index"],
+        )
+        assert reverse in pairs

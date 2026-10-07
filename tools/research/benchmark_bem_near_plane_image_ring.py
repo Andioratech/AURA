@@ -36,6 +36,7 @@ CANDIDATE_AZIMUTH_COUNTS = (16, 32, 64, 128, 256, 512)
 SPLIT_MULTIPLES = (2.0, 4.0, 6.0, 8.0)
 REFERENCE_AZIMUTH_COUNTS = (65_536, 131_072)
 GAUSS_REFERENCE_CASES = ((16, 8), (32, 8), (64, 8), (128, 8))
+MESH_NEIGHBOR_OFFSETS = (1, 2)
 REPEATS = 3
 DEFAULT_WALL_TIME_CAP_SECONDS = 120.0
 
@@ -204,6 +205,40 @@ def candidate_mesh_self_pairs() -> tuple[dict, ...]:
                 "source_theta_rad": theta,
             }
             selected.append(case)
+    return tuple(selected)
+
+
+def candidate_mesh_neighbor_pairs() -> tuple[dict, ...]:
+    """Return both orientations of first- and second-neighbor GL4 ring pairs."""
+    selected = []
+    for node_count in (16, 32, 64):
+        quadrature = sphere_meridian_quadrature(
+            SPHERE_RADIUS_M,
+            panels=node_count // 4,
+            order_per_panel=4,
+        )
+        nodes = tuple(theta for theta, _ in quadrature)
+        for offset in MESH_NEIGHBOR_OFFSETS:
+            for lower_index in range(node_count - offset):
+                upper_index = lower_index + offset
+                for field_index, source_index in (
+                    (lower_index, upper_index),
+                    (upper_index, lower_index),
+                ):
+                    field_theta, source_theta = nodes[field_index], nodes[source_index]
+                    case = geometry_from_radians(field_theta, source_theta)
+                    case["mesh_pair"] = {
+                        "selection": "ordered_meridian_neighbor_pair",
+                        "node_count": node_count,
+                        "panels": node_count // 4,
+                        "order_per_panel": 4,
+                        "neighbor_offset_nodes": offset,
+                        "field_node_index": field_index,
+                        "source_node_index": source_index,
+                        "field_theta_rad": field_theta,
+                        "source_theta_rad": source_theta,
+                    }
+                    selected.append(case)
     return tuple(selected)
 
 
@@ -447,7 +482,7 @@ def main(argv: list[str] | None = None) -> int:
         parser.error("--wall-time-cap-seconds must be finite and positive")
 
     record = {
-        "contract": "BEM-NEAR-PLANE-IMAGE-RING-QUALIFICATION-1.3",
+        "contract": "BEM-NEAR-PLANE-IMAGE-RING-QUALIFICATION-1.4",
         "status": "RUNNING",
         "created_utc": datetime.now(UTC).isoformat(),
         "source_revision": None,
@@ -475,6 +510,11 @@ def main(argv: list[str] | None = None) -> int:
                 "minimum_angular_scale_distinct_pair",
             ],
             "candidate_mesh_diagonal_pair_count": sum((16, 32, 64)),
+            "candidate_mesh_neighbor_offsets_nodes": MESH_NEIGHBOR_OFFSETS,
+            "candidate_mesh_ordered_neighbor_pair_count": sum(
+                2 * sum(node_count - offset for offset in MESH_NEIGHBOR_OFFSETS)
+                for node_count in (16, 32, 64)
+            ),
             "candidate_azimuth_counts_per_interval": CANDIDATE_AZIMUTH_COUNTS,
             "split_multiples": SPLIT_MULTIPLES,
             "reference_azimuth_counts": REFERENCE_AZIMUTH_COUNTS,
@@ -484,8 +524,8 @@ def main(argv: list[str] | None = None) -> int:
         },
         "scope": (
             "Pointwise image mixed-normal ring integrals for three exploratory angle pairs, every diagonal "
-            "ring pair, and the most angularly localized distinct ring pair from candidate GL4 meshes "
-            "at N=16/32/64. "
+            "ring pair, both orientations of first/second meridian-neighbor pairs, and the most angularly "
+            "localized distinct ring pair from candidate GL4 meshes at N=16/32/64. "
             "The candidate uses the existing periodic midpoint and gap-scaled split rules; the comparison "
             "uses both a full-period uniform midpoint sum and composite Gauss-Legendre pointwise sums. "
             "The two routes share the same pointwise kernel and geometry, so this is cross-quadrature "
@@ -507,7 +547,9 @@ def main(argv: list[str] | None = None) -> int:
         planned_cases = [
             geometry(field_angle, source_angle)
             for field_angle, source_angle in FIELD_SOURCE_ANGLES_DEGREES
-        ] + list(candidate_mesh_self_pairs()) + list(candidate_mesh_pairs()[1::2])
+        ] + list(candidate_mesh_self_pairs()) + list(candidate_mesh_neighbor_pairs()) + list(
+            candidate_mesh_pairs()[1::2]
+        )
         for case in planned_cases:
             measured = measure_case(case, wall_time_cap_seconds=args.wall_time_cap_seconds)
             for reference in measured["reference_midpoint"]:
