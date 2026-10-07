@@ -103,8 +103,12 @@ def output_path(value: str) -> Path:
 
 
 def geometry(field_theta_degrees: float, source_theta_degrees: float) -> dict:
-    field_theta = math.radians(field_theta_degrees)
-    source_theta = math.radians(source_theta_degrees)
+    return geometry_from_radians(
+        math.radians(field_theta_degrees), math.radians(source_theta_degrees)
+    )
+
+
+def geometry_from_radians(field_theta: float, source_theta: float) -> dict:
     radius = SPHERE_RADIUS_M
     gap = PLANE_GAP_M
     return {
@@ -114,8 +118,8 @@ def geometry(field_theta_degrees: float, source_theta_degrees: float) -> dict:
         "source_radius_m": radius * math.sin(source_theta),
         "source_height_m": gap + radius * (1.0 + math.cos(source_theta)),
         "source_normal_rz": (-math.sin(source_theta), -math.cos(source_theta)),
-        "field_theta_degrees": field_theta_degrees,
-        "source_theta_degrees": source_theta_degrees,
+        "field_theta_degrees": math.degrees(field_theta),
+        "source_theta_degrees": math.degrees(source_theta),
     }
 
 
@@ -162,9 +166,7 @@ def candidate_mesh_pairs() -> tuple[dict, ...]:
             ),
         )
         for selection, (scale, field_index, source_index) in pair_groups:
-            field_theta = math.degrees(nodes[field_index][0])
-            source_theta = math.degrees(nodes[source_index][0])
-            case = geometry(field_theta, source_theta)
+            case = geometry_from_radians(nodes[field_index][0], nodes[source_index][0])
             case["mesh_pair"] = {
                 "selection": selection,
                 "node_count": node_count,
@@ -175,6 +177,31 @@ def candidate_mesh_pairs() -> tuple[dict, ...]:
                 "field_theta_rad": nodes[field_index][0],
                 "source_theta_rad": nodes[source_index][0],
                 "angular_scale_rad": scale,
+            }
+            selected.append(case)
+    return tuple(selected)
+
+
+def candidate_mesh_self_pairs() -> tuple[dict, ...]:
+    """Return every diagonal image-ring pair on the candidate GL4 meshes."""
+    selected = []
+    for node_count in (16, 32, 64):
+        quadrature = sphere_meridian_quadrature(
+            SPHERE_RADIUS_M,
+            panels=node_count // 4,
+            order_per_panel=4,
+        )
+        for node_index, (theta, _) in enumerate(quadrature):
+            case = geometry_from_radians(theta, theta)
+            case["mesh_pair"] = {
+                "selection": "diagonal_all_nodes",
+                "node_count": node_count,
+                "panels": node_count // 4,
+                "order_per_panel": 4,
+                "field_node_index": node_index,
+                "source_node_index": node_index,
+                "field_theta_rad": theta,
+                "source_theta_rad": theta,
             }
             selected.append(case)
     return tuple(selected)
@@ -420,7 +447,7 @@ def main(argv: list[str] | None = None) -> int:
         parser.error("--wall-time-cap-seconds must be finite and positive")
 
     record = {
-        "contract": "BEM-NEAR-PLANE-IMAGE-RING-QUALIFICATION-1.2",
+        "contract": "BEM-NEAR-PLANE-IMAGE-RING-QUALIFICATION-1.3",
         "status": "RUNNING",
         "created_utc": datetime.now(UTC).isoformat(),
         "source_revision": None,
@@ -444,9 +471,10 @@ def main(argv: list[str] | None = None) -> int:
             "field_source_angles_degrees": FIELD_SOURCE_ANGLES_DEGREES,
             "candidate_mesh_nodes": [16, 32, 64],
             "candidate_mesh_selection": [
-                "minimum_angular_scale_self_pair",
+                "diagonal_all_nodes",
                 "minimum_angular_scale_distinct_pair",
             ],
+            "candidate_mesh_diagonal_pair_count": sum((16, 32, 64)),
             "candidate_azimuth_counts_per_interval": CANDIDATE_AZIMUTH_COUNTS,
             "split_multiples": SPLIT_MULTIPLES,
             "reference_azimuth_counts": REFERENCE_AZIMUTH_COUNTS,
@@ -455,8 +483,9 @@ def main(argv: list[str] | None = None) -> int:
             "wall_time_cap_seconds_per_reference_or_repeat": args.wall_time_cap_seconds,
         },
         "scope": (
-            "Pointwise image mixed-normal ring integrals for three exploratory angle pairs and the most "
-            "angularly localized self/distinct ring pairs from candidate GL4 meshes at N=16/32/64. "
+            "Pointwise image mixed-normal ring integrals for three exploratory angle pairs, every diagonal "
+            "ring pair, and the most angularly localized distinct ring pair from candidate GL4 meshes "
+            "at N=16/32/64. "
             "The candidate uses the existing periodic midpoint and gap-scaled split rules; the comparison "
             "uses both a full-period uniform midpoint sum and composite Gauss-Legendre pointwise sums. "
             "The two routes share the same pointwise kernel and geometry, so this is cross-quadrature "
@@ -478,7 +507,7 @@ def main(argv: list[str] | None = None) -> int:
         planned_cases = [
             geometry(field_angle, source_angle)
             for field_angle, source_angle in FIELD_SOURCE_ANGLES_DEGREES
-        ] + list(candidate_mesh_pairs())
+        ] + list(candidate_mesh_self_pairs()) + list(candidate_mesh_pairs()[1::2])
         for case in planned_cases:
             measured = measure_case(case, wall_time_cap_seconds=args.wall_time_cap_seconds)
             for reference in measured["reference_midpoint"]:

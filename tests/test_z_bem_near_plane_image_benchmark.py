@@ -63,3 +63,33 @@ def test_candidate_mesh_pair_selection_is_deterministic_and_includes_diagonal():
         assert distinct_pair["field_node_index"] < distinct_pair["source_node_index"]
         assert self_pair["angular_scale_rad"] > 0.0
         assert distinct_pair["angular_scale_rad"] > 0.0
+
+
+def test_candidate_mesh_diagonal_sweep_covers_every_gl4_node():
+    cases = BENCHMARK.candidate_mesh_self_pairs()
+
+    assert len(cases) == sum((16, 32, 64))
+    for node_count in (16, 32, 64):
+        mesh_cases = [
+            case for case in cases if case["mesh_pair"]["node_count"] == node_count
+        ]
+        assert len(mesh_cases) == node_count
+        assert [case["mesh_pair"]["field_node_index"] for case in mesh_cases] == list(
+            range(node_count)
+        )
+        assert all(
+            case["mesh_pair"]["selection"] == "diagonal_all_nodes"
+            and case["mesh_pair"]["field_node_index"]
+            == case["mesh_pair"]["source_node_index"]
+            and case["field_theta_degrees"] == case["source_theta_degrees"]
+            for case in mesh_cases
+        )
+        assert all(
+            case["field_radius_m"]
+            == BENCHMARK.SPHERE_RADIUS_M * math.sin(case["mesh_pair"]["field_theta_rad"])
+            and case["source_height_m"]
+            == BENCHMARK.PLANE_GAP_M
+            + BENCHMARK.SPHERE_RADIUS_M
+            * (1.0 + math.cos(case["mesh_pair"]["source_theta_rad"]))
+            for case in mesh_cases
+        )
