@@ -1,5 +1,11 @@
 # NUM-03 Interim Review — First Coupled Hasegawa Kernel
 
+## Matrix-free runtime harness prepared — 2026-10-07
+
+Added a tracked calibration CLI at [`tools/research/benchmark_bem_matrix_free_rings.py`](../../tools/research/benchmark_bem_matrix_free_rings.py). It streams direct free-space off-diagonal ring pairs over the exact-sphere `N=16/32/64` levels, times scalar and first-gradient kernels at azimuth count 256 with three repeats and a 120 s per-repeat stop, and does not retain a matrix. It requires a clean revision and successful ENV-1.0 verification; its future diagnostic JSON is written under ignored `results/diagnostics/` and includes the source/lock/runtime identities and repeat checksums.
+
+Ruff and `--help` smoke checks pass. No timing result has been generated. The script omits the singular diagonal, Maue/hypersingular term, image term, matrix assembly and solve. Its future timing will not be a solver runtime or a numerical accuracy result. Next commit and remotely validate this harness, then run it on that exact clean revision; retain the matrix-allocation gate.
+
 ## Candidate basis and resource screen — 2026-10-07
 
 For a bounded direct free-space sphere control, the candidate Nyström unknown is the complex total-pressure trace sampled on the exact meridian; the rigid-sphere normal-derivative trace is prescribed as zero. A Burton–Miller combined equation remains necessary for an exterior solve, with the half-jump explicit and the hypersingular part routed through the reviewed Maue/tangential form. Existing `n=0,1` outgoing-sphere identities test operator action only and are not matrix-solve results.

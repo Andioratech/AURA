@@ -1,5 +1,11 @@
 # NUM-03 BEM Kernel Foundation
 
+## Matrix-free kernel calibration harness — 2026-10-07
+
+`tools/research/benchmark_bem_matrix_free_rings.py` prepares a bounded timing measurement for the direct free-space sphere control. It streams target/source meridian pairs and evaluates the existing direct Helmholtz ring scalar and first-gradient functions without retaining a pair matrix. The 4/8/16-panel levels use 4-point Gauss rules (`N=16/32/64`), skip and count the singular diagonal explicitly, use 256 azimuth samples per ring pair, and repeat three times under a 120 s per-repeat cap. The script requires a clean revision and passing ENV-1.0 verification, records runtime/platform/lock identities and per-level checksums, and writes one new immutable JSON record under ignored `results/diagnostics/`.
+
+The harness deliberately does not time Maue/hypersingular terms, singular diagonal product integration, image-near-singular terms, Burton–Miller matrix assembly, a linear solve, or field observables. Therefore its result will calibrate only this bounded off-diagonal kernel workload and cannot authorize matrix allocation or turn the dense BEM estimate from INDETERMINATE into executable. Ruff and `--help` smoke checks pass; the tracked harness has not yet been committed or run. Execute it only after publication on its clean source revision and green remote Quality result.
+
 ## Candidate Nyström unknowns and non-allocating resource screen — 2026-10-07
 
 For the first direct free-space exact-sphere control only, use a zero-azimuthal-mode Nyström discretization on the exact meridian `r=a sin(theta), z=z_c+a cos(theta)`. Store one complex nodal total-pressure trace as the unknown for the rigid-sphere Neumann problem; its normal-derivative trace is prescribed as zero. An exterior solve uses a combined Burton–Miller equation, keeping the half-jump explicit and routing the hypersingular contribution through the reviewed tangential/Maue form. Existing outgoing-mode tests remain operator-action controls and do not constitute a solved linear system. The direct control is `a=17 mm`, `ka=2.3`, at `theta=120°/135°`; this is not the near-plane image case.
