@@ -8,6 +8,12 @@ The harness commit `9204c98eaddacf532b4c87a8a6b64fb6b70164b1` passed exact remot
 
 Scope is off-diagonal direct scalar and first-gradient ring kernels only. The singular diagonal, Maue/hypersingular terms, near-plane image, matrix assembly, solve, and field accuracy are excluded. The resource preflight correctly remains `INDETERMINATE` with execution unauthorized. This is a timing calibration for this kernel subset, not a complete BEM runtime, solver result, P4 gate, or physical validation. Source inspection confirms the separated-ring Maue/image routine rejects the diagonal. Next measure that separated-ring routine with a bounded matrix-free workload on the same exact sphere; keep singular product integration, assembly and allocation out of scope.
 
+## Separated-ring Maue timing — 2026-10-07
+
+The v1.1 harness commit `fe723931b8a6dab6e9f626a223a8491ffc98dcf2` passed remote Quality run `37570071393`. Under ENV-1.0 on that exact clean SHA, constant-pressure separated-ring Burton–Miller calls were added to the existing scalar/gradient timing for the direct exact-sphere control. The call returns a direct Maue term and a smooth image mixed-normal term; both were checksum-bound. Three-repeat median/max wall times were `0.674377/0.711091 s` at N=16, `2.863510/2.957363 s` at N=32 and `10.543530/10.638831 s` at N=64 (256 azimuth samples). Artifact SHA-256: `1899440623836bafa9871d853467a538018221add6eda3512f8ad49918a63844`.
+
+This still omits coincident-ring product integration, the near-plane image case, assembly and solve; the preflight stays `INDETERMINATE`. It is timing evidence for this off-diagonal kernel workload only. Next review the singular-panel primitive call path and scope a separate diagonal product-integration timing; no matrix is authorized.
+
 ## Candidate basis and resource screen — 2026-10-07
 
 For a bounded direct free-space sphere control, the candidate Nyström unknown is the complex total-pressure trace sampled on the exact meridian; the rigid-sphere normal-derivative trace is prescribed as zero. A Burton–Miller combined equation remains necessary for an exterior solve, with the half-jump explicit and the hypersingular part routed through the reviewed Maue/tangential form. Existing `n=0,1` outgoing-sphere identities test operator action only and are not matrix-solve results.
