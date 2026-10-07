@@ -18,6 +18,7 @@ from pathlib import Path
 
 from aura.fields._bem_axisymmetric import _integrate_ring_image_mixed_normal
 from aura.fields._bem_green import _free_space_mixed_normal_derivative
+from aura.fields._bem_mesh import sphere_meridian_quadrature
 
 ROOT = Path(__file__).resolve().parents[2]
 LOCK_FILES = (
@@ -115,6 +116,67 @@ def geometry(field_theta_degrees: float, source_theta_degrees: float) -> dict:
         "field_theta_degrees": field_theta_degrees,
         "source_theta_degrees": source_theta_degrees,
     }
+
+
+def candidate_mesh_pairs() -> tuple[dict, ...]:
+    """Select the most localized self and distinct ring pairs at each GL4 level."""
+    selected = []
+    for node_count in (16, 32, 64):
+        quadrature = sphere_meridian_quadrature(
+            SPHERE_RADIUS_M,
+            panels=node_count // 4,
+            order_per_panel=4,
+        )
+        nodes = tuple(
+            (
+                theta,
+                SPHERE_RADIUS_M * math.sin(theta),
+                PLANE_GAP_M + SPHERE_RADIUS_M * (1.0 + math.cos(theta)),
+            )
+            for theta, _ in quadrature
+        )
+
+        def angular_scale(
+            field_index: int, source_index: int, node_data=nodes
+        ) -> float:
+            _, field_radius, field_height = node_data[field_index]
+            _, source_radius, source_height = node_data[source_index]
+            return math.hypot(
+                field_radius - source_radius,
+                field_height + source_height,
+            ) / math.sqrt(field_radius * source_radius)
+
+        pair_groups = (
+            (
+                "minimum_angular_scale_self_pair",
+                min((angular_scale(index, index), index, index) for index in range(node_count)),
+            ),
+            (
+                "minimum_angular_scale_distinct_pair",
+                min(
+                    (angular_scale(field_index, source_index), field_index, source_index)
+                    for field_index in range(node_count)
+                    for source_index in range(field_index + 1, node_count)
+                ),
+            ),
+        )
+        for selection, (scale, field_index, source_index) in pair_groups:
+            field_theta = math.degrees(nodes[field_index][0])
+            source_theta = math.degrees(nodes[source_index][0])
+            case = geometry(field_theta, source_theta)
+            case["mesh_pair"] = {
+                "selection": selection,
+                "node_count": node_count,
+                "panels": node_count // 4,
+                "order_per_panel": 4,
+                "field_node_index": field_index,
+                "source_node_index": source_index,
+                "field_theta_rad": nodes[field_index][0],
+                "source_theta_rad": nodes[source_index][0],
+                "angular_scale_rad": scale,
+            }
+            selected.append(case)
+    return tuple(selected)
 
 
 def split_image_ring(samples: int, rule: str, split_multiple: float, case: dict) -> complex:
@@ -225,6 +287,7 @@ def measure_case(case: dict, *, reference_counts=REFERENCE_AZIMUTH_COUNTS,
     return {
         "field_theta_degrees": case["field_theta_degrees"],
         "source_theta_degrees": case["source_theta_degrees"],
+        "mesh_pair": case.get("mesh_pair"),
         "image_separation_m": math.hypot(
             case["field_radius_m"] - case["source_radius_m"],
             case["field_height_m"] + case["source_height_m"],
@@ -255,7 +318,7 @@ def main(argv: list[str] | None = None) -> int:
         parser.error("--wall-time-cap-seconds must be finite and positive")
 
     record = {
-        "contract": "BEM-NEAR-PLANE-IMAGE-RING-QUALIFICATION-1.0",
+        "contract": "BEM-NEAR-PLANE-IMAGE-RING-QUALIFICATION-1.1",
         "status": "RUNNING",
         "created_utc": datetime.now(UTC).isoformat(),
         "source_revision": None,
@@ -277,6 +340,11 @@ def main(argv: list[str] | None = None) -> int:
             "sound_speed_m_s": SOUND_SPEED_M_S,
             "wave_number_rad_m": WAVE_NUMBER_RAD_M,
             "field_source_angles_degrees": FIELD_SOURCE_ANGLES_DEGREES,
+            "candidate_mesh_nodes": [16, 32, 64],
+            "candidate_mesh_selection": [
+                "minimum_angular_scale_self_pair",
+                "minimum_angular_scale_distinct_pair",
+            ],
             "candidate_azimuth_counts_per_interval": CANDIDATE_AZIMUTH_COUNTS,
             "split_multiples": SPLIT_MULTIPLES,
             "reference_azimuth_counts": REFERENCE_AZIMUTH_COUNTS,
@@ -284,7 +352,8 @@ def main(argv: list[str] | None = None) -> int:
             "wall_time_cap_seconds_per_reference_or_repeat": args.wall_time_cap_seconds,
         },
         "scope": (
-            "Pointwise image mixed-normal ring integrals for three selected near-plane sphere angle pairs. "
+            "Pointwise image mixed-normal ring integrals for three exploratory angle pairs and the most "
+            "angularly localized self/distinct ring pairs from candidate GL4 meshes at N=16/32/64. "
             "The candidate uses the existing periodic midpoint and gap-scaled split rules; the comparison "
             "uses a full-period uniform midpoint sum at two larger sample counts with the pointwise kernel. "
             "This is finite-case quadrature sensitivity evidence, not an error bound, a surface integral, "
@@ -302,13 +371,16 @@ def main(argv: list[str] | None = None) -> int:
             raise RuntimeError("ENV-1.0 verification did not pass.")
         record["runtime"]["available_ram_bytes_at_start"] = available_ram_bytes()
         start = time.perf_counter()
-        for field_angle, source_angle in FIELD_SOURCE_ANGLES_DEGREES:
-            case = geometry(field_angle, source_angle)
+        planned_cases = [
+            geometry(field_angle, source_angle)
+            for field_angle, source_angle in FIELD_SOURCE_ANGLES_DEGREES
+        ] + list(candidate_mesh_pairs())
+        for case in planned_cases:
             measured = measure_case(case, wall_time_cap_seconds=args.wall_time_cap_seconds)
             for reference in measured["reference_midpoint"]:
                 if reference["wall_time_s"] > args.wall_time_cap_seconds:
                     raise TimeoutError("Independent reference exceeded its wall-time cap.")
-            if time.perf_counter() - start > 3 * args.wall_time_cap_seconds:
+            if time.perf_counter() - start > len(planned_cases) * args.wall_time_cap_seconds:
                 raise TimeoutError("Near-plane image qualification exceeded its total wall-time cap.")
             record["cases"].append(measured)
         record["runtime"]["available_ram_bytes_at_end"] = available_ram_bytes()
