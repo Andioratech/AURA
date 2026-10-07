@@ -29,4 +29,6 @@ Two targeted extensions use the same committed action function and fixed geometr
 
 The evidence is scoped to one exact sphere, one centered monopole boundary trace, a rigid-plane Neumann image construction, the listed collocation angles, GL4 meridian panels and the specified ring quadratures. It does not validate the direct singular contribution, a complete BIE solve, the selected Hasegawa P4 backend, acoustic force or acceleration, a general gravity-like field, experimental behavior, water, other bodies or other frequencies. Hasegawa remains the selected P4 backend; BEM remains a candidate numerical reference route. NUM-03 stays ACTIVE/INDETERMINATE, the plan remains DRAFT, and the public matrix/preflight remains unauthorized.
 
-**Next bounded task:** design and review a streamed, matrix-free combined direct-plus-image CBIE action for the same exact sphere and centered monopole trace. Compare with the existing analytic full half-space boundary identity at a stated angle set, retaining direct and image components separately. No operator matrix or solve is part of that task.
+**Completed follow-up:** the combined direct-plus-image action is recorded in [the review](NUM03-BEM-exact-sphere-combined-cbie.md).
+
+**Next bounded task:** isolate direct/image azimuth-quadrature sensitivity in the completed combined CBIE action at fixed meridian order. Keep all components separate, use at least three ring-sample levels, and treat differences as finite sensitivity evidence only. Do not allocate a matrix or solve.
