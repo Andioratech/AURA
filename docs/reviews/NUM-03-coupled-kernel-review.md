@@ -1,10 +1,12 @@
 # NUM-03 Interim Review — First Coupled Hasegawa Kernel
 
-## Matrix-free runtime harness prepared — 2026-10-07
+## Bounded off-diagonal kernel timing — 2026-10-07
 
 Added a tracked calibration CLI at [`tools/research/benchmark_bem_matrix_free_rings.py`](../../tools/research/benchmark_bem_matrix_free_rings.py). It streams direct free-space off-diagonal ring pairs over the exact-sphere `N=16/32/64` levels, times scalar and first-gradient kernels at azimuth count 256 with three repeats and a 120 s per-repeat stop, and does not retain a matrix. It requires a clean revision and successful ENV-1.0 verification; its future diagnostic JSON is written under ignored `results/diagnostics/` and includes the source/lock/runtime identities and repeat checksums.
 
-Ruff and `--help` smoke checks pass. No timing result has been generated. The script omits the singular diagonal, Maue/hypersingular term, image term, matrix assembly and solve. Its future timing will not be a solver runtime or a numerical accuracy result. Next commit and remotely validate this harness, then run it on that exact clean revision; retain the matrix-allocation gate.
+The harness commit `9204c98eaddacf532b4c87a8a6b64fb6b70164b1` passed exact remote Quality run `37562919561`. On its clean source revision under ENV-1.0 / CPython 3.12.14, the direct free-space exact-sphere candidate at `a=17 mm`, `ka=2.3`, center height `2a`, with composite GL4 panels 4/8/16 (`N=16/32/64`) and 256 azimuth samples, gave three-repeat median/max wall times `0.174820/0.197666 s`, `0.797175/0.878167 s`, and `2.975475/3.258054 s`. Repeated output checksums matched at each level; all levels completed within the 120 s per-repeat cap. Local artifact SHA-256: `fda6c8a0f466340e50b090de2b838809c7770098fdec9780b9efb9aa4cec8ba4`.
+
+Scope is off-diagonal direct scalar and first-gradient ring kernels only. The singular diagonal, Maue/hypersingular terms, near-plane image, matrix assembly, solve, and field accuracy are excluded. The resource preflight correctly remains `INDETERMINATE` with execution unauthorized. This is a timing calibration for this kernel subset, not a complete BEM runtime, solver result, P4 gate, or physical validation. Source inspection confirms the separated-ring Maue/image routine rejects the diagonal. Next measure that separated-ring routine with a bounded matrix-free workload on the same exact sphere; keep singular product integration, assembly and allocation out of scope.
 
 ## Candidate basis and resource screen — 2026-10-07
 
