@@ -1,5 +1,11 @@
 # NUM-03 Interim Review — First Coupled Hasegawa Kernel
 
+## Direct-sphere self-panel calibration harness prepared — 2026-10-07
+
+Added a standalone harness for the complete singular direct-sphere self-panel API at every composite GL4 collocation node for `N=16/32/64` and zonal modes `n=0,1`. It records code/environment/lock identity, computes repeat checksums, applies a 120 s/repeat cap, and captures the dimension-only workspace preflight without allocating a matrix. The 3 focused tests, CLI help and Ruff pass. The harness has not been run on a clean commit; full local and remote Quality remain prerequisites.
+
+The ring API currently calculates its smooth plane-image term along with the direct term. The benchmark discards the image result, so its timing includes that API overhead and is not a direct-only kernel timing. It excludes off-diagonal image near-singular integration, BIE jumps, assembly, solve and field accuracy. Next run and publish after full Quality, confirm exact remote Quality, then benchmark on the exact clean ENV-1.0 commit. Keep matrix allocation unauthorized.
+
 ## Bounded off-diagonal kernel timing — 2026-10-07
 
 Added a tracked calibration CLI at [`tools/research/benchmark_bem_matrix_free_rings.py`](../../tools/research/benchmark_bem_matrix_free_rings.py). It streams direct free-space off-diagonal ring pairs over the exact-sphere `N=16/32/64` levels, times scalar and first-gradient kernels at azimuth count 256 with three repeats and a 120 s per-repeat stop, and does not retain a matrix. It requires a clean revision and successful ENV-1.0 verification; its future diagnostic JSON is written under ignored `results/diagnostics/` and includes the source/lock/runtime identities and repeat checksums.

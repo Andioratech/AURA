@@ -1,5 +1,11 @@
 # NUM-03 BEM Kernel Foundation
 
+## Self-panel calibration harness prepared — 2026-10-07
+
+`tools/research/benchmark_bem_direct_sphere_maue_diagonal.py` now measures the full `integrate_direct_sphere_maue_panel` call at every candidate composite GL4 collocation node for panels 4/8/16 (`N=16/32/64`) and exact pressure traces `n=0,1`. Each level repeats three times and checks a SHA-256 over node-indexed complex outputs. It records source/environment/lock identities, available RAM and the current dimension-only dense preflight, and enforces a 120 s per-repeat cap. The tracked test exercises a reduced `N=4`, 16-azimuth case; all 3 tests and Ruff pass. No production calibration has been run because the harness source is not yet on a clean, remotely validated commit.
+
+The existing combined ring routine evaluates both direct Maue and smooth image mixed-normal contributions; the benchmark discards the image output. Therefore the recorded wall time will be the cost of this API invocation, including image overhead, rather than isolated direct-only cost. The operation integrates self-panels only; it excludes off-diagonal panels, near-plane image convergence, jumps, matrix assembly, linear solve and field accuracy. It does not authorize matrix allocation. Next finish exact-tree Quality and publication, then run on the exact clean source under ENV-1.0; retain INDETERMINATE if implementation-aware runtime or available-memory caps do not close.
+
 ## Matrix-free kernel calibration result — 2026-10-07
 
 `tools/research/benchmark_bem_matrix_free_rings.py` prepares a bounded timing measurement for the direct free-space sphere control. It streams target/source meridian pairs and evaluates the existing direct Helmholtz ring scalar and first-gradient functions without retaining a pair matrix. The 4/8/16-panel levels use 4-point Gauss rules (`N=16/32/64`), skip and count the singular diagonal explicitly, use 256 azimuth samples per ring pair, and repeat three times under a 120 s per-repeat cap. The script requires a clean revision and passing ENV-1.0 verification, records runtime/platform/lock identities and per-level checksums, and writes one new immutable JSON record under ignored `results/diagnostics/`.
