@@ -11,6 +11,7 @@ from aura.fields._bem_axisymmetric import (
 )
 from aura.fields._bem_singular import (
     integrate_cauchy_principal_value_panel,
+    integrate_direct_sphere_maue_panel,
     integrate_logarithmic_panel,
 )
 
@@ -173,14 +174,7 @@ def test_singular_panel_subtraction_matches_exact_sphere_hypersingular_modes(
     kr = 2.3
     wave_number = kr / radius
     clearance = radius
-    field_radius = radius * math.sin(field_theta)
-    field_height = clearance + radius * (1.0 + math.cos(field_theta))
-    field_normal = (-math.sin(field_theta), -math.cos(field_theta))
     field_pressure = 1.0 if degree == 0 else math.cos(field_theta)
-    field_tangent_derivative = 0.0 if degree == 0 else -math.sin(field_theta) / radius
-    cauchy_density = field_tangent_derivative
-    logarithmic_density = radius * wave_number**2 * field_pressure / (2.0 * math.pi)
-    logarithmic_scale = 8.0 * field_radius / radius
 
     def density(theta):
         return 1.0 if degree == 0 else math.cos(theta)
@@ -189,54 +183,18 @@ def test_singular_panel_subtraction_matches_exact_sphere_hypersingular_modes(
         return 0.0 if degree == 0 else -math.sin(theta) / radius
 
     def numerical_surface_integral(order):
-        from aura.fields.numerical import gauss_legendre_rule
-
-        nodes, weights = gauss_legendre_rule(order)
-
-        def regularized(theta):
-            source_radius = radius * math.sin(theta)
-            source_height = clearance + radius * (1.0 + math.cos(theta))
-            source_normal = (-math.sin(theta), -math.cos(theta))
-            direct, _ = integrate_neumann_ring_burton_miller_terms_zero_mode(
-                field_radius,
-                field_height,
-                field_normal,
-                source_radius,
-                source_height,
-                source_normal,
-                pressure_pa=density(theta),
-                pressure_tangent_derivative_pa_m=tangent_derivative(theta),
-                wave_number_rad_m=wave_number,
-                azimuth_samples=1_024,
-            )
-            offset = theta - field_theta
-            weighted_ring = source_radius * radius * direct
-            return (
-                weighted_ring
-                - cauchy_density / (2.0 * math.pi * offset)
-                - logarithmic_density * math.log(logarithmic_scale / abs(offset))
-            )
-
-        residual = 0j
-        for panel_left, panel_right in ((0.0, field_theta), (field_theta, math.pi)):
-            midpoint = 0.5 * (panel_left + panel_right)
-            half_width = 0.5 * (panel_right - panel_left)
-            residual += half_width * sum(
-                weight * regularized(midpoint + half_width * node)
-                for node, weight in zip(nodes, weights, strict=True)
-            )
-        principal_value = integrate_cauchy_principal_value_panel(
-            lambda _: cauchy_density, 0.0, math.pi, field_theta, order=order
-        )
-        logarithm = logarithmic_density * integrate_logarithmic_panel(
-            lambda _: 1.0,
+        return integrate_direct_sphere_maue_panel(
+            radius,
+            clearance,
+            field_theta,
             0.0,
             math.pi,
-            field_theta,
-            log_scale=logarithmic_scale,
-            order=order,
+            density,
+            tangent_derivative,
+            wave_number_rad_m=wave_number,
+            azimuth_samples=1_024,
+            meridian_order=order,
         )
-        return residual + principal_value + logarithm
 
     j0 = math.sin(kr) / kr
     j1 = math.sin(kr) / (kr * kr) - math.cos(kr) / kr
@@ -258,6 +216,32 @@ def test_singular_panel_subtraction_matches_exact_sphere_hypersingular_modes(
     assert abs(intermediate - exact) < abs(coarse - exact) / 2.0
     assert abs(refined - exact) < abs(intermediate - exact) / 3.0
     assert refined == pytest.approx(exact, rel=2e-4, abs=2e-5)
+
+
+@pytest.mark.parametrize(
+    ("field_theta", "left", "right", "meridian_order"),
+    [
+        (0.0, 0.0, math.pi, 16),
+        (math.pi / 2.0, 0.0, math.pi / 2.0, 16),
+        (1.1, 0.0, math.pi, 1),
+    ],
+)
+def test_direct_sphere_maue_panel_rejects_poles_joins_and_invalid_order(
+    field_theta, left, right, meridian_order
+):
+    with pytest.raises(InvalidInputError):
+        integrate_direct_sphere_maue_panel(
+            0.017,
+            0.001,
+            field_theta,
+            left,
+            right,
+            lambda _: 1.0,
+            lambda _: 0.0,
+            wave_number_rad_m=2.3 / 0.017,
+            azimuth_samples=16,
+            meridian_order=meridian_order,
+        )
 
 
 @pytest.mark.parametrize("degree", [0, 1])
