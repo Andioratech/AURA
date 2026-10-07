@@ -10,6 +10,8 @@
 
 **NUM-03 off-diagonal timing result — 2026-10-07:** Commit `9204c98` and exact remote Quality run `37562919561` are green. Clean ENV-1.0 measurements (three-repeat median/max) are 0.174820/0.197666 s at N=16, 0.797175/0.878167 s at N=32, and 2.975475/3.258054 s at N=64 for 256-azimuth off-diagonal direct scalar/first-gradient ring kernels. Checksums repeat; matrix allocation remains unauthorized. The singular diagonal, Maue term, image term, assembly and solve remain unmeasured. Source review confirmed the separated-ring Maue/image function rejects coincident pairs. Next calibrate its bounded off-diagonal workload; keep singular product integration and assembly out of scope.
 
+**NUM-03 singular-panel primitive microcalibration — 2026-10-07:** Harness `f052002` passed remote Quality run `37575291950`. Isolated Cauchy/log primitive median/max times were 0.001881/0.002543 s (N=16), 0.007229/0.007314 s (N=32), and 0.052164/0.052682 s (N=64), with repeated checksums. The primitives have no production BEM caller; this excludes the regularized direct-ring residual and is not a complete diagonal action. Preflight remains INDETERMINATE; no matrix allocated. Next define and verify the complete direct-sphere diagonal action before implementation or timing.
+
 **NUM-03 separated-ring Maue timing — 2026-10-07:** Harness v1.1 commit `fe72393` passed remote Quality run `37570071393`. Combined scalar/gradient and separated-ring direct Maue/smooth image mixed-normal timing at N=16/32/64 has three-repeat median/max of 0.674377/0.711091 s, 2.863510/2.957363 s and 10.543530/10.638831 s. This excludes the diagonal product integral and near-plane image case; no matrix or solve. Next review and isolate diagonal product-integration cost.
 
 

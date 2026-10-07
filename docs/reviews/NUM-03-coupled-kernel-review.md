@@ -14,6 +14,12 @@ The v1.1 harness commit `fe723931b8a6dab6e9f626a223a8491ffc98dcf2` passed remote
 
 This still omits coincident-ring product integration, the near-plane image case, assembly and solve; the preflight stays `INDETERMINATE`. It is timing evidence for this off-diagonal kernel workload only. Next review the singular-panel primitive call path and scope a separate diagonal product-integration timing; no matrix is authorized.
 
+## Singular-panel primitive microcalibration — 2026-10-07
+
+Harness commit `f052002cbd9b911dd1c6d8632fd7f95efa32a4c9` passed remote Quality run `37575291950`. On the clean ENV-1.0 source SHA, isolated Cauchy principal-value and logarithmic primitive calls over each GL4 collocation node's containing panel, for exact-sphere n=0/1 pressure modes, measured median/max 0.001881/0.002543 s at N=16, 0.007229/0.007314 s at N=32 and 0.052164/0.052682 s at N=64. Three checksums per level match. Artifact SHA-256: `1c333e74f453667f9def643d29227186de1ec6aec6172ac64243a8deb43cefba`.
+
+Neither primitive has a production BEM caller at this revision. This measures only the one-dimensional correction calls, not the regularized direct-ring residual or a complete diagonal action. No matrix or solve was performed; preflight remains `INDETERMINATE`. Next define and verify the full matrix-free direct-sphere diagonal action before implementation or assembly.
+
 ## Candidate basis and resource screen — 2026-10-07
 
 For a bounded direct free-space sphere control, the candidate Nyström unknown is the complex total-pressure trace sampled on the exact meridian; the rigid-sphere normal-derivative trace is prescribed as zero. A Burton–Miller combined equation remains necessary for an exterior solve, with the half-jump explicit and the hypersingular part routed through the reviewed Maue/tangential form. Existing `n=0,1` outgoing-sphere identities test operator action only and are not matrix-solve results.
