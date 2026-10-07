@@ -1,5 +1,25 @@
 # NUM-03 BEM Kernel Foundation
 
+## Candidate Nyström unknowns and non-allocating resource screen — 2026-10-07
+
+For the first direct free-space exact-sphere control only, use a zero-azimuthal-mode Nyström discretization on the exact meridian `r=a sin(theta), z=z_c+a cos(theta)`. Store one complex nodal total-pressure trace as the unknown for the rigid-sphere Neumann problem; its normal-derivative trace is prescribed as zero. An exterior solve uses a combined Burton–Miller equation, keeping the half-jump explicit and routing the hypersingular contribution through the reviewed tangential/Maue form. Existing outgoing-mode tests remain operator-action controls and do not constitute a solved linear system. The direct control is `a=17 mm`, `ka=2.3`, at `theta=120°/135°`; this is not the near-plane image case.
+
+The unknowns are pressure samples at the same composite Gauss–Legendre nodes used to integrate the meridian (Nyström sampling, not a piecewise-constant facet density). Use four Gauss nodes per panel on `[0, pi]`, with panel counts 4, 8 and 16, giving `N=16, 32, 64`. These are three comparable screening levels, not an accepted convergence sequence or stopping rule. The sphere remains exact at every node and in every weight. This sequence says nothing about the near-singular image contribution for a sphere 0.1 mm from the plane, which requires a separate transformed/adaptive rule and resource accounting.
+
+For resource planning only, let `N` be the node count and account for four simultaneously live dense complex operator/work arrays, 21 complex vectors, and 64 KiB fixed metadata/workspace. Use 64 bytes per stored complex entry/vector element as a broad Python-container allowance, then double the sum for allocator and temporary-array headroom:
+
+`M_plan = 2 * (4 * 64 * N^2 + 21 * 64 * N + 65,536) bytes`.
+
+| Panels × Gauss nodes | `N` | Meridian target/source pairs `N²` | Four-operator entries `4N²` | Planned RAM allowance |
+|---:|---:|---:|---:|---:|
+| 4 × 4 | 16 | 256 | 1,024 | 305,152 bytes (0.292 MiB) |
+| 8 × 4 | 32 | 1,024 | 4,096 | 741,376 bytes (0.707 MiB) |
+| 16 × 4 | 64 | 4,096 | 16,384 | 2,400,256 bytes (2.289 MiB) |
+
+This is a dimension-based planning allowance, not measured peak RSS or a hard bound on a future numerical library, factorization, or process. It supports a candidate 16 MiB RAM ceiling for a later direct-control pilot, subject to checking currently available memory and implementation overhead. Pair counts expose dense `O(N²)` assembly work but do not predict seconds: ring-kernel cost, singular corrections, the linear solver and runtime coefficient remain uncalibrated. The pure `estimate_bem_dense_workspace` preflight now implements this accounting without generating quadrature or solver arrays; focused tests verify all three levels, rejection against either RAM limit, and that a fitting estimate remains INDETERMINATE with `execution_authorized=false`. The exact local Quality workflow passes 1,813 tests in 1,085.79 s, alongside locked install, editable install, `pip check`, ENV-1.0, Ruff, required-document checks and `git diff --check`. Therefore **no system matrix may yet be allocated**. Next calibrate a bounded matrix-free kernel workload on an exact clean source and environment, retain an explicit wall-time cap, and repeat the RAM estimate with the selected implementation before matrix assembly.
+
+This is a candidate numerical layout, not a BEM qualification. The literature supports axisymmetric reduction to the generating curve and demonstrates Nyström/curved-element Burton–Miller discretizations separately ([Wang, Atalla & Nicolas, 1997](https://doi.org/10.1121/1.414136); [Cao et al., 2015](https://doi.org/10.1016/j.enganabound.2014.07.006)); applying that combination to AURA's ring kernels and exact-sphere controls remains our derivation and requires verification. No matrix, solve, convergence pass, P4 pass, or physical claim follows.
+
 ## Exact sphere meridian quadrature — 2026-10-07
 
 `src/aura/fields/_bem_mesh.py` now provides `sphere_meridian_quadrature`, a bounded composite Gauss-Legendre rule on the exact sphere parameterization `r=a sin(theta)`, `z=z_c+a cos(theta)`. Each output pair is `(theta, a^2 sin(theta) dtheta)`; the azimuthal integral is deliberately excluded because a zero-mode ring kernel already integrates over source azimuth. Panel edges and nodes describe the exact sphere and do not approximate it with facets.

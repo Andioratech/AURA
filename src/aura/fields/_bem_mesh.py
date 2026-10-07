@@ -7,6 +7,12 @@ import math
 from aura.errors import InvalidInputError, NumericalDomainError
 
 MAX_BEM_MERIDIAN_NODES = 65_536
+MAX_BEM_RESOURCE_BYTES = (1 << 63) - 1
+BEM_COMPLEX_ELEMENT_BYTES = 64
+BEM_DENSE_OPERATOR_ARRAYS = 4
+BEM_SOLVER_VECTOR_COUNT = 21
+BEM_FIXED_WORKSPACE_BYTES = 65_536
+BEM_RAM_HEADROOM_FACTOR = 2
 
 
 def sphere_meridian_quadrature(
@@ -69,3 +75,72 @@ def sphere_meridian_quadrature(
                 )
             result.append((theta, surface_weight))
     return tuple(result)
+
+
+def estimate_bem_dense_workspace(
+    *,
+    panels: int,
+    order_per_panel: int,
+    ram_cap_bytes: int,
+    available_ram_bytes: int,
+) -> dict[str, int | str | bool | None]:
+    """Estimate candidate dense-BEM workspace without allocating solver data.
+
+    The estimate reserves four complex dense arrays, 21 complex solver vectors,
+    fixed workspace, and a RAM headroom multiplier. It is a planning contract,
+    not a runtime calibration or authorization to assemble a matrix.
+    """
+    if type(panels) is not int or not 1 <= panels <= MAX_BEM_MERIDIAN_NODES:
+        raise InvalidInputError(
+            "BEM_MERIDIAN_PANELS", "/panels", "Expected a positive bounded panel count."
+        )
+    if type(order_per_panel) is not int or not 1 <= order_per_panel <= 512:
+        raise InvalidInputError(
+            "BEM_MERIDIAN_ORDER", "/order_per_panel", "Expected Gauss order from 1 through 512."
+        )
+    if type(ram_cap_bytes) is not int or not 0 <= ram_cap_bytes <= MAX_BEM_RESOURCE_BYTES:
+        raise InvalidInputError(
+            "BEM_RESOURCE_CAP", "/ram_cap_bytes", "Expected a bounded nonnegative RAM cap."
+        )
+    if type(available_ram_bytes) is not int or not 0 <= available_ram_bytes <= MAX_BEM_RESOURCE_BYTES:
+        raise InvalidInputError(
+            "BEM_RESOURCE_AVAILABLE", "/available_ram_bytes",
+            "Expected a bounded nonnegative available-RAM value.",
+        )
+
+    nodes = panels * order_per_panel
+    if nodes > MAX_BEM_MERIDIAN_NODES:
+        raise InvalidInputError(
+            "BEM_MERIDIAN_WORK", "/order_per_panel",
+            f"Composite rule exceeds {MAX_BEM_MERIDIAN_NODES} nodes.",
+        )
+    pairs = nodes * nodes
+    operator_entries = BEM_DENSE_OPERATOR_ARRAYS * pairs
+    raw_bytes = (
+        operator_entries * BEM_COMPLEX_ELEMENT_BYTES
+        + BEM_SOLVER_VECTOR_COUNT * nodes * BEM_COMPLEX_ELEMENT_BYTES
+        + BEM_FIXED_WORKSPACE_BYTES
+    )
+    estimated_ram = BEM_RAM_HEADROOM_FACTOR * raw_bytes
+    if estimated_ram > MAX_BEM_RESOURCE_BYTES:
+        raise InvalidInputError(
+            "BEM_RESOURCE_RANGE", "/panels", "BEM workspace estimate exceeds the supported integer range."
+        )
+
+    limiting_cap = min(ram_cap_bytes, available_ram_bytes)
+    rejected = estimated_ram > limiting_cap
+    return {
+        "contract": "BEM-DENSE-WORKSPACE-1.0",
+        "status": "REJECTED" if rejected else "INDETERMINATE",
+        "reason": "RESOURCE_BUDGET_EXCEEDED" if rejected else "BEM_RUNTIME_UNCALIBRATED",
+        "panels": panels,
+        "order_per_panel": order_per_panel,
+        "node_count": nodes,
+        "meridian_pair_count": pairs,
+        "operator_entry_count": operator_entries,
+        "estimated_ram_bytes": estimated_ram,
+        "ram_cap_bytes": ram_cap_bytes,
+        "available_ram_bytes": available_ram_bytes,
+        "runtime_estimate_seconds": None,
+        "execution_authorized": False,
+    }
