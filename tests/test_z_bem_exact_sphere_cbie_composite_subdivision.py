@@ -20,7 +20,7 @@ def test_composite_subdivision_grid_fixes_cutoff_order_and_azimuth_counts():
     harness = _load_harness()
     grid = harness.case_grid()
 
-    assert grid == ((179.0, 10),)
+    assert grid == ((179.0, 12),)
     assert harness.MERIDIAN_SPLIT_FACTOR == 8.0
     assert harness.MERIDIAN_ORDER == 256
     assert harness.DIRECT_AZIMUTH_SAMPLES == 4_096
@@ -29,18 +29,54 @@ def test_composite_subdivision_grid_fixes_cutoff_order_and_azimuth_counts():
 
 def test_composite_subdivision_case_repeats_and_reconstructs_residual():
     harness = _load_harness()
-    case = harness.measure_case(179.0, 10)
+    case = harness.measure_case(179.0, 12)
 
     assert case["repeat_checksum_sha256"]
     assert case["collocation_theta_degrees"] == 179.0
     assert case["meridian_split_factor"] == 8.0
-    assert case["meridian_subdivisions_per_active_interval"] == 10
+    assert case["meridian_subdivisions_per_active_interval"] == 12
     assert case["active_meridian_subintervals"] == 2
-    assert case["evaluated_meridian_panels"] == 20
+    assert case["evaluated_meridian_panels"] == 24
     assert case["meridian_order_per_active_subinterval"] == 256
     assert case["direct_azimuth_samples"] == 4_096
     assert case["image_azimuth_samples"] == 2_048
     assert len(case["repeat_wall_times_s"]) == 2
+    assert case["completed_repeats"] == 2
+    assert case["target_repeats"] == 2
+    assert case["exceeded_time_limit"] is False
+
+
+def test_over_limit_action_keeps_its_completed_terms(monkeypatch):
+    harness = _load_harness()
+
+    class Base:
+        @staticmethod
+        def evaluate_action(*args, **kwargs):
+            return {
+                "jump_half_pressure": "0x0.0p+0:0x0.0p+0",
+                "direct_double_layer": "0x0.0p+0:0x0.0p+0",
+                "image_double_layer": "0x0.0p+0:0x0.0p+0",
+                "direct_single_layer": "0x0.0p+0:0x0.0p+0",
+                "image_single_layer": "0x0.0p+0:0x0.0p+0",
+                "cbie_residual": "0x0.0p+0:0x0.0p+0",
+                "normalized_residual_by_boundary_pressure": 0.0,
+                "active_meridian_subintervals": 2,
+                "evaluated_meridian_panels": 24,
+            }
+
+    monkeypatch.setattr(harness, "_base_module", lambda: Base())
+    clock = iter((0.0, harness.WALL_TIME_LIMIT_SECONDS + 1.0))
+    monkeypatch.setattr(harness.time, "perf_counter", lambda: next(clock))
+
+    try:
+        harness.measure_case(179.0, 12)
+    except harness.CaseTimeLimitError as exc:
+        assert exc.case["completed_repeats"] == 1
+        assert exc.case["target_repeats"] == 2
+        assert exc.case["exceeded_time_limit"] is True
+        assert exc.case["direct_double_layer"] == "0x0.0p+0:0x0.0p+0"
+    else:
+        raise AssertionError("Over-limit action was accepted.")
 
 
 def test_action_rejects_nonpositive_or_noninteger_subdivision_count():

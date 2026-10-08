@@ -20,12 +20,24 @@ ROOT = Path(__file__).resolve().parents[2]
 BASE_SCRIPT = ROOT / "tools/research/benchmark_bem_exact_sphere_combined_cbie.py"
 COLLOCATION_ANGLES_DEGREES = (179.0,)
 MERIDIAN_SPLIT_FACTOR = 8.0
-MERIDIAN_SUBDIVISIONS = (10,)
+MERIDIAN_SUBDIVISIONS = (12,)
 MERIDIAN_ORDER = 256
 DIRECT_AZIMUTH_SAMPLES = 4_096
 IMAGE_AZIMUTH_SAMPLES = 2_048
 REPEATS = 2
 WALL_TIME_LIMIT_SECONDS = 120.0
+
+
+class CaseTimeLimitError(TimeoutError):
+    """A completed over-limit action with its numerical terms retained."""
+
+    def __init__(self, case: dict) -> None:
+        self.case = case
+        super().__init__(
+            f"Case theta={case['collocation_theta_degrees']}, "
+            f"subdivisions={case['meridian_subdivisions_per_active_interval']} exceeded "
+            f"{WALL_TIME_LIMIT_SECONDS}s after evaluation."
+        )
 
 
 def _base_module():
@@ -71,13 +83,10 @@ def measure_case(theta_degrees: float, subdivisions: int, *, repeats: int = REPE
             meridian_subdivisions=subdivisions,
         )
         elapsed = time.perf_counter() - started
-        if elapsed > WALL_TIME_LIMIT_SECONDS:
-            raise TimeoutError(
-                f"Case theta={theta_degrees}, subdivisions={subdivisions} exceeded "
-                f"{WALL_TIME_LIMIT_SECONDS}s after evaluation."
-            )
         values.append(value)
         timings.append(elapsed)
+        if elapsed > WALL_TIME_LIMIT_SECONDS:
+            break
 
     encoded = [json.dumps(value, sort_keys=True, allow_nan=False) for value in values]
     if len(set(encoded)) != 1:
@@ -94,6 +103,9 @@ def measure_case(theta_degrees: float, subdivisions: int, *, repeats: int = REPE
         **values[-1],
         "repeat_checksum_sha256": hashlib.sha256("\n".join(encoded).encode()).hexdigest(),
         "repeat_wall_times_s": timings,
+        "completed_repeats": len(values),
+        "target_repeats": repeats,
+        "exceeded_time_limit": any(elapsed > WALL_TIME_LIMIT_SECONDS for elapsed in timings),
     }
     jump = _decode(record["jump_half_pressure"])
     direct_double = _decode(record["direct_double_layer"])
@@ -105,6 +117,8 @@ def measure_case(theta_degrees: float, subdivisions: int, *, repeats: int = REPE
         raise ArithmeticError("Recorded CBIE terms do not reconstruct the residual.")
     if not math.isfinite(record["normalized_residual_by_boundary_pressure"]):
         raise ArithmeticError("Normalized CBIE residual is non-finite.")
+    if record["exceeded_time_limit"]:
+        raise CaseTimeLimitError(record)
     return record
 
 
@@ -179,7 +193,11 @@ def main(argv: list[str] | None = None) -> int:
         )
         record["environment_verification"] = json.loads(environment.stdout)
         for theta, subdivisions in case_grid():
-            record["cases"].append(measure_case(theta, subdivisions))
+            try:
+                record["cases"].append(measure_case(theta, subdivisions))
+            except CaseTimeLimitError as exc:
+                record["cases"].append(exc.case)
+                raise
         record["runtime"]["peak_rss_platform_units"] = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
         record["status"] = "COMPLETED"
     except Exception as exc:  # noqa: BLE001 - Preserve every failed sweep as an artifact.
