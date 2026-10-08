@@ -131,7 +131,8 @@ def evaluate_action(theta_degrees: float, meridian_order: int, *,
                     direct_azimuth_samples: int = DIRECT_AZIMUTH_SAMPLES,
                     image_azimuth_samples: int = IMAGE_AZIMUTH_SAMPLES,
                     meridian_order_levels: tuple[int, ...] = MERIDIAN_ORDERS,
-                    meridian_split_factor: float = 8.0) -> dict:
+                    meridian_split_factor: float = 8.0,
+                    meridian_subdivisions: int = 1) -> dict:
     """Return the CBIE jump, layer terms and residual at one sphere point."""
     if theta_degrees not in COLLOCATION_ANGLES_DEGREES:
         raise ValueError("Collocation angle is not in the frozen benchmark set.")
@@ -144,6 +145,8 @@ def evaluate_action(theta_degrees: float, meridian_order: int, *,
     if (type(meridian_split_factor) not in (int, float) or type(meridian_split_factor) is bool
             or not math.isfinite(meridian_split_factor) or meridian_split_factor <= 0):
         raise ValueError("Meridian split factor must be finite and positive.")
+    if type(meridian_subdivisions) is not int or meridian_subdivisions < 1:
+        raise ValueError("Meridian subdivisions must be a positive integer.")
 
     theta_field = math.radians(theta_degrees)
     field = _point(theta_field)
@@ -173,48 +176,57 @@ def evaluate_action(theta_degrees: float, meridian_order: int, *,
         if upper > lower
     )
     for lower, upper in active_panels:
-        midpoint = 0.5 * (lower + upper)
-        half_width = 0.5 * (upper - lower)
-        for node, weight in zip(nodes, weights, strict=True):
-            theta = midpoint + half_width * node
-            source = _point(theta)
-            source_radius, source_height = source[0], source[2]
-            source_normal = (-math.sin(theta), -math.cos(theta))
-            pressure, normal_derivative = _trace(theta)
-            direct_green = integrate_helmholtz_ring_green_zero_mode(
-                field_radius, field[2], source_radius, source_height,
-                wave_number_rad_m=WAVE_NUMBER_RAD_M,
-                azimuth_samples=direct_azimuth_samples,
+        for subdivision in range(meridian_subdivisions):
+            sub_lower = (
+                lower if subdivision == 0
+                else lower + (upper - lower) * subdivision / meridian_subdivisions
             )
-            _, direct_source_gradient = integrate_helmholtz_ring_green_gradient_zero_mode(
-                field_radius, field[2], source_radius, source_height,
-                wave_number_rad_m=WAVE_NUMBER_RAD_M,
-                azimuth_samples=direct_azimuth_samples,
+            sub_upper = (
+                upper if subdivision + 1 == meridian_subdivisions
+                else lower + (upper - lower) * (subdivision + 1) / meridian_subdivisions
             )
-            direct_source_normal = (
-                source_normal[0] * direct_source_gradient[0]
-                + source_normal[1] * direct_source_gradient[1]
-            )
-            image_green, image_source_normal = _image_ring(
-                field, theta, samples=image_azimuth_samples
-            )
+            midpoint = 0.5 * (sub_lower + sub_upper)
+            half_width = 0.5 * (sub_upper - sub_lower)
+            for node, weight in zip(nodes, weights, strict=True):
+                theta = midpoint + half_width * node
+                source = _point(theta)
+                source_radius, source_height = source[0], source[2]
+                source_normal = (-math.sin(theta), -math.cos(theta))
+                pressure, normal_derivative = _trace(theta)
+                direct_green = integrate_helmholtz_ring_green_zero_mode(
+                    field_radius, field[2], source_radius, source_height,
+                    wave_number_rad_m=WAVE_NUMBER_RAD_M,
+                    azimuth_samples=direct_azimuth_samples,
+                )
+                _, direct_source_gradient = integrate_helmholtz_ring_green_gradient_zero_mode(
+                    field_radius, field[2], source_radius, source_height,
+                    wave_number_rad_m=WAVE_NUMBER_RAD_M,
+                    azimuth_samples=direct_azimuth_samples,
+                )
+                direct_source_normal = (
+                    source_normal[0] * direct_source_gradient[0]
+                    + source_normal[1] * direct_source_gradient[1]
+                )
+                image_green, image_source_normal = _image_ring(
+                    field, theta, samples=image_azimuth_samples
+                )
 
-            quadrature_weight = half_width * weight
-            surface_weight = quadrature_weight * SPHERE_RADIUS_M * source_radius
-            logarithm = math.log(
-                log_scale / abs(SPHERE_RADIUS_M * theta - singular_arclength)
-            )
-            direct_double_remainder.append(
-                surface_weight * pressure * direct_source_normal
-                - quadrature_weight * pressure * logarithm / (4.0 * math.pi)
-            )
-            direct_single_remainder.append(
-                surface_weight * normal_derivative * direct_green
-                - quadrature_weight * SPHERE_RADIUS_M * normal_derivative
-                * logarithm / (2.0 * math.pi)
-            )
-            image_double_terms.append(surface_weight * pressure * image_source_normal)
-            image_single_terms.append(surface_weight * normal_derivative * image_green)
+                quadrature_weight = half_width * weight
+                surface_weight = quadrature_weight * SPHERE_RADIUS_M * source_radius
+                logarithm = math.log(
+                    log_scale / abs(SPHERE_RADIUS_M * theta - singular_arclength)
+                )
+                direct_double_remainder.append(
+                    surface_weight * pressure * direct_source_normal
+                    - quadrature_weight * pressure * logarithm / (4.0 * math.pi)
+                )
+                direct_single_remainder.append(
+                    surface_weight * normal_derivative * direct_green
+                    - quadrature_weight * SPHERE_RADIUS_M * normal_derivative
+                    * logarithm / (2.0 * math.pi)
+                )
+                image_double_terms.append(surface_weight * pressure * image_source_normal)
+                image_single_terms.append(surface_weight * normal_derivative * image_green)
 
     direct_double_log = integrate_logarithmic_panel(
         lambda arclength: _trace(arclength / SPHERE_RADIUS_M)[0]
@@ -249,6 +261,8 @@ def evaluate_action(theta_degrees: float, meridian_order: int, *,
         "boundary_pressure": _encode(field_pressure),
         "normalized_residual_by_boundary_pressure": abs(residual) / abs(field_pressure),
         "active_meridian_subintervals": len(active_panels),
+        "meridian_subdivisions_per_active_interval": meridian_subdivisions,
+        "evaluated_meridian_panels": len(active_panels) * meridian_subdivisions,
     }
 
 
