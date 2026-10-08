@@ -302,3 +302,7 @@ At cutoff factor 8 and per-panel order 256, composite subdivisions 1/2/4 reduce 
 ## Eight-subdivision CBIE sensitivity — 2026-10-08
 
 The clean four-angle level-8 sweep shows nonmonotone residual behavior: relative to level 4, the 179° residual rises even though residuals at 120°/175° fall and 135° is nearly unchanged. The direct terms shift at 179°; image terms do not materially change for this geometry. Artifact and exact scope are in the [review](../reviews/NUM03-BEM-exact-sphere-cbie-eight-subdivision.md). The fixed order-256 singular logarithm restoration limits interpretation. No convergence or field-accuracy claim follows. Next repeat 179° at 10 subdivisions as a finite sensitivity check.
+
+## Focused 179° CBIE subdivision 10 — 2026-10-08
+
+At 179°, the level-10 residual lies between the level-4 and level-8 residuals, and both direct layer terms remain sensitive. Image terms change only near floating-point noise. See the [review](../reviews/NUM03-BEM-exact-sphere-cbie-179deg-subdivision-10.md) and immutable artifact SHA-256 `f9f864de24158ebcd80cc525abefe97103bf5e70b3b69aced2db179dbd18e2fe`. The product-integral restoration stays at order 256. This is not a convergence result. Next test level 12 at the same point and settings.
