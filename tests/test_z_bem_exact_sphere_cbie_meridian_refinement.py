@@ -24,18 +24,18 @@ def test_meridian_refinement_grid_freezes_azimuth_rules():
     assert len(grid) == 12
     assert len(set(grid)) == 12
     assert {case[0] for case in grid} == {120.0, 135.0, 175.0, 179.0}
-    assert {case[1] for case in grid} == {256, 384, 512}
+    assert {case[1] for case in grid} == {128, 192, 256}
     assert {case[2] for case in grid} == {4_096}
     assert {case[3] for case in grid} == {2_048}
 
 
 def test_meridian_refinement_case_repeats_and_reconstructs_residual():
     harness = _load_harness()
-    case = harness.measure_case(175.0, 256, 4_096, 2_048)
+    case = harness.measure_case(175.0, 192, 4_096, 2_048)
 
     assert case["repeat_checksum_sha256"]
     assert case["collocation_theta_degrees"] == 175.0
-    assert case["meridian_order_per_active_subinterval"] == 256
+    assert case["meridian_order_per_active_subinterval"] == 192
     assert case["direct_azimuth_samples"] == 4_096
     assert case["image_azimuth_samples"] == 2_048
     assert len(case["repeat_wall_times_s"]) == 2

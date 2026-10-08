@@ -19,7 +19,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 BASE_SCRIPT = ROOT / "tools/research/benchmark_bem_exact_sphere_combined_cbie.py"
 COLLOCATION_ANGLES_DEGREES = (120.0, 135.0, 175.0, 179.0)
-MERIDIAN_ORDER_LEVELS = (256, 384, 512)
+MERIDIAN_ORDER_LEVELS = (128, 192, 256)
 DIRECT_AZIMUTH_SAMPLES = 4_096
 IMAGE_AZIMUTH_SAMPLES = 2_048
 REPEATS = 2
