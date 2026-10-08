@@ -130,7 +130,8 @@ def _image_ring(field: tuple[float, float, float], theta: float, *, samples: int
 def evaluate_action(theta_degrees: float, meridian_order: int, *,
                     direct_azimuth_samples: int = DIRECT_AZIMUTH_SAMPLES,
                     image_azimuth_samples: int = IMAGE_AZIMUTH_SAMPLES,
-                    meridian_order_levels: tuple[int, ...] = MERIDIAN_ORDERS) -> dict:
+                    meridian_order_levels: tuple[int, ...] = MERIDIAN_ORDERS,
+                    meridian_split_factor: float = 8.0) -> dict:
     """Return the CBIE jump, layer terms and residual at one sphere point."""
     if theta_degrees not in COLLOCATION_ANGLES_DEGREES:
         raise ValueError("Collocation angle is not in the frozen benchmark set.")
@@ -140,6 +141,9 @@ def evaluate_action(theta_degrees: float, meridian_order: int, *,
         raise ValueError("Direct azimuth sample count must be an integer >=4.")
     if type(image_azimuth_samples) is not int or image_azimuth_samples < 4:
         raise ValueError("Image azimuth sample count must be an integer >=4.")
+    if (type(meridian_split_factor) not in (int, float) or type(meridian_split_factor) is bool
+            or not math.isfinite(meridian_split_factor) or meridian_split_factor <= 0):
+        raise ValueError("Meridian split factor must be finite and positive.")
 
     theta_field = math.radians(theta_degrees)
     field = _point(theta_field)
@@ -150,7 +154,7 @@ def evaluate_action(theta_degrees: float, meridian_order: int, *,
 
     # This fixed geometric split follows the existing 175-degree CBIE
     # regression. It is a quadrature partition, not a universal error bound.
-    cutoff = 8.0 * field[2] / field_radius
+    cutoff = meridian_split_factor * field[2] / field_radius
     edges = (
         0.0,
         max(0.0, theta_field - cutoff),
