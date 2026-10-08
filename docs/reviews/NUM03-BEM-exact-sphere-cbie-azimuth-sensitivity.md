@@ -31,4 +31,6 @@ This sweep distinguishes direct-ring count effects from image-ring count effects
 
 NUM-03 remains ACTIVE/INDETERMINATE; its qualification plan remains DRAFT, the BEM preflight remains unauthorized, and Hasegawa remains the selected P4 backend. No matrix or solver was started.
 
-**Next bounded task:** refine direct azimuth counts to 1,024/2,048/4,096 at fixed meridian order 256 and image count 2,048, across the same four angles. Preserve layer values, residuals, repeats and failures. Treat the comparison as finite sensitivity evidence and do not select a universal tolerance or allocate a matrix.
+**Completed follow-up:** direct azimuth counts 1,024/2,048/4,096 were compared at fixed meridian order 256 and image count 2,048; see the [direct-refinement review](NUM03-BEM-exact-sphere-cbie-direct-azimuth-refinement.md).
+
+**Next bounded task:** isolate meridian-order sensitivity at 256/384/512 while fixing direct/image counts at 4,096/2,048, across the same four angles. Preserve layer values, residuals, repeats and failures. Treat the comparison as finite sensitivity evidence and do not select a universal tolerance or allocate a matrix.
