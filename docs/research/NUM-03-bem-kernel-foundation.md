@@ -294,3 +294,7 @@ At fixed direct/image azimuth counts 4,096/2,048, meridian orders 128/192/256 gi
 ## Meridian partition cutoff sensitivity — 2026-10-08
 
 At fixed order 256 and direct/image azimuth counts 4,096/2,048, varying the cutoff multiplier 6/8/10 leaves the 120° and 135° action unchanged because the boundaries clip to the same single interval. At 175° and 179°, direct double- and single-layer terms and the residual respond to the cutoff; image-term changes are much smaller for this sample set. This is finite sensitivity and does not select an accurate factor or bound error. The ignored artifact and exact protocol are recorded in the [review](../reviews/NUM03-BEM-exact-sphere-cbie-partition-sensitivity.md). No matrix was allocated. Next compare composite subdivisions while keeping per-panel order at the supported maximum 256.
+
+## Composite meridian subdivision sensitivity — 2026-10-08
+
+At cutoff factor 8 and per-panel order 256, composite subdivisions 1/2/4 reduce the sampled CBIE residual at 120°/135°/175°/179°. Direct double- and single-layer terms change materially, while image terms are nearly unchanged in this geometry. The order-256 logarithmic product-integral restoration is fixed across subdivisions. Four one-subdivision results match the prior artifact exactly. Artifact and complete protocol are in the [review](../reviews/NUM03-BEM-exact-sphere-cbie-composite-subdivision.md). This is finite remainder-quadrature sensitivity, not proof of convergence or field accuracy. No matrix was allocated. Next compare eight subdivisions.
