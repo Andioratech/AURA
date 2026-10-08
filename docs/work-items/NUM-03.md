@@ -738,3 +738,7 @@ The clean ENV-1.0 level-8 sweep completed four cases twice with exact repeats an
 ## Exact-sphere CBIE 179° subdivision 10 — 2026-10-08
 
 The one-angle clean-source run completed twice at 10 subdivisions, factor 8, order 256 and direct/image azimuth counts 4,096/2,048. Residual is `3.16159604e-7`; prior levels 4/8 give `2.90541893e-7 / 4.46046500e-7`. Direct layers change materially from 8 to 10 while image layers remain near floating-point noise. Repeat action times are 84.22–84.89 s. Artifact SHA-256 `f9f864de24158ebcd80cc525abefe97103bf5e70b3b69aced2db179dbd18e2fe`; see [the review](../reviews/NUM03-BEM-exact-sphere-cbie-179deg-subdivision-10.md). Local Quality passed 1,842 tests; exact remote run [37738811988](https://github.com/Andioratech/AURA/actions/runs/37738811988) passed. This is finite sensitivity, not convergence. Next compare level 12 at 179°; no matrix or solver.
+
+## Exact-sphere CBIE 179° subdivision-12 cap failure — 2026-10-08
+
+The first 179° action with 12 subdivisions exceeded the 120 s per-action cap; the second repeat did not start, and the harness rejected the result before preserving layer terms. Failure artifact SHA-256 `4feec4a30f119dfc543c8044c101df71e63674402118860c4eb6f0806345afeb`. This is a runtime failure, not a numerical or physical result. Local code returned to validated commit `0992cc8`, with no cap/assumption change. The next direction requires owner choice: optimize the same action under the existing cap, revise the cap explicitly, or move to a separate independent verification.

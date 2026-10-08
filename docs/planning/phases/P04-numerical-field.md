@@ -630,3 +630,7 @@ At factor 8, order 256 per panel and azimuth counts 4,096/2,048, subdivision 8 g
 ## Exact-sphere CBIE at 179° with ten subdivisions — 2026-10-08
 
 The focused clean-source run completed twice at factor 8, order 256 per panel and azimuth counts 4,096/2,048. Its normalized residual is `3.1616e-7`, between level 4 (`2.9054e-7`) and level 8 (`4.4605e-7`). Direct layers change by `3.66e-7` and `3.99e-7` normalized from level 8; image layers are near `1e-15`. Artifact SHA-256 `f9f864de24158ebcd80cc525abefe97103bf5e70b3b69aced2db179dbd18e2fe`; see [the review](../../reviews/NUM03-BEM-exact-sphere-cbie-179deg-subdivision-10.md). The sequence remains nonmonotone; no convergence follows. Next evaluate level 12 at 179° with the same limits.
+
+## 179°/12 subdivision runtime-cap failure — 2026-10-08
+
+The first order-256 action at 12 subdivisions exceeded the 120 s limit; the second repeat did not run. The harness discarded the returned layers before artifact append, so the preserved failure record notes unavailable terms. This is not evidence against the CBIE identity. Artifact SHA-256 `4feec4a30f119dfc543c8044c101df71e63674402118860c4eb6f0806345afeb`. No cap or scientific setting was changed; code returned to the validated level-10 state. Further work awaits the owner's choice of performance optimization, explicit cap revision or independent verification.

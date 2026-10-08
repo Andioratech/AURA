@@ -306,3 +306,7 @@ The clean four-angle level-8 sweep shows nonmonotone residual behavior: relative
 ## Focused 179° CBIE subdivision 10 — 2026-10-08
 
 At 179°, the level-10 residual lies between the level-4 and level-8 residuals, and both direct layer terms remain sensitive. Image terms change only near floating-point noise. See the [review](../reviews/NUM03-BEM-exact-sphere-cbie-179deg-subdivision-10.md) and immutable artifact SHA-256 `f9f864de24158ebcd80cc525abefe97103bf5e70b3b69aced2db179dbd18e2fe`. The product-integral restoration stays at order 256. This is not a convergence result. Next test level 12 at the same point and settings.
+
+## 179°/12 subdivision attempt — runtime cap exceeded — 2026-10-08
+
+A focused first action exceeded the 120 s cap and no repeated case completed. The harness raised before writing layer terms. Preserve the timeout record `results/diagnostics/bem-exact-sphere-cbie-subdivision-179deg-12-timeout-20261008.json`, SHA-256 `4feec4a30f119dfc543c8044c101df71e63674402118860c4eb6f0806345afeb`. No numerical rejection, cap change or scientific conclusion follows. The next task needs explicit direction on optimizing under the established cap, revising it, or moving to an independent verification.

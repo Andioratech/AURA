@@ -1203,3 +1203,7 @@ The clean-source level-8 sweep on `63a3be4776be927cde292b4c4a872a5a277abd4e` com
 ## Focused exact-sphere CBIE subdivision 10 at 179° — 2026-10-08
 
 On clean source `07b5eecc00cb54434c0ae86e0a5c69a6e55d578c`, the level-10 residual is `3.1615960441405e-7` versus `2.9054189257073e-7` at level 4 and `4.4604649965014e-7` at level 8. Two repeats match and each takes 84.22–84.89 s. From level 8 to 10, normalized direct double/single changes are `3.661e-7 / 3.992e-7`; image-layer changes are `2.3e-15 / 3.1e-15`. Artifact SHA-256 `f9f864de24158ebcd80cc525abefe97103bf5e70b3b69aced2db179dbd18e2fe`; full details in [the review](NUM03-BEM-exact-sphere-cbie-179deg-subdivision-10.md). This sequence does not demonstrate convergence. Exact remote CI [37738811988](https://github.com/Andioratech/AURA/actions/runs/37738811988) passed; local Quality passed 1,842 tests. Next test 12 subdivisions, keeping the same method and explicit limits.
+
+## 179°/12 subdivision attempt exceeded runtime cap — 2026-10-08
+
+The first action exceeded 120 s and `measure_case` raised before preserving its returned layers; the second repeat was not started. This records a compute-budget limit, not a failed CBIE identity. The immutable attempt record has SHA-256 `4feec4a30f119dfc543c8044c101df71e63674402118860c4eb6f0806345afeb` and marks its action terms unavailable. The uncommitted n=12 harness change was reverted to published, validated `0992cc8`; no cap was changed. Further work awaits owner direction among same-formula optimization, explicit cap revision or an independent verification.
