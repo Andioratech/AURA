@@ -298,3 +298,7 @@ At fixed order 256 and direct/image azimuth counts 4,096/2,048, varying the cuto
 ## Composite meridian subdivision sensitivity — 2026-10-08
 
 At cutoff factor 8 and per-panel order 256, composite subdivisions 1/2/4 reduce the sampled CBIE residual at 120°/135°/175°/179°. Direct double- and single-layer terms change materially, while image terms are nearly unchanged in this geometry. The order-256 logarithmic product-integral restoration is fixed across subdivisions. Four one-subdivision results match the prior artifact exactly. Artifact and complete protocol are in the [review](../reviews/NUM03-BEM-exact-sphere-cbie-composite-subdivision.md). This is finite remainder-quadrature sensitivity, not proof of convergence or field accuracy. No matrix was allocated. Next compare eight subdivisions.
+
+## Eight-subdivision CBIE sensitivity — 2026-10-08
+
+The clean four-angle level-8 sweep shows nonmonotone residual behavior: relative to level 4, the 179° residual rises even though residuals at 120°/175° fall and 135° is nearly unchanged. The direct terms shift at 179°; image terms do not materially change for this geometry. Artifact and exact scope are in the [review](../reviews/NUM03-BEM-exact-sphere-cbie-eight-subdivision.md). The fixed order-256 singular logarithm restoration limits interpretation. No convergence or field-accuracy claim follows. Next repeat 179° at 10 subdivisions as a finite sensitivity check.
