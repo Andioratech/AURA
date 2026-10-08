@@ -6,6 +6,7 @@ import pytest
 
 from aura.errors import InvalidInputError
 from aura.fields._bem_axisymmetric import (
+    _integrate_helmholtz_ring_green_and_gradient_zero_mode,
     _integrate_ring_image_mixed_normal,
     integrate_helmholtz_ring_green_gradient_zero_mode,
     integrate_helmholtz_ring_green_zero_mode,
@@ -21,6 +22,30 @@ from aura.fields._bem_green import (
     _free_space_term,
     neumann_half_space_green,
 )
+
+
+@pytest.mark.parametrize(
+    ("geometry", "wave_number", "samples"),
+    [
+        ((0.021, 0.044, 0.008, 0.019), 458.0, 64),
+        ((0.0123, 0.018, 0.0122999, 0.017999), 458.0, 512),
+        ((0.001, 0.003, 0.0, 0.002), 458.0, 4096),
+    ],
+)
+def test_combined_helmholtz_ring_kernel_matches_separate_integrals(geometry, wave_number, samples):
+    combined = _integrate_helmholtz_ring_green_and_gradient_zero_mode(
+        *geometry, wave_number_rad_m=wave_number, azimuth_samples=samples
+    )
+    scalar = integrate_helmholtz_ring_green_zero_mode(
+        *geometry, wave_number_rad_m=wave_number, azimuth_samples=samples
+    )
+    gradients = integrate_helmholtz_ring_green_gradient_zero_mode(
+        *geometry, wave_number_rad_m=wave_number, azimuth_samples=samples
+    )
+    actual = (combined[0], *combined[1], *combined[2])
+    expected = (scalar, *gradients[0], *gradients[1])
+    for value, reference in zip(actual, expected, strict=True):
+        assert value == pytest.approx(reference, rel=2e-13, abs=4e-15)
 
 
 def test_zero_radius_source_ring_is_two_pi_times_point_green():

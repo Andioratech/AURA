@@ -17,8 +17,7 @@ from itertools import pairwise
 from pathlib import Path
 
 from aura.fields._bem_axisymmetric import (
-    integrate_helmholtz_ring_green_gradient_zero_mode,
-    integrate_helmholtz_ring_green_zero_mode,
+    _integrate_helmholtz_ring_green_and_gradient_zero_mode,
 )
 from aura.fields._bem_green import neumann_half_space_green
 from aura.fields._bem_singular import integrate_logarithmic_panel
@@ -112,11 +111,7 @@ def _image_ring(field: tuple[float, float, float], theta: float, *, samples: int
     # Translate the image source upward to z=0. The derivative with respect
     # to the physical source retains the reflected-coordinate chain-rule sign.
     translated_field_height = field[2] + source_height
-    green = integrate_helmholtz_ring_green_zero_mode(
-        field[0], translated_field_height, source_radius, 0.0,
-        wave_number_rad_m=WAVE_NUMBER_RAD_M, azimuth_samples=samples,
-    )
-    _, image_source_gradient = integrate_helmholtz_ring_green_gradient_zero_mode(
+    green, _, image_source_gradient = _integrate_helmholtz_ring_green_and_gradient_zero_mode(
         field[0], translated_field_height, source_radius, 0.0,
         wave_number_rad_m=WAVE_NUMBER_RAD_M, azimuth_samples=samples,
     )
@@ -193,12 +188,7 @@ def evaluate_action(theta_degrees: float, meridian_order: int, *,
                 source_radius, source_height = source[0], source[2]
                 source_normal = (-math.sin(theta), -math.cos(theta))
                 pressure, normal_derivative = _trace(theta)
-                direct_green = integrate_helmholtz_ring_green_zero_mode(
-                    field_radius, field[2], source_radius, source_height,
-                    wave_number_rad_m=WAVE_NUMBER_RAD_M,
-                    azimuth_samples=direct_azimuth_samples,
-                )
-                _, direct_source_gradient = integrate_helmholtz_ring_green_gradient_zero_mode(
+                direct_green, _, direct_source_gradient = _integrate_helmholtz_ring_green_and_gradient_zero_mode(
                     field_radius, field[2], source_radius, source_height,
                     wave_number_rad_m=WAVE_NUMBER_RAD_M,
                     azimuth_samples=direct_azimuth_samples,

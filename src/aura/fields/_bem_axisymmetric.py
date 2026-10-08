@@ -493,6 +493,94 @@ def integrate_helmholtz_ring_green_gradient_zero_mode(
     return field_gradient, source_gradient
 
 
+def _integrate_helmholtz_ring_green_and_gradient_zero_mode(
+    field_radius_m: float,
+    field_height_m: float,
+    source_radius_m: float,
+    source_height_m: float,
+    *,
+    wave_number_rad_m: float,
+    azimuth_samples: int,
+) -> tuple[complex, tuple[complex, complex], tuple[complex, complex]]:
+    """Evaluate scalar and gradient ring kernels in one azimuthal pass.
+
+    This is an arithmetic-sharing primitive for the bounded CBIE research
+    action. The static Laplace pieces remain the same elliptic evaluations as
+    the separate routines above; only the midpoint loop is shared.
+    """
+    field_radius = _nonnegative(field_radius_m, "/field_radius_m")
+    field_height = _nonnegative(field_height_m, "/field_height_m")
+    source_radius = _nonnegative(source_radius_m, "/source_radius_m")
+    source_height = _nonnegative(source_height_m, "/source_height_m")
+    if type(azimuth_samples) is not int or not 4 <= azimuth_samples <= MAX_BEM_AZIMUTH_SAMPLES:
+        raise InvalidInputError("BEM_RING_QUADRATURE", "/azimuth_samples", "Azimuth count is outside its supported range.")
+    if type(wave_number_rad_m) not in (int, float) or type(wave_number_rad_m) is bool:
+        raise InvalidInputError("BEM_WAVE_NUMBER", "/wave_number_rad_m", "Expected a finite positive wave number.")
+    wave_number = float(wave_number_rad_m)
+    if not math.isfinite(wave_number) or wave_number <= 0.0:
+        raise InvalidInputError("BEM_WAVE_NUMBER", "/wave_number_rad_m", "Expected a finite positive wave number.")
+
+    laplace_scalar = integrate_laplace_ring_green_zero_mode(
+        field_radius, field_height, source_radius, source_height
+    )
+    static_field, static_source = integrate_laplace_ring_green_gradient_zero_mode(
+        field_radius, field_height, source_radius, source_height
+    )
+    scalar_total = 0j
+    scalar_correction = 0j
+    field_residual = [0j, 0j]
+    field_correction = [0j, 0j]
+    source_residual = [0j, 0j]
+    source_correction = [0j, 0j]
+    weight = 2.0 * math.pi / azimuth_samples
+    for index in range(azimuth_samples):
+        angle = 2.0 * math.pi * (index + 0.5) / azimuth_samples
+        cosine, sine = math.cos(angle), math.sin(angle)
+        displacement = (
+            field_radius - source_radius * cosine,
+            -source_radius * sine,
+            field_height - source_height,
+        )
+        radius = math.hypot(*displacement)
+        phase = wave_number * radius
+        if not math.isfinite(phase):
+            raise NumericalDomainError("BEM_RING_RANGE", "/wave_number_rad_m", "Kernel phase is outside binary64 range.")
+        sine_half_squared = math.sin(0.5 * phase) ** 2
+        sine_phase = math.sin(phase)
+        cosine_phase = math.cos(phase)
+        scalar_residual = complex(-2.0 * sine_half_squared, sine_phase) / (4.0 * math.pi * radius)
+        scalar_total, scalar_correction = _compensated_add(
+            scalar_total, scalar_correction, weight * scalar_residual
+        )
+        gradient_factor = complex(
+            2.0 * sine_half_squared - phase * sine_phase,
+            phase * cosine_phase - sine_phase,
+        ) / (4.0 * math.pi * radius**3)
+        field_vectors = (displacement[0], displacement[2])
+        source_vectors = (
+            -displacement[0] * cosine - displacement[1] * sine,
+            -displacement[2],
+        )
+        for axis in range(2):
+            field_term = weight * gradient_factor * field_vectors[axis]
+            adjusted = field_term - field_correction[axis]
+            updated = field_residual[axis] + adjusted
+            field_correction[axis] = (updated - field_residual[axis]) - adjusted
+            field_residual[axis] = updated
+            source_term = weight * gradient_factor * source_vectors[axis]
+            adjusted = source_term - source_correction[axis]
+            updated = source_residual[axis] + adjusted
+            source_correction[axis] = (updated - source_residual[axis]) - adjusted
+            source_residual[axis] = updated
+
+    scalar = complex(laplace_scalar, 0.0) + scalar_total
+    field_gradient = tuple(complex(static_field[i]) + field_residual[i] for i in range(2))
+    source_gradient = tuple(complex(static_source[i]) + source_residual[i] for i in range(2))
+    if not all(math.isfinite(value.real) and math.isfinite(value.imag) for value in (scalar, *field_gradient, *source_gradient)):
+        raise NumericalDomainError("BEM_RING_RANGE", "/geometry", "Helmholtz ring integral is outside binary64 range.")
+    return scalar, field_gradient, source_gradient
+
+
 def _integrate_ring_image_mixed_normal(
     field_radius: float,
     field_height: float,
