@@ -20,10 +20,10 @@ def test_composite_subdivision_grid_fixes_cutoff_order_and_azimuth_counts():
     harness = _load_harness()
     grid = harness.case_grid()
 
-    assert len(grid) == 12
-    assert len(set(grid)) == 12
+    assert len(grid) == 4
+    assert len(set(grid)) == 4
     assert {case[0] for case in grid} == {120.0, 135.0, 175.0, 179.0}
-    assert {case[1] for case in grid} == {1, 2, 4}
+    assert {case[1] for case in grid} == {8}
     assert harness.MERIDIAN_SPLIT_FACTOR == 8.0
     assert harness.MERIDIAN_ORDER == 256
     assert harness.DIRECT_AZIMUTH_SAMPLES == 4_096
@@ -32,13 +32,14 @@ def test_composite_subdivision_grid_fixes_cutoff_order_and_azimuth_counts():
 
 def test_composite_subdivision_case_repeats_and_reconstructs_residual():
     harness = _load_harness()
-    case = harness.measure_case(175.0, 1)
+    case = harness.measure_case(120.0, 8)
 
     assert case["repeat_checksum_sha256"]
-    assert case["collocation_theta_degrees"] == 175.0
+    assert case["collocation_theta_degrees"] == 120.0
     assert case["meridian_split_factor"] == 8.0
-    assert case["meridian_subdivisions_per_active_interval"] == 1
-    assert case["active_meridian_subintervals"] >= 1
+    assert case["meridian_subdivisions_per_active_interval"] == 8
+    assert case["active_meridian_subintervals"] == 1
+    assert case["evaluated_meridian_panels"] == 8
     assert case["meridian_order_per_active_subinterval"] == 256
     assert case["direct_azimuth_samples"] == 4_096
     assert case["image_azimuth_samples"] == 2_048
