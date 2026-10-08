@@ -103,7 +103,7 @@ If no justified weighted tail bound or conservative resource envelope can be est
 
 ### 3.4 Candidate absolute tail majorant
 
-The following gives a conservative route to a mode-by-mode absolute bound for each image layer. It is an analytical candidate; the displayed decimal evaluations use ordinary floating point and still need outward-rounded evaluation before they qualify as certified numeric bounds.
+The following gives a conservative route to a mode-by-mode absolute bound for each image layer. The inequalities are evaluated with outward-rounded Decimal arithmetic in the retained local diagnostic. The derivation still needs independent review before using the bounds to select a cutoff.
 
 For positive real `z`, the power series in DLMF Eq. 10.53.1 gives
 
@@ -125,19 +125,21 @@ For every image collocation angle, `R(theta) >= R_min=L-a`, `|P_n(mu_R)| <= 1`, 
 
 To terminate the infinite bound, the finite Hankel sum also obeys `H_n(z) <= exp(z)(2n-1)!!/z^(n+1)`: index its terms backward from `m=n`; each successive ratio is at most `z/l`, so their sum is bounded by `exp(z)`. Substitution gives
 
-`C_n = [k^3 a^2 exp(z_L+z_R)/(4 pi (2n+1) z_L z_R)] r^n exp(z_a^2/(2n+3)) d_n`,
+`C_n = [k^3 a^2 exp(z_L+z_R)/(4 pi (2n+1) z_L z_R)] r^n exp(z_a^2/(2n+3)) d_n^+`,
 
-where `z_a=ka`, `z_L=kL`, `z_R=kR_min`, `r=z_a^2/(z_L z_R)=a^2/[L(L-a)]`, and `d_n=n/z_a + [z_a/(2n+3)] exp(-z_a^2/[(2n+3)(2n+5)])`. For `n>=2000`, `d_{n+1}/d_n <= (n+1)/n + z_a^2/[n(2n+5)]`, while the remaining order factor `(2n+1)/(2n+3)` and exponential ratio are below one. At the frozen geometry this gives `C_(n+1)/C_n < r[1+1/2000+z_a^2/(2000*4005)] < 0.495` for every integer `n>=2000`. Thus the residual beyond mode 2000 is bounded by `C_2001/(1-0.495)`.
+where `z_a=ka`, `z_L=kL`, `z_R=kR_min`, `r=z_a^2/(z_L z_R)=a^2/[L(L-a)]`, and `d_n^+=n/z_a + z_a/(2n+3)`. This replaces the smaller exact derivative factor by a simpler upper bound. For `n>=2000`, `d_{n+1}^+/d_n^+ <= (n+1)/n + z_a^2/[n(2n+5)]`, while the remaining order factor `(2n+1)/(2n+3)` and exponential ratio are below one. At the frozen geometry this gives `C_(n+1)/C_n < r[1+1/2000+z_a^2/(2000*4005)] < 0.495` for every integer `n>=2000`. Thus the residual beyond mode 2000 is bounded by `C_2001/(1-0.495)`.
 
-An exploratory evaluation of the exact finite-sum majorants through mode 2000 gives these preliminary tail magnitudes for either image layer:
+The finite Hankel majorant can be evaluated in linear time in the maximum order using its positive coefficient recurrence, initialized with `H_0(z)=1/z` and `H_1(z)=1/z+1/z^2`. The spherical-Bessel majorant uses the exact adjacent-order ratio from its closed form. An 80-digit outward-rounded Decimal replay through mode 2000 gives these absolute tail upper bounds for either image layer:
 
-| Cutoff `N` | Estimated `sum_(n>N)^2000 B_n` | Coarse bound above mode 2000 |
+| Cutoff `N` | `sum_(n>N)^2000 B_n` upper bound | Coarse bound above mode 2000 |
 |---:|---:|---:|
-| 48 | `2.13e-1 Pa` | `< 3e-598 Pa` |
-| 64 | `4.28e-6 Pa` | `< 3e-598 Pa` |
-| 80 | `7.21e-11 Pa` | `< 3e-598 Pa` |
+| 48 | `0.2127293581590253156501681 Pa` | `< 2.849e-598 Pa` |
+| 64 | `4.274317711556059065154885e-6 Pa` | `< 2.849e-598 Pa` |
+| 80 | `7.207744719959559718521768e-11 Pa` | `< 2.849e-598 Pa` |
 
-These are bounds from absolute majorants in exact arithmetic, not measured truncation errors; the decimals are not yet certified because rounding was not directed outward. They suggest that a cutoff near 80 could make the analytic tail small for this one geometry, but no cutoff or accuracy target is selected. Before relying on these figures, independently check the derivation, evaluate the finite sums with directed rounding, check the `0.495` ratio inequality for all integer orders `n>=2000`, and include the calculation and its provenance in the plan. Then estimate runtime and memory for the three candidate cutoffs. A small tail does not resolve the separate direct-layer discrepancy or validate the manufactured physical model.
+These are upper bounds from the stated absolute majorants, not measured truncation errors or physical-source calibration. The ratio envelope is `0.4943106438736159212 < 0.495`; its algebraic bound applies to every integer order `n>=2000`. This supports a very small tail estimate for this one geometry, but does not select a cutoff or accuracy target. The directed-rounding calculator took 0.047 s in CPython 3.12.14; this is only the bound calculator's runtime, not the modal evaluator's runtime or memory estimate. The independent reviewer should check the inequalities, recurrence implementation, and source normalization before cutoff selection. A small image tail does not resolve the separate direct-layer discrepancy or validate the manufactured physical model.
+
+Local ignored record: `results/diagnostics/NUM03-MODAL-TAIL-BOUND-20261008-01/`, source revision `960346a8d384ce0f8c654d9a50110b403a781bb5`; calculator SHA-256 `789cd00497e3154f11de362366d3c7e7286c11cd8d587e18bc0a8adc0e861ee9`, output SHA-256 `01db175cadf460fc0203e5fd82fd6b35288d25c5b1ecd6daf3a3086c377a5eb8`. The two retained output replays match byte-for-byte. The discarded first calculator attempt rounded several endpoints in unsafe directions; its limitation is recorded in `attempt-01-note.md` (SHA-256 `9aa2916406f5925294fd4dcd7864108d345f12bbebf2f3c1cfb0fa6dec7bc288`) and none of its values are used.
 
 ### Exploratory one-angle formula check
 
@@ -204,4 +206,4 @@ Before execution, run the repository's exact resource preflight for the proposed
 5. Current implementation conventions: [`_bem_green.py`](../../src/aura/fields/_bem_green.py), [`benchmark_bem_exact_sphere_combined_cbie.py`](../../tools/research/benchmark_bem_exact_sphere_combined_cbie.py), and exact mode/identity regressions in [`test_z_bem_halfspace_integral_identity.py`](../../tests/test_z_bem_halfspace_integral_identity.py) and [`test_z_bem_singular.py`](../../tests/test_z_bem_singular.py). These are repository evidence and regression controls, not replacements for the primary mathematical sources.
 6. Current finite-sensitivity result: [14/16 subdivision review](../reviews/NUM03-BEM-exact-sphere-cbie-179deg-subdivision-14-16.md).
 
-The DLMF equations support the single-center outgoing expansion, both source-sphere projections, and the candidate absolute-majorant route. The numerical bound values still require outward-rounded reproduction and ratio review, followed by a resource estimate, before any cutoff can be selected or code written.
+The DLMF equations support the single-center outgoing expansion, both source-sphere projections, and the absolute-majorant route. The majorants have an outward-rounded local replay, but still require independent mathematical review and a modal-evaluator resource estimate before any cutoff can be selected or code written.
