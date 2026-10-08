@@ -129,11 +129,12 @@ def _image_ring(field: tuple[float, float, float], theta: float, *, samples: int
 
 def evaluate_action(theta_degrees: float, meridian_order: int, *,
                     direct_azimuth_samples: int = DIRECT_AZIMUTH_SAMPLES,
-                    image_azimuth_samples: int = IMAGE_AZIMUTH_SAMPLES) -> dict:
+                    image_azimuth_samples: int = IMAGE_AZIMUTH_SAMPLES,
+                    meridian_order_levels: tuple[int, ...] = MERIDIAN_ORDERS) -> dict:
     """Return the CBIE jump, layer terms and residual at one sphere point."""
     if theta_degrees not in COLLOCATION_ANGLES_DEGREES:
         raise ValueError("Collocation angle is not in the frozen benchmark set.")
-    if meridian_order not in MERIDIAN_ORDERS:
+    if type(meridian_order) is not int or meridian_order not in meridian_order_levels:
         raise ValueError("Meridian order is not in the frozen benchmark set.")
     if type(direct_azimuth_samples) is not int or direct_azimuth_samples < 4:
         raise ValueError("Direct azimuth sample count must be an integer >=4.")

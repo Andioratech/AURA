@@ -70,6 +70,7 @@ def measure_case(theta_degrees: float, meridian_order: int, direct_samples: int,
             meridian_order,
             direct_azimuth_samples=direct_samples,
             image_azimuth_samples=image_samples,
+            meridian_order_levels=MERIDIAN_ORDER_LEVELS,
         )
         elapsed = time.perf_counter() - started
         if elapsed > WALL_TIME_LIMIT_SECONDS:
