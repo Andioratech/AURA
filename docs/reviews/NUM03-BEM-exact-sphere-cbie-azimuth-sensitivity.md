@@ -35,4 +35,6 @@ NUM-03 remains ACTIVE/INDETERMINATE; its qualification plan remains DRAFT, the B
 
 **Completed follow-up:** meridian orders 128/192/256 were compared at fixed direct/image counts 4,096/2,048; see the [meridian-refinement review](NUM03-BEM-exact-sphere-cbie-meridian-refinement.md). The attempted 384/512 levels were rejected by the explicit product-integration cap and remain preserved as failed diagnostic artifacts.
 
-**Next bounded task:** isolate sensitivity to the meridian partition cutoff multiplier at 6/8/10, holding meridian order 256 and direct/image counts 4,096/2,048 fixed. Preserve layer values, residuals, active panel counts, repeats and failures. Treat the comparison as finite sensitivity evidence and do not select a universal factor or tolerance or allocate a matrix.
+**Completed follow-up:** cutoff multipliers 6/8/10 were tested at order 256 and direct/image counts 4,096/2,048; see the [partition-sensitivity review](NUM03-BEM-exact-sphere-cbie-partition-sensitivity.md).
+
+**Next bounded task:** at factor 8, direct/image counts 4,096/2,048 and order 256 per panel, compare composite subdivisions 1/2/4 of each active meridian interval. Preserve layer values, residuals, active panel counts, repeats and failures. Treat the comparison as finite sensitivity evidence; do not select a universal factor or tolerance, exceed the product-integration cap, or allocate a matrix.
