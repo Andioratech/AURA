@@ -18,9 +18,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 BASE_SCRIPT = ROOT / "tools/research/benchmark_bem_exact_sphere_combined_cbie.py"
-COLLOCATION_ANGLES_DEGREES = (120.0, 135.0, 175.0, 179.0)
+COLLOCATION_ANGLES_DEGREES = (179.0,)
 MERIDIAN_SPLIT_FACTOR = 8.0
-MERIDIAN_SUBDIVISIONS = (8,)
+MERIDIAN_SUBDIVISIONS = (10,)
 MERIDIAN_ORDER = 256
 DIRECT_AZIMUTH_SAMPLES = 4_096
 IMAGE_AZIMUTH_SAMPLES = 2_048
