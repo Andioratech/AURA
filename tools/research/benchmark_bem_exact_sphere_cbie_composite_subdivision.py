@@ -54,19 +54,22 @@ def _decode(value: str) -> complex:
     return complex(float.fromhex(real), float.fromhex(imaginary))
 
 
-def case_grid() -> tuple[tuple[float, int], ...]:
+def case_grid(subdivisions: int | None = None) -> tuple[tuple[float, int], ...]:
+    selected = MERIDIAN_SUBDIVISIONS if subdivisions is None else (subdivisions,)
+    if any(type(value) is not int or not 1 <= value <= 32 for value in selected):
+        raise ValueError("Meridian subdivisions must be integers from 1 through 32.")
     return tuple(
-        (theta, subdivisions)
+        (theta, count)
         for theta in COLLOCATION_ANGLES_DEGREES
-        for subdivisions in MERIDIAN_SUBDIVISIONS
+        for count in selected
     )
 
 
 def measure_case(theta_degrees: float, subdivisions: int, *, repeats: int = REPEATS) -> dict:
     if theta_degrees not in COLLOCATION_ANGLES_DEGREES:
         raise ValueError("Collocation angle is not in the frozen set.")
-    if type(subdivisions) is not int or subdivisions not in MERIDIAN_SUBDIVISIONS:
-        raise ValueError("Meridian subdivision count is not in the frozen set.")
+    if type(subdivisions) is not int or not 1 <= subdivisions <= 32:
+        raise ValueError("Meridian subdivisions must be an integer from 1 through 32.")
     if type(repeats) is not int or repeats < 2:
         raise ValueError("At least two repeats are required.")
 
@@ -134,7 +137,9 @@ def _output_path(value: str) -> Path:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", required=True, help="new JSON path under results/diagnostics/")
+    parser.add_argument("--subdivisions", type=int, default=MERIDIAN_SUBDIVISIONS[0])
     args = parser.parse_args(argv)
+    selected_grid = case_grid(args.subdivisions)
     destination = _output_path(args.output)
     record = {
         "contract": "BEM-EXACT-SPHERE-CBIE-COMPOSITE-SUBDIVISION-1.0",
@@ -161,7 +166,7 @@ def main(argv: list[str] | None = None) -> int:
             "normal_convention": "AURA normal into the sphere",
             "collocation_angles_degrees": COLLOCATION_ANGLES_DEGREES,
             "meridian_split_factor": MERIDIAN_SPLIT_FACTOR,
-            "meridian_subdivisions_per_active_interval": MERIDIAN_SUBDIVISIONS,
+            "meridian_subdivisions_per_active_interval": (args.subdivisions,),
             "meridian_order_per_active_subinterval": MERIDIAN_ORDER,
             "direct_azimuth_samples": DIRECT_AZIMUTH_SAMPLES,
             "image_azimuth_samples": IMAGE_AZIMUTH_SAMPLES,
@@ -192,7 +197,7 @@ def main(argv: list[str] | None = None) -> int:
             cwd=ROOT, check=True, capture_output=True, text=True,
         )
         record["environment_verification"] = json.loads(environment.stdout)
-        for theta, subdivisions in case_grid():
+        for theta, subdivisions in selected_grid:
             try:
                 record["cases"].append(measure_case(theta, subdivisions))
             except CaseTimeLimitError as exc:

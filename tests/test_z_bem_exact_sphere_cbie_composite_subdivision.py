@@ -25,6 +25,14 @@ def test_composite_subdivision_grid_fixes_cutoff_order_and_azimuth_counts():
     assert harness.MERIDIAN_ORDER == 256
     assert harness.DIRECT_AZIMUTH_SAMPLES == 4_096
     assert harness.IMAGE_AZIMUTH_SAMPLES == 2_048
+    assert harness.case_grid(14) == ((179.0, 14),)
+    for invalid in (0, -1, 1.5, True, 33):
+        try:
+            harness.case_grid(invalid)
+        except ValueError as exc:
+            assert "integers from 1 through 32" in str(exc)
+        else:
+            raise AssertionError(f"Invalid subdivision count accepted: {invalid!r}")
 
 
 def test_composite_subdivision_case_repeats_and_reconstructs_residual():
