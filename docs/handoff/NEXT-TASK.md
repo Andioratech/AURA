@@ -1,18 +1,18 @@
-# Next Task — Owner Review of the Modal Reference Plan
+# Next Task — Complete the Bounded Modal Reference Check
 
-## Latest completed step — 2026-10-08
+## Latest completed step — 2026-10-09
 
-The DRAFT modal derivation and review plan is in [the modal reference plan](../research/NUM-03-exact-sphere-modal-reference-plan.md). It derives the manufactured trace coefficients, diagonal direct-sphere layer eigenvalues, and separate reflected `K`/`V` formulas by projecting each source mode on the mirrored sphere. A one-off order-80 calculation at 179° matches the recorded image `K`/`V` values within `3.74e-15`/`1.83e-14 Pa`; the direct-layer differences are `7.19e-7`/`7.86e-7 Pa`. Two deterministic formula-check replays are byte-identical. An 80-digit outward-rounded absolute-majorant calculation bounds either image-layer tail after cutoffs 48/64/80 by `0.2127293582`, `4.274317712e-6`, and `7.207744720e-11 Pa`, plus `<2.849e-598 Pa` beyond mode 2000. This is a mathematical upper bound under the unit-source convention, pending independent review; it does not establish evaluator accuracy or physical validity. The reflected layer formulas do not require a separate-center translation matrix or source-ring traversal.
+The owner authorized the bounded, research-only evaluator in the DRAFT plan. The implementation reports the four layer terms separately, retains every modal contribution, reconstructs pressure and inward normal derivative, records cancellation and residual values, and only accepts the frozen orders 48/64/80 and angles 120°/135°/175°/179°. It imports the existing special-function recurrence but no ring quadrature. Only reflected-layer tails use the previously recorded outward-rounded bound; direct-layer tails remain uncertified.
 
-At the 0.1 mm plane gap, the two sphere surfaces are 0.2 mm apart. The raw kernel ratio is `a/R_min=0.9920634921...`, while the weighted image-mode factor is bounded by a geometric envelope below `0.495` after mode 2000. The exploratory one-angle resource screen is complete: median times at N=48/64/80 were 0.0669/0.0708/0.0757 s, with maximum RSS 19,836/19,944/20,080 KiB across three fresh processes per cutoff. It includes Python startup, covers only 179°, and is not a production evaluator guarantee. Next independently review the inequality chain, unit normalization, and proposed evaluator boundary. Keep the exact combined image identity separate from layer-by-layer verification.
+Focused checks pass (12 cases). A separate 100-digit Decimal calculation at 179°/N=80 independently evaluates the special functions and four layer sums. Absolute differences from binary64 are `3.88e-16`, `7.37e-15`, `6.00e-15`, and `3.40e-15 Pa` for direct K, direct V, image K, and image V. The first Decimal attempt had a cosine quadrant-sign error; it is preserved with the corrected local record and is not used as evidence. The 179° comparison with the recorded ring case retains the previously observed direct-layer differences near `7.2e-7` and `7.9e-7 Pa`, while image-layer differences remain below `2e-14 Pa` at N=80.
 
-The owner should review the DRAFT plan before modal code is written. This review is not P2 exit or authorization to start the simulation core.
+The next step is to run the maintained protocol from a clean committed revision, independently replay it, and record all four angles/cutoffs and resource use. This remains numerical cross-verification only; no cutoff is selected and NUM-03 remains ACTIVE/INDETERMINATE.
 
-## Owner review checkpoint
+On 2026-10-09 the owner authorized the bounded research-only modal evaluator described in the DRAFT plan. This is not P2 exit, P4 approval, cutoff acceptance, or authorization to start the simulation core.
 
-The analytical plan, outward-rounded tail estimates, and exploratory resource screen are ready for review in [the modal reference plan](../research/NUM-03-exact-sphere-modal-reference-plan.md). Please review the stated unit-source normalization, the derivation of the absolute image-layer bound, and the proposed boundary for a maintained evaluator. No maintained modal evaluator, matrix, solver or simulation core has started.
+## Authorized bounded work
 
-After the plan is reviewed, the next work is to record the owner's decision, refine any requested assumptions, and only then begin the bounded research-only modal evaluator. Keep direct `K`, direct `V`, image `K`, and image `V` separate. Do not allocate a matrix or begin a solver/core.
+The evaluator is restricted to the frozen exact-sphere case and cutoffs 48/64/80. It reports direct `K`, direct `V`, image `K`, image `V`, the half-pressure jump, modal traces, termwise sums, cancellation indicators and the combined residual. Only the image-layer tails have the recorded analytical upper bound; direct-layer truncation remains finite-cutoff sensitivity. No matrix, solver or simulation core is in scope.
 
 ## Scope and current gate
 

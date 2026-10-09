@@ -1,6 +1,6 @@
 # NUM-03 Exact-Sphere Modal Reference Plan
 
-**Status:** DRAFT — owner review requested before implementation
+**Status:** DRAFT — owner authorized bounded implementation on 2026-10-09; numerical claims remain exploratory
 **Date:** 2026-10-08
 **Scope:** One manufactured, axisymmetric Helmholtz trace on a rigid sphere above a Neumann plane
 **Decision basis:** DEC-007, DEC-008; NUM-03 remains ACTIVE / INDETERMINATE
@@ -212,4 +212,4 @@ Before execution, run the repository's exact resource preflight for the proposed
 5. Current implementation conventions: [`_bem_green.py`](../../src/aura/fields/_bem_green.py), [`benchmark_bem_exact_sphere_combined_cbie.py`](../../tools/research/benchmark_bem_exact_sphere_combined_cbie.py), and exact mode/identity regressions in [`test_z_bem_halfspace_integral_identity.py`](../../tests/test_z_bem_halfspace_integral_identity.py) and [`test_z_bem_singular.py`](../../tests/test_z_bem_singular.py). These are repository evidence and regression controls, not replacements for the primary mathematical sources.
 6. Current finite-sensitivity result: [14/16 subdivision review](../reviews/NUM03-BEM-exact-sphere-cbie-179deg-subdivision-14-16.md).
 
-The DLMF equations support the single-center outgoing expansion, both source-sphere projections, and the absolute-majorant route. The majorants have an outward-rounded local replay. An exploratory one-angle resource screen is recorded above; it is not a production evaluator estimate. The equations, majorant, unit normalization, and proposed evaluator boundary now await independent owner review before a cutoff can be selected or maintained code written.
+The DLMF equations support the single-center outgoing expansion, both source-sphere projections, and the absolute-majorant route. The majorants have an outward-rounded local replay. An exploratory one-angle resource screen is recorded above; it is not a production evaluator estimate. The owner authorized the bounded research-only evaluator on 2026-10-09. This permits implementation and numerical checking only; it does not select a cutoff, accept the candidate tail proof as reviewed, change NUM-03 status, or authorize a solver core.
