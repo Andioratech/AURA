@@ -1,0 +1,39 @@
+# NUM-03 Exact-Sphere Modal Reference Review
+
+**Date:** 2026-10-09 · **Status:** Exploratory numerical cross-check · **Scientific gate:** INDETERMINATE
+
+## Scope
+
+The owner authorized a bounded research-only evaluator on 2026-10-09. The evaluator covers the manufactured 25-mm sphere, 0.1-mm Neumann-plane gap, 25,230-Hz source, 346-m/s sound speed, unit Green strength `Q=1 Pa m`, and collocation angles 120°, 135°, 175° and 179°. It reports separate direct `K`, direct `V`, image `K`, and image `V` layer sums at inclusive modal cutoffs 48, 64 and 80. It forms no BEM matrix and calculates no force, motion or physical response.
+
+The source trace follows the outgoing spherical addition theorem and Legendre parity for the mirror source. The direct sphere eigenvalues use surface area `a² dOmega`; AURA's inward normal reverses the outward-normal double-layer eigenvalue. Reflection maps the physical inward source normal to the image sphere's inward normal. These conventions are consistent with the documented CBIE `0.5 p + K_direct + K_image - V_direct - V_image` and the existing exact-sphere mode checks. The derivation is supported by the NIST [outgoing addition formulas](https://dlmf.nist.gov/10.60), [spherical-harmonic orthogonality and normalization](https://dlmf.nist.gov/14.30), and [spherical-Bessel derivative/Wronskian identities](https://dlmf.nist.gov/10.51) [§10.50](https://dlmf.nist.gov/10.50). The tail majorant uses the [spherical-Bessel power series](https://dlmf.nist.gov/10.53), [finite Hankel formula](https://dlmf.nist.gov/10.49), and [Legendre bound](https://dlmf.nist.gov/18.14).
+
+This is a maintainer derivation check with a separate high-precision arithmetic path, not external peer review. The research plan remains DRAFT; no cutoff or scientific acceptance threshold is selected.
+
+## Verification and comparison
+
+The evaluator uses the repository's bounded spherical-Bessel recurrence and an independent Legendre recurrence. It does not import or call ring quadrature. It retains the per-mode pressure and inward-normal derivative coefficients and all four layer terms, sums real and imaginary parts separately with `math.fsum`, records cancellation indicators, and reconstructs the combined residual.
+
+Twelve focused tests passed. They check the image combined identity at all four angles against the exact reflected monopole, the three nested cutoffs, recorded term coverage, source trace reconstruction, deterministic repeats, and rejection of unsupported angles/orders. Ruff and `git diff --check` passed.
+
+At N=80, the normalized combined residuals were between `2.06e-16` and `1.06e-15`. The modal trace differed from the closed form by at most `1.52e-14 Pa` for pressure and `6.88e-12 Pa/m` for inward normal derivative across the four angles. These small residuals are not accuracy proofs: cancellation can make the combined result small while individual layers differ.
+
+Against the existing order-256, four-subdivision ring calculation at matching 4,096/2,048 direct/image azimuth samples, the N=80 image `K`/`V` layer differences ranged from `5.6e-16` to `1.1e-14 Pa` across the four angles. Direct `K` differences ranged from `1.1e-9` to `6.1e-7 Pa`; direct `V` differences ranged from `1.2e-8` to `5.1e-6 Pa`. At 179°, the separate later 14-subdivision record gives direct differences `7.19e-7` / `7.86e-7 Pa` and image differences below `2e-14 Pa`. This is finite cross-method comparison. The direct discrepancies remain unresolved and are not assigned to either method as error.
+
+A separate 100-digit Decimal implementation computes `j_n` from its power series, computes trigonometric seeds for `y_n` with its own Taylor series, advances the `y_n` recurrence, and accumulates complex pairs without the binary64 evaluator's special-function routine. At 179°/N=80, absolute differences for direct `K`, direct `V`, image `K`, and image `V` were `3.89e-16`, `7.37e-15`, `6.00e-15`, and `3.40e-15 Pa`. The first Decimal attempt omitted the cosine sign change during quadrant reduction; its incorrect values are excluded and the failed attempt is retained in the local diagnostic note.
+
+## Tail and resource limits
+
+The maintained calculator now applies candidate outward-rounded analytic absolute majorants to all four layer tails. For the frozen geometry and `Q=1 Pa m`, the direct `K` bounds beyond N=48/64/80 are `0.5850450561`, `1.336763456e-5`, and `2.560823124e-10 Pa`; direct `V` bounds are `0.2946309247`, `6.706388809e-6`, and `1.282524283e-10 Pa`. Each image-layer bound remains `0.2127293582`, `4.274317712e-6`, and `7.207744720e-11 Pa`. The finite majorants run through mode 2000, with ratio-envelope geometric remainders afterward. A separate derivation and calculator are in `tools/research/modal_tail_bounds.py` and §3.5 of the plan.
+
+These four tail values remain **preliminary candidates pending independent mathematical review**; no cutoff or error tolerance is selected. Outward rounding controls only the arithmetic of the bound calculator. It does not bound binary64 modal evaluation, ring quadrature, or physical-model discrepancy. The direct-layer ring/modal difference remains unexplained; the small candidate modal tail alone does not assign that difference to either method or qualify P4.
+
+The complete 12-case maintained protocol produced byte-identical case payloads on replay (SHA-256 `e853f37029575c5d5dfc67da178cc276ac83bec41fc036865395b89d1e2fd18a`). The primary record SHA-256 is `32615a229a7505ae3db867d4e4f8fe544a8b7dc61ea5001f36f639951363d354`; replay SHA-256 is `a86bb1fef6a286a98b40edf24d59f5a409f4564acc1614b74b8991703903198b`. A separate timed invocation took `0.10 s` wall-clock and reached `25,420 KiB` process RSS, including interpreter/import overhead. The evaluator's declared working-set estimate is 1 MiB against an 8 MiB cap; it is a planning estimate, not a measurement of process RSS or a production guarantee.
+
+Ignored local artifacts are under `results/diagnostics/NUM03-MODAL-REFERENCE-20261009-01/` and `results/diagnostics/NUM03-MODAL-DECIMAL-CROSSCHECK-20261009-01/`. The Decimal record SHA-256 is `76dc978b856b40cbcf18e8565462dad5f7f558625f66ec6f5379ae2c09d0fbf4`; its script SHA-256 is `c3dcdfe331afd3b1b07826d71d77f7236b8e9030702775ff65af745e4e9915d2`. Generated results remain outside Git.
+
+## Disposition and next work
+
+The modal method reproduces the reflected image layers and the exact source trace for this frozen case to the observed precision, with an independent arithmetic cross-check at one angle. It does not resolve the direct-layer discrepancy, certify direct-layer truncation, select a cutoff, validate a physical field, or pass P4. NUM-03 remains ACTIVE/INDETERMINATE.
+
+Next obtain an independent mathematical review of all four candidate tail inequalities and the Decimal recurrence, then preserve the ring comparison and determine whether the observed direct-layer differences are quadrature sensitivity, modal truncation, or another numerical effect. Do not use the small residual or tail estimate as a stopping criterion and do not begin a solver or simulation core.
