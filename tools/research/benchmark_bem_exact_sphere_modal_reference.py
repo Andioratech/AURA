@@ -19,7 +19,6 @@ import sys
 import time
 from pathlib import Path
 
-from aura.fields.numerical import _spherical_sequences
 from tools.research.modal_tail_bounds import compute_modal_tail_bounds
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -65,6 +64,8 @@ def _legendre_values(cosine: float, maximum_order: int) -> tuple[float, ...]:
 
 def _spherical_values(maximum_order: int, argument: float):
     """Build j, y and their derivatives once for one positive real argument."""
+    from aura.fields.numerical import _spherical_sequences
+
     return _spherical_sequences(maximum_order, argument)
 
 
