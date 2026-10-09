@@ -1,5 +1,9 @@
 # NUM-03 — Implement the Selected Air Field Backend
 
+## 2026-10-09 — GitHub test-import correction
+
+Quality run [37938189732](https://github.com/Andioratech/AURA/actions/runs/37938189732) for `e683a69` failed at test collection: the hosted runner could not import the repository's `tools` namespace. Commit `29620e4` adds the repository root to the test module's import path. In the clean hash-locked temporary environment, all 1,859 tests pass in 1,074.44 s; 128 focused CLI/preflight/modal tests, Ruff, ENV-1.0, `pip check`, and required-document checks also pass. Exact remote CI for `29620e4` remains pending.
+
 ## 2026-10-09 — Bounded modal reference evaluated
 
 Commit `52679349f0326cb826c1335b46f660775d7b8316` adds a research-only evaluator for the exact-sphere manufactured trace. Twelve cases cover cutoffs 48/64/80 and angles 120°/135°/175°/179°; a clean replay has the same case payload checksum. At N=80 the normalized combined residuals range `2.06e-16`–`1.06e-15`, while image-layer comparisons with the matching ring record are within `1.1e-14 Pa`. Direct-layer differences reach `5.1e-6 Pa`; their tail remains uncertified. A separate 100-digit Decimal path at 179° agrees with all four layers within `7.4e-15 Pa`. A one-time process measurement was 0.10 s and 25,420 KiB peak RSS including interpreter/import overhead. The static workspace estimate is 1 MiB under an 8 MiB cap, not a measured process-RSS guarantee. See the [formal review](../reviews/NUM03-modal-reference.md); raw records remain ignored under `results/diagnostics/`.
