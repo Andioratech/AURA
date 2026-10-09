@@ -34,21 +34,32 @@ def test_image_layer_combination_matches_exact_reflected_monopole(angle):
     observed = _decode(image_layers["image_double_layer"]) - _decode(
         image_layers["image_single_layer"]
     )
-    tail = float(result["image_layer_tail_upper_pa_each"])
+    tail = float(result["layer_tail_upper_bounds_pa"]["image_double_layer_upper_pa"])
     assert abs(observed + exact_image) <= 2.0 * tail + 2e-12
 
 
-def test_evaluator_records_each_layer_term_and_nested_certified_cutoffs():
+def test_evaluator_records_each_layer_term_and_nested_candidate_tail_bounds():
     coarse, medium, fine = (evaluate_modal(179.0, cutoff) for cutoff in CUTOFFS)
     assert [case["cutoff_inclusive"] for case in (coarse, medium, fine)] == [48, 64, 80]
     assert all(len(case["modal_rows"]) == case["cutoff_inclusive"] + 1 for case in (coarse, medium, fine))
-    assert all(
-        case["direct_layer_tail_status"] == "FINITE_CUTOFF_SENSITIVITY_ONLY; NO CERTIFIED BOUND"
-        for case in (coarse, medium, fine)
+    assert all(case["tail_bound_status"] == "PRELIMINARY_OUTWARD_ROUNDED_CANDIDATE"
+               for case in (coarse, medium, fine))
+    layer_names = (
+        "direct_double_layer_upper_pa",
+        "direct_single_layer_upper_pa",
+        "image_double_layer_upper_pa",
+        "image_single_layer_upper_pa",
     )
-    assert float(fine["image_layer_tail_upper_pa_each"]) < float(
-        medium["image_layer_tail_upper_pa_each"]
-    ) < float(coarse["image_layer_tail_upper_pa_each"])
+    for layer in layer_names:
+        assert float(fine["layer_tail_upper_bounds_pa"][layer]) < float(
+            medium["layer_tail_upper_bounds_pa"][layer]
+        ) < float(coarse["layer_tail_upper_bounds_pa"][layer])
+    assert float(fine["layer_tail_upper_bounds_pa"]["direct_double_layer_upper_pa"]) == pytest.approx(
+        2.560823123768433e-10, rel=2e-15
+    )
+    assert float(fine["layer_tail_upper_bounds_pa"]["direct_single_layer_upper_pa"]) == pytest.approx(
+        1.282524282772518e-10, rel=2e-15
+    )
 
 
 def test_modal_trace_coefficients_reconstruct_closed_form_at_high_cutoff():

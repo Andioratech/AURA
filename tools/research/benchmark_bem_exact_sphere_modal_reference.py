@@ -1,9 +1,9 @@
 """Bounded modal reference for the frozen exact-sphere CBIE case.
 
 This research-only calculation deliberately does not import or call BEM ring
-quadrature. Its three cutoffs reuse the existing outward-rounded image-layer
-tail certificate documented in the NUM-03 modal reference plan. That certificate
-does not cover the direct-layer sums or binary64 evaluation error.
+quadrature. It computes candidate outward-rounded absolute tail majorants for
+all four layers in the frozen NUM-03 case. Their derivation remains preliminary;
+they do not bound binary64 evaluation error or physical-model discrepancy.
 """
 
 from __future__ import annotations
@@ -20,6 +20,7 @@ import time
 from pathlib import Path
 
 from aura.fields.numerical import _spherical_sequences
+from tools.research.modal_tail_bounds import compute_modal_tail_bounds
 
 ROOT = Path(__file__).resolve().parents[2]
 CONTRACT = "NUM03-EXACT-SPHERE-MODAL-REFERENCE-1.0"
@@ -34,11 +35,7 @@ CUTOFFS = (48, 64, 80)
 ANGLES_DEGREES = (120.0, 135.0, 175.0, 179.0)
 WORKSPACE_ESTIMATE_BYTES = 1_048_576
 WORKSPACE_CAP_BYTES = 8_388_608
-TAIL_UPPER_PA = {
-    48: "0.21272935815902531565016809912384618657363648816083184242212063935383269802469029",
-    64: "0.0000042743177115560590651548847751467905071342067626553524839558858657755421211429605",
-    80: "7.2077447199595597185217674229494542416715781328407104433288363705027387757198983E-11",
-}
+TAIL_CERTIFICATE = compute_modal_tail_bounds()
 
 
 def _encode(value: complex) -> dict[str, str]:
@@ -238,8 +235,8 @@ def evaluate_modal(theta_degrees: float, cutoff: int) -> dict:
         "cbie_residual": _encode(residual),
         "cbie_residual_absolute_pa": abs(residual),
         "cbie_residual_normalized_by_pressure": abs(residual) / abs(exact_point),
-        "image_layer_tail_upper_pa_each": TAIL_UPPER_PA[cutoff],
-        "direct_layer_tail_status": "FINITE_CUTOFF_SENSITIVITY_ONLY; NO CERTIFIED BOUND",
+        "layer_tail_upper_bounds_pa": TAIL_CERTIFICATE["cutoffs"][str(cutoff)],
+        "tail_bound_status": TAIL_CERTIFICATE["status"],
         "modal_rows": modal_rows,
     }
 
@@ -296,6 +293,7 @@ def run_protocol() -> dict:
         "status": "EXPLORATORY_NUMERICAL_REFERENCE",
         "source_revision": source_revision,
         "script_sha256": _sha256(Path(__file__).resolve()),
+        "tail_bounds_script_sha256": _sha256(ROOT / "tools/research/modal_tail_bounds.py"),
         "numerical_module_sha256": _sha256(ROOT / "src/aura/fields/numerical.py"),
         "environment_lock": {
             "aggregate_sha256": lock_digest.hexdigest(),
@@ -323,13 +321,7 @@ def run_protocol() -> dict:
             "workspace_estimate_bytes": WORKSPACE_ESTIMATE_BYTES,
             "workspace_cap_bytes": WORKSPACE_CAP_BYTES,
         },
-        "tail_certificate": {
-            "scope": "uniform bound for image K and image V separately, frozen geometry and Q=1 Pa m",
-            "method": "80-digit outward-rounded analytic absolute majorant through mode 2000 plus ratio envelope",
-            "ratio_envelope_upper_n_ge_2000": "0.49431064387361592119814519443240782414870655661183164396561687357918174722014202",
-            "direct_layer_scope": "not covered",
-            "arithmetic_error_scope": "not covered",
-        },
+        "tail_certificate": TAIL_CERTIFICATE,
         "cases": cases,
         "cases_sha256": hashlib.sha256(value_payload).hexdigest(),
         "wall_time_seconds": time.perf_counter() - started,
