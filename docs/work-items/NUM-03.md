@@ -2,7 +2,7 @@
 
 ## 2026-10-09 — GitHub test-import correction
 
-Quality run [37938189732](https://github.com/Andioratech/AURA/actions/runs/37938189732) for `e683a69` failed at test collection: the hosted runner could not import the repository's `tools` namespace. Commit `29620e4` adds the repository root to the test module's import path. In the clean hash-locked temporary environment, all 1,859 tests pass in 1,074.44 s; 128 focused CLI/preflight/modal tests, Ruff, ENV-1.0, `pip check`, and required-document checks also pass. Exact remote CI for `29620e4` remains pending.
+Quality run [37938189732](https://github.com/Andioratech/AURA/actions/runs/37938189732) for `e683a69` failed at test collection: the hosted runner could not import the repository's `tools` namespace. Commit `29620e4` adds the repository root to the test module's import path. In the clean hash-locked temporary environment, all 1,859 tests pass in 1,074.44 s; 128 focused CLI/preflight/modal tests, Ruff, ENV-1.0, `pip check`, and required-document checks also pass. Exact GitHub Quality run [37940716094](https://github.com/Andioratech/AURA/actions/runs/37940716094) passed on `10ca10eaf8b084667ec60426cfe37c9d5353a0e8` in 27m55s.
 
 ## 2026-10-09 — Bounded modal reference evaluated
 
